@@ -7,9 +7,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;0,700;1,300&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
 
 <style>
-/* ── Reset & Base ─────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
@@ -24,109 +24,32 @@
   --muted:     #8a8277;
   --border:    #e0d9d0;
   --text:      #1c2020;
-  --text-light:#5c5650;
-
-  --chart-1: #1c2b3a;
-  --chart-2: #b8873f;
-  --chart-3: #4a7c6a;
-  --chart-4: #c0533a;
-  --chart-5: #7b5ea7;
-  --chart-6: #2d7da8;
-  --chart-7: #c47a2d;
-  --chart-8: #3d7a5c;
-
-  --radius: 8px;
-  --shadow: 0 1px 3px rgba(28,32,32,.06), 0 4px 16px rgba(28,32,32,.06);
+  --radius:    8px;
+  --shadow:    0 1px 3px rgba(28,32,32,.06), 0 4px 16px rgba(28,32,32,.06);
 }
 
 html { font-size: 15px; }
-body {
-  font-family: 'DM Sans', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
-}
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; -webkit-font-smoothing: antialiased; }
 
-/* ── Loading overlay ──────────────────────────────────── */
-#loading {
-  position: fixed; inset: 0;
-  background: var(--bg);
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  gap: 16px; z-index: 999;
-}
-.loading-title {
-  font-family: 'Fraunces', serif;
-  font-size: 2rem; font-weight: 600;
-  color: var(--navy);
-}
-.loading-sub {
-  font-size: .85rem; color: var(--muted);
-  letter-spacing: .08em; text-transform: uppercase;
-}
-.spinner {
-  width: 32px; height: 32px;
-  border: 2.5px solid var(--border);
-  border-top-color: var(--gold);
-  border-radius: 50%;
-  animation: spin .8s linear infinite;
-}
+/* Loading */
+#loading { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; z-index: 999; }
+.loading-title { font-family: 'Fraunces', serif; font-size: 2rem; font-weight: 600; color: var(--navy); }
+.loading-sub { font-size: .85rem; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
+.spinner { width: 32px; height: 32px; border: 2.5px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin .8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ── Page wrapper ─────────────────────────────────────── */
+/* App */
 #app { display: none; max-width: 1180px; margin: 0 auto; padding: 32px 24px 64px; }
 
-/* ── Header ───────────────────────────────────────────── */
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 36px;
-  padding-bottom: 24px;
-  border-bottom: 1.5px solid var(--border);
-  flex-wrap: wrap;
-  gap: 20px;
-}
-.header-brand {}
-.brand-eyebrow {
-  font-size: .7rem;
-  font-weight: 500;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  color: var(--gold);
-  margin-bottom: 4px;
-}
-.brand-title {
-  font-family: 'Fraunces', serif;
-  font-size: 2rem;
-  font-weight: 600;
-  color: var(--navy);
-  line-height: 1.1;
-}
-.brand-sub {
-  font-size: .8rem;
-  color: var(--muted);
-  margin-top: 5px;
-}
-.header-controls {
-  display: flex;
-  align-items: flex-end;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-.ctrl-group {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.ctrl-label {
-  font-size: .68rem;
-  font-weight: 500;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
+/* Header */
+.page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 28px; padding-bottom: 24px; border-bottom: 1.5px solid var(--border); flex-wrap: wrap; gap: 20px; }
+.brand-eyebrow { font-size: .7rem; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); margin-bottom: 4px; }
+.brand-title { font-family: 'Fraunces', serif; font-size: 2rem; font-weight: 600; color: var(--navy); line-height: 1.1; transition: all .3s; }
+.brand-sub { font-size: .8rem; color: var(--muted); margin-top: 5px; }
+.header-controls { display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
+.ctrl-group { display: flex; flex-direction: column; gap: 4px; }
+.ctrl-label { font-size: .68rem; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+
 select {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -143,228 +66,103 @@ select {
   transition: border-color .15s;
 }
 select:focus { outline: none; border-color: var(--navy); }
+#selPipeline { border-color: var(--gold); font-weight: 500; }
 
-.btn-pdf {
-  background: var(--navy);
-  color: #fff;
-  border: none;
-  border-radius: var(--radius);
-  font-family: 'DM Sans', sans-serif;
-  font-size: .8rem;
-  font-weight: 500;
-  letter-spacing: .05em;
-  padding: 8px 18px;
-  cursor: pointer;
-  transition: background .15s, transform .1s;
-  align-self: flex-end;
-}
+.btn-pdf { background: var(--navy); color: #fff; border: none; border-radius: var(--radius); font-family: 'DM Sans', sans-serif; font-size: .8rem; font-weight: 500; letter-spacing: .05em; padding: 8px 18px; cursor: pointer; transition: background .15s, transform .1s; align-self: flex-end; }
 .btn-pdf:hover { background: var(--navy-light); transform: translateY(-1px); }
-.btn-pdf:active { transform: translateY(0); }
 
-/* ── KPI cards ────────────────────────────────────────── */
-.kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 12px;
-  margin-bottom: 28px;
-}
-.kpi-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 20px 18px 16px;
-  box-shadow: var(--shadow);
-  position: relative;
-  overflow: hidden;
-}
-.kpi-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-  background: var(--gold);
-  opacity: 0;
-  transition: opacity .3s;
-}
+/* Funnel section */
+.funnel-section { margin-bottom: 28px; }
+.funnel-label { font-size: .68rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.funnel-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.funnel-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.funnel-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px 14px; box-shadow: var(--shadow); position: relative; overflow: hidden; }
+.funnel-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+.funnel-card.fc-criados::before { background: var(--navy); }
+.funnel-card.fc-finalizados::before { background: var(--gold); }
+.funnel-card.fc-ganhos::before { background: var(--sage); }
+.funnel-card-label { font-size: .68rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+.funnel-card-value { font-family: 'Fraunces', serif; font-size: 2.2rem; font-weight: 600; line-height: 1; }
+.funnel-card.fc-criados .funnel-card-value { color: var(--navy); }
+.funnel-card.fc-finalizados .funnel-card-value { color: var(--gold); }
+.funnel-card.fc-ganhos .funnel-card-value { color: var(--sage); }
+.funnel-card-sub { font-size: .75rem; color: var(--muted); margin-top: 6px; }
+.funnel-pct { display: inline-block; font-size: .7rem; font-weight: 600; padding: 2px 7px; border-radius: 20px; margin-left: 6px; }
+.funnel-card.fc-finalizados .funnel-pct { background: #fef3e2; color: var(--gold); }
+.funnel-card.fc-ganhos .funnel-pct { background: #e8f5f0; color: var(--sage); }
+
+/* KPI grid */
+.section-divider { font-size: .68rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; margin-top: 4px; display: flex; align-items: center; gap: 8px; }
+.section-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.kpi-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 28px; }
+.kpi-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 18px 16px; box-shadow: var(--shadow); position: relative; overflow: hidden; }
+.kpi-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--gold); opacity: 0; transition: opacity .3s; }
 .kpi-card:hover::before { opacity: 1; }
-.kpi-label {
-  font-size: .68rem;
-  font-weight: 500;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 10px;
-}
-.kpi-value {
-  font-family: 'Fraunces', serif;
-  font-size: 1.75rem;
-  font-weight: 600;
-  color: var(--navy);
-  line-height: 1;
-}
-.kpi-unit {
-  font-size: .75rem;
-  color: var(--muted);
-  margin-top: 5px;
-}
+.kpi-label { font-size: .68rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+.kpi-value { font-family: 'Fraunces', serif; font-size: 1.75rem; font-weight: 600; color: var(--navy); line-height: 1; }
+.kpi-unit { font-size: .75rem; color: var(--muted); margin-top: 5px; }
 
-/* ── Chart section ────────────────────────────────────── */
-.section-title {
-  font-family: 'Fraunces', serif;
-  font-size: 1.05rem;
-  font-weight: 600;
-  color: var(--navy);
-  margin-bottom: 14px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--border);
-  letter-spacing: -.01em;
-}
-.charts-row {
-  display: grid;
-  gap: 16px;
-  margin-bottom: 20px;
-}
+/* Charts */
+.section-title { font-family: 'Fraunces', serif; font-size: 1.05rem; font-weight: 600; color: var(--navy); margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+.charts-row { display: grid; gap: 16px; margin-bottom: 20px; }
 .charts-row.cols-2 { grid-template-columns: 1fr 1fr; }
-.charts-row.cols-3 { grid-template-columns: 2fr 1fr 1fr; }
-
-.chart-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 22px 22px 18px;
-  box-shadow: var(--shadow);
-}
-.chart-card-title {
-  font-size: .72rem;
-  font-weight: 600;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 16px;
-}
-.chart-canvas-wrap {
-  position: relative;
-  height: 220px;
-}
+.chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 22px 18px; box-shadow: var(--shadow); }
+.chart-card-title { font-size: .72rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; }
+.chart-canvas-wrap { position: relative; height: 220px; }
 .chart-canvas-wrap.tall { height: 260px; }
 
-/* ── Data table ───────────────────────────────────────── */
-.table-wrap {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  overflow: hidden;
-  margin-top: 8px;
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: .82rem;
-}
+/* Product grid */
+.product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+
+/* Table */
+.table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; margin-top: 8px; }
+table { width: 100%; border-collapse: collapse; font-size: .82rem; }
 thead { background: var(--navy); }
-thead th {
-  color: rgba(255,255,255,.75);
-  font-size: .66rem;
-  font-weight: 500;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  padding: 12px 16px;
-  text-align: left;
-}
+thead th { color: rgba(255,255,255,.75); font-size: .66rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; padding: 12px 16px; text-align: left; }
 thead th:not(:first-child) { text-align: right; }
 tbody tr { border-bottom: 1px solid var(--border); transition: background .12s; }
 tbody tr:last-child { border-bottom: none; }
 tbody tr:hover { background: var(--bg); }
-tbody td {
-  padding: 11px 16px;
-  color: var(--text);
-  vertical-align: middle;
-}
+tbody td { padding: 11px 16px; color: var(--text); vertical-align: middle; }
 tbody td:not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }
 .td-month { font-weight: 500; color: var(--navy); }
 .td-zero { color: var(--muted); }
-tfoot td {
-  padding: 11px 16px;
-  font-weight: 600;
-  color: var(--navy);
-  background: var(--gold-pale);
-  font-size: .83rem;
-  border-top: 1.5px solid var(--border);
-}
+tfoot td { padding: 11px 16px; font-weight: 600; color: var(--navy); background: var(--gold-pale); font-size: .83rem; border-top: 1.5px solid var(--border); }
 tfoot td:not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }
 
-/* ── Product breakdown ────────────────────────────────── */
-.product-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-bottom: 20px;
-}
+/* Footer */
+.page-footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.footer-copy { font-size: .72rem; color: var(--muted); }
+.footer-update { font-size: .72rem; color: var(--muted); }
 
-/* ── Footer ───────────────────────────────────────────── */
-.page-footer {
-  margin-top: 40px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.footer-copy {
-  font-size: .72rem;
-  color: var(--muted);
-  letter-spacing: .04em;
-}
-.footer-update {
-  font-size: .72rem;
-  color: var(--muted);
-}
+/* Error */
+.error-banner { background: #fef2f2; border: 1px solid #fecaca; border-radius: var(--radius); color: #991b1b; padding: 14px 18px; font-size: .85rem; margin-bottom: 20px; display: none; }
 
-/* ── Error banner ─────────────────────────────────────── */
-.error-banner {
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: var(--radius);
-  color: #991b1b;
-  padding: 14px 18px;
-  font-size: .85rem;
-  margin-bottom: 20px;
-  display: none;
-}
-
-/* ── Print ────────────────────────────────────────────── */
+/* Print */
 @media print {
   body { background: #fff !important; }
   #app { padding: 16px 20px 32px; max-width: 100%; display: block !important; }
   .btn-pdf, .header-controls select { display: none !important; }
-  .chart-card, .table-wrap, .kpi-card { box-shadow: none !important; break-inside: avoid; }
-  .charts-row { break-inside: avoid; }
+  .chart-card, .table-wrap, .kpi-card, .funnel-card { box-shadow: none !important; break-inside: avoid; }
   .kpi-grid { grid-template-columns: repeat(5, 1fr) !important; }
+  .funnel-cards { grid-template-columns: repeat(3, 1fr) !important; }
   @page { margin: 20mm; size: A4 landscape; }
 }
 
-/* ── Responsive ───────────────────────────────────────── */
 @media (max-width: 900px) {
-  .kpi-grid { grid-template-columns: repeat(3, 1fr); }
-  .charts-row.cols-2, .charts-row.cols-3, .product-grid { grid-template-columns: 1fr; }
-}
-@media (max-width: 600px) {
-  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
-  .page-header { flex-direction: column; }
+  .kpi-grid, .funnel-cards { grid-template-columns: repeat(3, 1fr); }
+  .charts-row.cols-2, .product-grid { grid-template-columns: 1fr; }
 }
 </style>
 </head>
 <body>
 
-<!-- Loading -->
 <div id="loading">
   <div class="loading-title">Board Academy</div>
   <div class="loading-sub">Carregando relatório de licenciados</div>
   <div class="spinner"></div>
 </div>
 
-<!-- App -->
 <div id="app">
   <div class="error-banner" id="errorBanner"></div>
 
@@ -372,10 +170,14 @@ tfoot td:not(:first-child) { text-align: right; font-variant-numeric: tabular-nu
   <div class="page-header">
     <div class="header-brand">
       <div class="brand-eyebrow">Board Academy</div>
-      <div class="brand-title">Relatório — Licenciados</div>
-      <div class="brand-sub" id="headerSub">Carregando período...</div>
+      <div class="brand-title" id="brandTitle">Relatório — Licenciados</div>
+      <div class="brand-sub" id="headerSub">Carregando...</div>
     </div>
     <div class="header-controls">
+      <div class="ctrl-group">
+        <span class="ctrl-label">Funil</span>
+        <select id="selPipeline"></select>
+      </div>
       <div class="ctrl-group">
         <span class="ctrl-label">De</span>
         <select id="selFrom"></select>
@@ -388,17 +190,35 @@ tfoot td:not(:first-child) { text-align: right; font-variant-numeric: tabular-nu
     </div>
   </div>
 
-  <!-- KPIs -->
-  <div class="kpi-grid">
-    <div class="kpi-card">
-      <div class="kpi-label">Leads Criados</div>
-      <div class="kpi-value" id="kLeads">—</div>
-      <div class="kpi-unit">no período</div>
+  <!-- Funil Section -->
+  <div class="funnel-section">
+    <div class="funnel-label">Funil de Negócios — por data de criação</div>
+    <div class="funnel-cards">
+      <div class="funnel-card fc-criados">
+        <div class="funnel-card-label">Criados</div>
+        <div class="funnel-card-value" id="fCriados">—</div>
+        <div class="funnel-card-sub">deals abertos no período</div>
+      </div>
+      <div class="funnel-card fc-finalizados">
+        <div class="funnel-card-label">Finalizados</div>
+        <div class="funnel-card-value" id="fFinalizados">—</div>
+        <div class="funnel-card-sub">ganhos + perdidos <span class="funnel-pct" id="fFinPct"></span></div>
+      </div>
+      <div class="funnel-card fc-ganhos">
+        <div class="funnel-card-label">Ganhos</div>
+        <div class="funnel-card-value" id="fGanhos">—</div>
+        <div class="funnel-card-sub">status = won <span class="funnel-pct" id="fGanPct"></span></div>
+      </div>
     </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="section-divider">Métricas de Receita — por data de ganho</div>
+  <div class="kpi-grid">
     <div class="kpi-card">
       <div class="kpi-label">Negócios Ganhos</div>
       <div class="kpi-value" id="kWon">—</div>
-      <div class="kpi-unit">fechamentos</div>
+      <div class="kpi-unit">no período</div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">Receita Total</div>
@@ -413,25 +233,28 @@ tfoot td:not(:first-child) { text-align: right; font-variant-numeric: tabular-nu
     <div class="kpi-card">
       <div class="kpi-label">Conversão</div>
       <div class="kpi-value" id="kConversion">—</div>
-      <div class="kpi-unit">leads → ganhos</div>
+      <div class="kpi-unit">criados → ganhos</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Finalizados</div>
+      <div class="kpi-value" id="kFinalizados">—</div>
+      <div class="kpi-unit">won + lost</div>
     </div>
   </div>
 
-  <!-- Charts row 1: Leads e Ganhos por mês -->
-  <div class="section-title">Evolução Mensal</div>
-  <div class="charts-row cols-2" style="margin-bottom: 20px;">
+  <!-- Evolução mensal -->
+  <div class="section-title" id="secTitleEvolucao">Evolução Mensal</div>
+  <div class="charts-row cols-2" style="margin-bottom:20px">
     <div class="chart-card">
-      <div class="chart-card-title">Leads Criados por Mês</div>
+      <div class="chart-card-title">Criados por Mês</div>
       <div class="chart-canvas-wrap"><canvas id="cLeads"></canvas></div>
     </div>
     <div class="chart-card">
-      <div class="chart-card-title">Volume de Ganhos por Mês</div>
+      <div class="chart-card-title">Ganhos por Mês (volume)</div>
       <div class="chart-canvas-wrap"><canvas id="cWon"></canvas></div>
     </div>
   </div>
-
-  <!-- Chart row 2: Receita e Ticket -->
-  <div class="charts-row cols-2" style="margin-bottom: 28px;">
+  <div class="charts-row cols-2" style="margin-bottom:28px">
     <div class="chart-card">
       <div class="chart-card-title">Receita por Mês (R$)</div>
       <div class="chart-canvas-wrap"><canvas id="cRevenue"></canvas></div>
@@ -442,9 +265,9 @@ tfoot td:not(:first-child) { text-align: right; font-variant-numeric: tabular-nu
     </div>
   </div>
 
-  <!-- Product breakdown -->
-  <div class="section-title">Quebra por Produto</div>
-  <div class="product-grid" style="margin-bottom: 28px;">
+  <!-- Produtos -->
+  <div class="section-title" id="secTitleProdutos">Quebra por Produto</div>
+  <div class="product-grid" style="margin-bottom:28px">
     <div class="chart-card">
       <div class="chart-card-title">Volume por Produto (ganhos)</div>
       <div class="chart-canvas-wrap tall"><canvas id="cProdVol"></canvas></div>
@@ -455,15 +278,17 @@ tfoot td:not(:first-child) { text-align: right; font-variant-numeric: tabular-nu
     </div>
   </div>
 
-  <!-- Monthly table -->
+  <!-- Tabela -->
   <div class="section-title">Detalhe por Mês</div>
   <div class="table-wrap">
     <table>
       <thead>
         <tr>
           <th>Mês</th>
-          <th>Leads</th>
-          <th>Ganhos</th>
+          <th>Criados</th>
+          <th>Finalizados</th>
+          <th>Ganhos (cri.)</th>
+          <th>Ganhos (rec.)</th>
           <th>Receita</th>
           <th>Ticket Médio</th>
           <th>Conversão</th>
@@ -474,7 +299,6 @@ tfoot td:not(:first-child) { text-align: right; font-variant-numeric: tabular-nu
     </table>
   </div>
 
-  <!-- Footer -->
   <div class="page-footer">
     <div class="footer-copy">Board Academy · Relatório de Licenciados</div>
     <div class="footer-update" id="footerUpdate"></div>
@@ -482,9 +306,11 @@ tfoot td:not(:first-child) { text-align: right; font-variant-numeric: tabular-nu
 </div>
 
 <script>
-// ── Formatters ─────────────────────────────────────────────
+Chart.register(ChartDataLabels);
+
+// ── Formatters ──────────────────────────────────────────────
 const brl  = v => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 0, maximumFractionDigits: 0 });
-const brlK = v => v >= 1000 ? 'R$ ' + (v / 1000).toFixed(0) + 'k' : 'R$ ' + v.toFixed(0);
+const brlK = v => v >= 1000 ? 'R$' + (v / 1000).toFixed(0) + 'k' : 'R$' + v.toFixed(0);
 const pct  = v => v.toFixed(1) + '%';
 const labelMes = ym => {
   const [y, m] = ym.split('-');
@@ -492,39 +318,66 @@ const labelMes = ym => {
   return months[parseInt(m) - 1] + '/' + y.slice(2);
 };
 
-// ── State ──────────────────────────────────────────────────
-let ALL_DATA   = [];
-let charts     = {};
-const PALETTE  = ['#1c2b3a','#b8873f','#4a7c6a','#c0533a','#7b5ea7','#2d7da8','#c47a2d','#3d7a5c'];
+// ── State ───────────────────────────────────────────────────
+let API_RESPONSE = null;
+let charts       = {};
+const PALETTE    = ['#1c2b3a','#b8873f','#4a7c6a','#c0533a','#7b5ea7','#2d7da8','#c47a2d','#3d7a5c'];
 
-// ── Chart factory ──────────────────────────────────────────
-const GRID_COLOR   = 'rgba(28,32,32,.06)';
-const TICK_COLOR   = '#8a8277';
-const baseScaleX   = () => ({ grid: { display: false }, ticks: { color: TICK_COLOR, font: { size: 10 } }, border: { color: 'transparent' } });
-const baseScaleY   = () => ({ grid: { color: GRID_COLOR }, ticks: { color: TICK_COLOR, font: { size: 10 } }, border: { color: 'transparent' } });
+// ── Chart helpers ───────────────────────────────────────────
+const GC = 'rgba(28,32,32,.06)';
+const TC = '#8a8277';
 
-function makeBar(id, labels, datasets, yCallback) {
+const datalabelsBar = (fmt) => ({
+  display: ctx => ctx.dataset.data[ctx.dataIndex] > 0,
+  formatter: fmt,
+  color: '#1c2b3a',
+  font: { family: 'DM Sans', size: 10, weight: '600' },
+  anchor: 'end', align: 'end', offset: 2,
+  clamp: true,
+});
+
+const datalabelsLine = (fmt) => ({
+  display: ctx => {
+    const d = ctx.dataset.data, i = ctx.dataIndex, v = d[i];
+    if (!v) return false;
+    return v >= (d[i - 1] || 0) && v >= (d[i + 1] || 0);
+  },
+  formatter: fmt,
+  color: ctx => ctx.dataset.borderColor,
+  font: { family: 'DM Sans', size: 10, weight: '600' },
+  anchor: 'end', align: 'top', offset: 4,
+});
+
+function makeBar(id, labels, data, color, fmt) {
   if (charts[id]) charts[id].destroy();
   charts[id] = new Chart(document.getElementById(id), {
     type: 'bar',
-    data: { labels, datasets },
+    data: {
+      labels,
+      datasets: [{ data, backgroundColor: color + 'cc', borderColor: color, borderWidth: 1.5, borderRadius: 5, borderSkipped: false }]
+    },
     options: {
       responsive: true, maintainAspectRatio: false,
       animation: { duration: 600, easing: 'easeOutQuart' },
-      plugins: { legend: { display: datasets.length > 1, position: 'bottom', labels: { color: TICK_COLOR, font: { size: 10 }, boxWidth: 10, padding: 12 } }, tooltip: { callbacks: { label: ctx => yCallback ? yCallback(ctx.parsed.y) : ctx.parsed.y } } },
+      layout: { padding: { top: 24 } },
+      plugins: {
+        legend: { display: false },
+        datalabels: datalabelsBar(fmt),
+        tooltip: { callbacks: { label: ctx => fmt(ctx.parsed.y) } }
+      },
       scales: {
-        x: baseScaleX(),
-        y: { ...baseScaleY(), ticks: { ...baseScaleY().ticks, callback: yCallback || (v => v) } }
+        x: { grid: { display: false }, ticks: { color: TC, font: { size: 10 } }, border: { color: 'transparent' } },
+        y: { grid: { color: GC }, ticks: { color: TC, font: { size: 10 }, callback: fmt }, border: { color: 'transparent' } }
       }
     }
   });
 }
 
-function makeLine(id, labels, data, color, yCallback) {
+function makeLine(id, labels, data, color, fmt) {
   if (charts[id]) charts[id].destroy();
-  const ctx = document.getElementById(id).getContext('2d');
+  const ctx  = document.getElementById(id).getContext('2d');
   const grad = ctx.createLinearGradient(0, 0, 0, 220);
-  grad.addColorStop(0, color + '30');
+  grad.addColorStop(0, color + '28');
   grad.addColorStop(1, color + '00');
   charts[id] = new Chart(ctx, {
     type: 'line',
@@ -532,33 +385,45 @@ function makeLine(id, labels, data, color, yCallback) {
     options: {
       responsive: true, maintainAspectRatio: false,
       animation: { duration: 600 },
-      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => yCallback ? yCallback(ctx.parsed.y) : ctx.parsed.y } } },
+      layout: { padding: { top: 24 } },
+      plugins: {
+        legend: { display: false },
+        datalabels: datalabelsLine(fmt),
+        tooltip: { callbacks: { label: ctx => fmt(ctx.parsed.y) } }
+      },
       scales: {
-        x: baseScaleX(),
-        y: { ...baseScaleY(), ticks: { ...baseScaleY().ticks, callback: yCallback || (v => v) } }
+        x: { grid: { display: false }, ticks: { color: TC, font: { size: 10 } }, border: { color: 'transparent' } },
+        y: { grid: { color: GC }, ticks: { color: TC, font: { size: 10 }, callback: fmt }, border: { color: 'transparent' } }
       }
     }
   });
 }
 
-function makeDoughnut(id, labels, data, colors) {
+function makeDoughnut(id, labels, data, colors, fmtTooltip) {
   if (charts[id]) charts[id].destroy();
+  const total = data.reduce((a, b) => a + b, 0);
   charts[id] = new Chart(document.getElementById(id), {
     type: 'doughnut',
     data: { labels, datasets: [{ data, backgroundColor: colors, borderColor: '#fff', borderWidth: 2, hoverOffset: 6 }] },
     options: {
       responsive: true, maintainAspectRatio: false,
       animation: { duration: 600 },
-      cutout: '55%',
+      cutout: '52%',
       plugins: {
-        legend: { position: 'right', labels: { color: TICK_COLOR, font: { size: 10 }, padding: 10, boxWidth: 10 } },
-        tooltip: { callbacks: { label: ctx => `${ctx.label}: ${ctx.parsed}` } }
+        legend: { position: 'right', labels: { color: TC, font: { size: 10 }, padding: 10, boxWidth: 10 } },
+        datalabels: {
+          display: ctx => ctx.dataset.data[ctx.dataIndex] > 0,
+          formatter: (v) => total > 0 ? ((v / total) * 100).toFixed(0) + '%' : '',
+          color: '#fff',
+          font: { family: 'DM Sans', size: 10, weight: '600' },
+        },
+        tooltip: { callbacks: { label: ctx => `${ctx.label}: ${fmtTooltip(ctx.parsed)}` } }
       }
     }
   });
 }
 
-function makeHorizontalBar(id, labels, data, colors) {
+function makeHorizontalBar(id, labels, data, colors, fmt) {
   if (charts[id]) charts[id].destroy();
   charts[id] = new Chart(document.getElementById(id), {
     type: 'bar',
@@ -567,60 +432,86 @@ function makeHorizontalBar(id, labels, data, colors) {
       responsive: true, maintainAspectRatio: false,
       indexAxis: 'y',
       animation: { duration: 600 },
+      layout: { padding: { right: 50 } },
       plugins: {
         legend: { display: false },
-        tooltip: { callbacks: { label: ctx => brl(ctx.parsed.x) } }
+        datalabels: {
+          display: ctx => ctx.dataset.data[ctx.dataIndex] > 0,
+          formatter: fmt,
+          color: '#1c2b3a',
+          font: { family: 'DM Sans', size: 10, weight: '600' },
+          anchor: 'end', align: 'right', offset: 4,
+        },
+        tooltip: { callbacks: { label: ctx => fmt(ctx.parsed.x) } }
       },
       scales: {
-        x: { ...baseScaleY(), ticks: { ...baseScaleY().ticks, callback: v => brlK(v) } },
-        y: { grid: { display: false }, ticks: { color: TICK_COLOR, font: { size: 10 } }, border: { color: 'transparent' } }
+        x: { grid: { color: GC }, ticks: { color: TC, font: { size: 10 }, callback: fmt }, border: { color: 'transparent' } },
+        y: { grid: { display: false }, ticks: { color: TC, font: { size: 10 } }, border: { color: 'transparent' } }
       }
     }
   });
 }
 
-// ── Render ─────────────────────────────────────────────────
-function render(data) {
+// ── Render ──────────────────────────────────────────────────
+function render(data, pipelineName) {
+  const isAll = !pipelineName || pipelineName === 'Todos os Funis';
+
+  // Atualiza título
+  document.getElementById('brandTitle').textContent =
+    isAll ? 'Relatório — Licenciados' : `Relatório — ${pipelineName}`;
+  document.getElementById('secTitleEvolucao').textContent =
+    isAll ? 'Evolução Mensal' : `Evolução Mensal · ${pipelineName}`;
+  document.getElementById('secTitleProdutos').textContent =
+    isAll ? 'Quebra por Produto' : `Quebra por Produto · ${pipelineName}`;
+
   if (!data.length) {
-    document.getElementById('kLeads').textContent      = '0';
-    document.getElementById('kWon').textContent        = '0';
-    document.getElementById('kRevenue').textContent    = 'R$ 0';
-    document.getElementById('kTicket').textContent     = '—';
-    document.getElementById('kConversion').textContent = '—';
+    ['fCriados','fFinalizados','fGanhos','kWon','kRevenue','kTicket','kConversion','kFinalizados']
+      .forEach(id => document.getElementById(id).textContent = '0');
     return;
   }
 
   const labels   = data.map(d => labelMes(d.month));
-  const leads    = data.map(d => d.leads);
+  const criados  = data.map(d => d.criados);
+  const finalizados = data.map(d => d.finalizados);
+  const ganhos   = data.map(d => d.ganhos);
   const won      = data.map(d => d.won);
   const revenue  = data.map(d => d.revenue);
   const tickets  = data.map(d => d.avgTicket);
 
-  const totLeads   = leads.reduce((a, b) => a + b, 0);
-  const totWon     = won.reduce((a, b) => a + b, 0);
-  const totRevenue = revenue.reduce((a, b) => a + b, 0);
-  const avgTicket  = totWon > 0 ? totRevenue / totWon : 0;
-  const convPct    = totLeads > 0 ? (totWon / totLeads) * 100 : 0;
+  const totCriados    = criados.reduce((a,b) => a+b, 0);
+  const totFinalizados= finalizados.reduce((a,b) => a+b, 0);
+  const totGanhos     = ganhos.reduce((a,b) => a+b, 0);
+  const totWon        = won.reduce((a,b) => a+b, 0);
+  const totRevenue    = revenue.reduce((a,b) => a+b, 0);
+  const avgTicket     = totWon > 0 ? totRevenue / totWon : 0;
+  const convPct       = totCriados > 0 ? (totWon / totCriados) * 100 : 0;
 
-  // KPIs
-  document.getElementById('kLeads').textContent      = totLeads.toLocaleString('pt-BR');
-  document.getElementById('kWon').textContent        = totWon.toLocaleString('pt-BR');
-  document.getElementById('kRevenue').textContent    = brlK(totRevenue);
-  document.getElementById('kTicket').textContent     = avgTicket > 0 ? brlK(avgTicket) : '—';
-  document.getElementById('kConversion').textContent = pct(convPct);
+  // Funil
+  document.getElementById('fCriados').textContent    = totCriados.toLocaleString('pt-BR');
+  document.getElementById('fFinalizados').textContent= totFinalizados.toLocaleString('pt-BR');
+  document.getElementById('fGanhos').textContent     = totGanhos.toLocaleString('pt-BR');
+  document.getElementById('fFinPct').textContent     = totCriados > 0 ? pct(totFinalizados/totCriados*100) + ' dos criados' : '';
+  document.getElementById('fGanPct').textContent     = totCriados > 0 ? pct(totGanhos/totCriados*100) + ' dos criados' : '';
 
-  // Header subtitle
+  // KPIs receita
+  document.getElementById('kWon').textContent         = totWon.toLocaleString('pt-BR');
+  document.getElementById('kRevenue').textContent     = brlK(totRevenue);
+  document.getElementById('kTicket').textContent      = avgTicket > 0 ? brlK(avgTicket) : '—';
+  document.getElementById('kConversion').textContent  = pct(convPct);
+  document.getElementById('kFinalizados').textContent = totFinalizados.toLocaleString('pt-BR');
+
+  // Header sub
   const first = labelMes(data[0].month);
   const last  = labelMes(data[data.length - 1].month);
   document.getElementById('headerSub').textContent = first === last ? first : `${first} a ${last}`;
 
   // Charts
-  makeLine('cLeads',   labels, leads,   PALETTE[0], v => v);
-  makeLine('cWon',     labels, won,     PALETTE[1], v => v);
-  makeLine('cRevenue', labels, revenue, PALETTE[2], v => brlK(v));
-  makeLine('cTicket',  labels, tickets, PALETTE[3], v => brlK(v));
+  makeBar ('cLeads',   labels, criados,  PALETTE[0], v => v);
+  makeBar ('cWon',     labels, won,      PALETTE[1], v => v);
+  makeLine('cRevenue', labels, revenue,  PALETTE[2], v => brlK(v));
+  makeLine('cTicket',  labels, tickets,  PALETTE[3], v => brlK(v));
 
-  // Product breakdown
+  // Produtos
   const productMap = {};
   for (const d of data) {
     for (const [prod, vals] of Object.entries(d.products)) {
@@ -629,28 +520,30 @@ function render(data) {
       productMap[prod].revenue += vals.revenue;
     }
   }
-  const prodEntries = Object.entries(productMap).sort((a, b) => b[1].revenue - a[1].revenue);
+  const prodEntries = Object.entries(productMap).sort((a,b) => b[1].revenue - a[1].revenue);
   const prodLabels  = prodEntries.map(([k]) => k);
-  const prodCounts  = prodEntries.map(([, v]) => v.count);
-  const prodRevs    = prodEntries.map(([, v]) => v.revenue);
-  const prodColors  = prodLabels.map((_, i) => PALETTE[i % PALETTE.length]);
+  const prodCounts  = prodEntries.map(([,v]) => v.count);
+  const prodRevs    = prodEntries.map(([,v]) => v.revenue);
+  const prodColors  = prodLabels.map((_,i) => PALETTE[i % PALETTE.length]);
 
-  makeDoughnut('cProdVol', prodLabels, prodCounts, prodColors);
-  makeHorizontalBar('cProdRev', prodLabels, prodRevs, prodColors);
+  makeDoughnut('cProdVol', prodLabels, prodCounts, prodColors, v => v + ' ganhos');
+  makeHorizontalBar('cProdRev', prodLabels, prodRevs, prodColors, v => brlK(v));
 
-  // Table
+  // Tabela
   const tbody = document.getElementById('tableBody');
   tbody.innerHTML = '';
   data.forEach(d => {
     const tr = document.createElement('tr');
-    const zero = v => v === 0 ? '<span class="td-zero">—</span>' : v;
+    const z  = v => v === 0 ? '<span class="td-zero">—</span>' : v.toLocaleString('pt-BR');
     tr.innerHTML = `
       <td class="td-month">${labelMes(d.month)}</td>
-      <td>${zero(d.leads)}</td>
-      <td>${zero(d.won)}</td>
+      <td>${z(d.criados)}</td>
+      <td>${z(d.finalizados)}</td>
+      <td>${z(d.ganhos)}</td>
+      <td>${z(d.won)}</td>
       <td>${d.revenue > 0 ? brl(d.revenue) : '<span class="td-zero">—</span>'}</td>
       <td>${d.avgTicket > 0 ? brl(d.avgTicket) : '<span class="td-zero">—</span>'}</td>
-      <td>${d.leads > 0 ? pct(d.conversion) : '<span class="td-zero">—</span>'}</td>
+      <td>${d.criados > 0 ? pct(d.conversion) : '<span class="td-zero">—</span>'}</td>
     `;
     tbody.appendChild(tr);
   });
@@ -659,7 +552,9 @@ function render(data) {
   tfoot.innerHTML = `
     <tr>
       <td>Total / Média</td>
-      <td>${totLeads.toLocaleString('pt-BR')}</td>
+      <td>${totCriados.toLocaleString('pt-BR')}</td>
+      <td>${totFinalizados.toLocaleString('pt-BR')}</td>
+      <td>${totGanhos.toLocaleString('pt-BR')}</td>
       <td>${totWon.toLocaleString('pt-BR')}</td>
       <td>${brl(totRevenue)}</td>
       <td>${avgTicket > 0 ? brl(avgTicket) : '—'}</td>
@@ -667,63 +562,77 @@ function render(data) {
     </tr>
   `;
 
-  // Footer timestamp
   document.getElementById('footerUpdate').textContent =
     'Atualizado em ' + new Date().toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
 }
 
-// ── Period selectors ───────────────────────────────────────
-function buildSelectors(data) {
-  const months = data.map(d => d.month);
-  const from   = document.getElementById('selFrom');
-  const to     = document.getElementById('selTo');
+// ── Selectors ───────────────────────────────────────────────
+function applyFilters() {
+  const pipeId   = document.getElementById('selPipeline').value;
+  const pipeName = document.getElementById('selPipeline').selectedOptions[0]?.text;
+  const from     = document.getElementById('selFrom').value;
+  const to       = document.getElementById('selTo').value;
 
-  months.forEach(m => {
-    const o1 = document.createElement('option');
-    o1.value = m; o1.textContent = labelMes(m);
-    from.appendChild(o1);
-    const o2 = document.createElement('option');
-    o2.value = m; o2.textContent = labelMes(m);
-    to.appendChild(o2);
-  });
-
-  from.value = months[0];
-  to.value   = months[months.length - 1];
-
-  const applyFilter = () => {
-    const f = from.value, t = to.value;
-    if (f > t) { to.value = f; }
-    render(ALL_DATA.filter(d => d.month >= from.value && d.month <= to.value));
-  };
-  from.addEventListener('change', applyFilter);
-  to.addEventListener('change', applyFilter);
+  const source = API_RESPONSE.byPipeline[pipeId] || [];
+  const filtered = source.filter(d => d.month >= from && d.month <= to);
+  render(filtered, pipeId === 'all' ? null : pipeName);
 }
 
-// ── Export PDF ─────────────────────────────────────────────
+function buildSelectors(pipelines, allMonths) {
+  // Pipeline selector
+  const selPipe = document.getElementById('selPipeline');
+  const optAll  = document.createElement('option');
+  optAll.value = 'all'; optAll.textContent = 'Todos os Funis';
+  selPipe.appendChild(optAll);
+  pipelines.forEach(p => {
+    const o = document.createElement('option');
+    o.value = p.id; o.textContent = p.name;
+    selPipe.appendChild(o);
+  });
+
+  // Period selectors from all months
+  const selFrom = document.getElementById('selFrom');
+  const selTo   = document.getElementById('selTo');
+  allMonths.forEach(m => {
+    const o1 = new Option(labelMes(m), m);
+    const o2 = new Option(labelMes(m), m);
+    selFrom.appendChild(o1);
+    selTo.appendChild(o2);
+  });
+  selFrom.value = allMonths[0];
+  selTo.value   = allMonths[allMonths.length - 1];
+
+  selPipe.addEventListener('change', applyFilters);
+  selFrom.addEventListener('change', () => { if (selFrom.value > selTo.value) selTo.value = selFrom.value; applyFilters(); });
+  selTo.addEventListener('change',   () => { if (selTo.value < selFrom.value) selFrom.value = selTo.value; applyFilters(); });
+}
+
 function exportPDF() { window.print(); }
 
-// ── Init ───────────────────────────────────────────────────
+// ── Init ────────────────────────────────────────────────────
 async function init() {
   try {
     const res  = await fetch('/api/report');
     const json = await res.json();
-
     if (!json.ok) throw new Error(json.error || 'Erro desconhecido');
 
-    ALL_DATA = json.data;
+    API_RESPONSE = json;
+
+    // Todos os meses únicos (de 'all')
+    const allMonths = (json.byPipeline['all'] || []).map(d => d.month);
 
     document.getElementById('loading').style.display = 'none';
     document.getElementById('app').style.display     = 'block';
 
-    buildSelectors(ALL_DATA);
-    render(ALL_DATA);
+    buildSelectors(json.pipelines, allMonths);
+    applyFilters();
   } catch (e) {
     console.error(e);
     document.getElementById('loading').style.display = 'none';
     document.getElementById('app').style.display     = 'block';
     const banner = document.getElementById('errorBanner');
-    banner.style.display  = 'block';
-    banner.textContent    = `Erro ao carregar dados: ${e.message}`;
+    banner.style.display = 'block';
+    banner.textContent   = `Erro ao carregar dados: ${e.message}`;
   }
 }
 
