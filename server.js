@@ -11,101 +11,129 @@ const PRODUCT_FIELD_KEY = process.env.PRODUCT_FIELD    || '8bdce76ba66f0fed02809
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ─── Pipedrive helpers ──────────────────────────────────────
 const BASE = `https://${ORG}.pipedrive.com/api/v1`;
 
 async function pipeGet(endpoint) {
   const sep = endpoint.includes('?') ? '&' : '?';
-  const url = `${BASE}${endpoint}${sep}api_token=${API_TOKEN}`;
-  const res = await fetch(url);
+  const url  = `${BASE}${endpoint}${sep}api_token=${API_TOKEN}`;
+  const res  = await fetch(url);
   if (!res.ok) throw new Error(`Pipedrive ${res.status} → ${endpoint}`);
   return res.json();
 }
 
 async function fetchAllDeals() {
   const all = [];
-  let start = 0;
-  const limit = 500;
+  let start  = 0;
   while (true) {
-    const json = await pipeGet(
-      `/deals?filter_id=${FILTER_ID}&status=all&limit=${limit}&start=${start}`
-    );
+    const json = await pipeGet(`/deals?filter_id=${FILTER_ID}&status=all&limit=500&start=${start}`);
     (json.data || []).forEach(d => all.push(d));
     if (!json.additional_data?.pagination?.more_items_in_collection) break;
-    start += limit;
+    start += 500;
   }
   return all;
 }
 
 async function getProductLabels() {
   try {
-    const json = await pipeGet('/dealFields');
+    const json  = await pipeGet('/dealFields');
     const field = (json.data || []).find(f => f.key === PRODUCT_FIELD_KEY);
     if (!field?.options) return {};
     return Object.fromEntries(field.options.map(o => [String(o.id), o.label]));
-  } catch (e) {
-    console.warn('[getProductLabels]', e.message);
-    return {};
-  }
+  } catch (e) { return {}; }
 }
 
-// ─── Report endpoint ────────────────────────────────────────
+async function fetchPipelines() {
+  try {
+    const json = await pipeGet('/pipelines');
+    return (json.data || []).map(p => ({ id: String(p.id), name: p.name }));
+  } catch (e) { return []; }
+}
+
 app.get('/api/report', async (req, res) => {
   if (!API_TOKEN) {
-    return res.status(500).json({ ok: false, error: 'PIPEDRIVE_TOKEN não configurado no Render.' });
+    return res.status(500).json({ ok: false, error: 'PIPEDRIVE_TOKEN não configurado.' });
   }
   try {
-    const [deals, productLabels] = await Promise.all([fetchAllDeals(), getProductLabels()]);
+    const [deals, productLabels, pipelines] = await Promise.all([
+      fetchAllDeals(), getProductLabels(), fetchPipelines()
+    ]);
 
-    const byMonth = {};
-    const ensure  = ym => {
-      if (!byMonth[ym]) byMonth[ym] = { leads: 0, won: 0, revenue: 0, products: {} };
-      return byMonth[ym];
+    const data = { all: {} };
+
+    const ensure = (container, ym) => {
+      if (!container[ym]) container[ym] = {
+        criados: 0, finalizados: 0, ganhos: 0,
+        won: 0, revenue: 0, products: {}
+      };
+      return container[ym];
     };
 
     for (const deal of deals) {
-      // Leads criados (add_time)
+      const pipeId = String(deal.pipeline_id || 'unknown');
+      if (!data[pipeId]) data[pipeId] = {};
+
+      // Por data de criação (funil / cohort)
       if (deal.add_time) {
-        ensure(deal.add_time.substring(0, 7)).leads++;
+        const ym    = deal.add_time.substring(0, 7);
+        const allM  = ensure(data.all, ym);
+        const pipeM = ensure(data[pipeId], ym);
+
+        allM.criados++;  pipeM.criados++;
+
+        if (deal.status === 'won' || deal.status === 'lost') {
+          allM.finalizados++;  pipeM.finalizados++;
+        }
+        if (deal.status === 'won') {
+          allM.ganhos++;  pipeM.ganhos++;
+        }
       }
 
-      // Deals ganhos
+      // Por data de ganho (receita)
       if (deal.status === 'won' && deal.won_time) {
-        const ym  = deal.won_time.substring(0, 7);
-        const m   = ensure(ym);
-        const val = parseFloat(deal.value || 0);
-        m.won++;
-        m.revenue += val;
+        const ym    = deal.won_time.substring(0, 7);
+        const allM  = ensure(data.all, ym);
+        const pipeM = ensure(data[pipeId], ym);
+        const val   = parseFloat(deal.value || 0);
 
-        // Produto
-        const raw = deal[PRODUCT_FIELD_KEY];
+        allM.won++;  pipeM.won++;
+        allM.revenue += val;  pipeM.revenue += val;
+
+        const raw   = deal[PRODUCT_FIELD_KEY];
         let produto = 'Não informado';
         if (raw !== null && raw !== undefined && raw !== '') {
           produto = productLabels[String(raw)] || String(raw);
         }
-        if (!m.products[produto]) m.products[produto] = { count: 0, revenue: 0 };
-        m.products[produto].count++;
-        m.products[produto].revenue += val;
+        for (const m of [allM, pipeM]) {
+          if (!m.products[produto]) m.products[produto] = { count: 0, revenue: 0 };
+          m.products[produto].count++;
+          m.products[produto].revenue += val;
+        }
       }
     }
 
-    const data = Object.keys(byMonth)
-      .sort()
-      .map(m => ({
-        month:      m,
-        leads:      byMonth[m].leads,
-        won:        byMonth[m].won,
-        revenue:    byMonth[m].revenue,
-        avgTicket:  byMonth[m].won > 0 ? byMonth[m].revenue / byMonth[m].won : 0,
-        conversion: byMonth[m].leads > 0 ? (byMonth[m].won / byMonth[m].leads) * 100 : 0,
-        products:   byMonth[m].products,
+    const toArray = (obj) =>
+      Object.keys(obj).sort().map(m => ({
+        month:       m,
+        criados:     obj[m].criados,
+        finalizados: obj[m].finalizados,
+        ganhos:      obj[m].ganhos,
+        won:         obj[m].won,
+        revenue:     obj[m].revenue,
+        avgTicket:   obj[m].won > 0 ? obj[m].revenue / obj[m].won : 0,
+        conversion:  obj[m].criados > 0 ? (obj[m].won / obj[m].criados) * 100 : 0,
+        products:    obj[m].products,
       }));
 
-    res.json({ ok: true, data });
+    const byPipeline = {};
+    for (const [id, months] of Object.entries(data)) {
+      byPipeline[id] = toArray(months);
+    }
+
+    res.json({ ok: true, pipelines, byPipeline });
   } catch (e) {
     console.error('[/api/report]', e);
     res.status(500).json({ ok: false, error: e.message });
   }
 });
 
-app.listen(PORT, () => console.log(`✓ Servidor rodando na porta ${PORT}`));
+app.listen(PORT, () => console.log(`✓ Porta ${PORT}`));
