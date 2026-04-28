@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Relatório Licenciados — Board Academy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;0,700;1,300&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
+<style>
+/* ── Reset & Base ─────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f2ede6;
+  --surface:   #ffffff;
+  --navy:      #1c2b3a;
+  --navy-light:#2d4459;
+  --gold:      #b8873f;
+  --gold-pale: #f5e9d6;
+  --sage:      #4a7c6a;
+  --rust:      #c0533a;
+  --muted:     #8a8277;
+  --border:    #e0d9d0;
+  --text:      #1c2020;
+  --text-light:#5c5650;
+
+  --chart-1: #1c2b3a;
+  --chart-2: #b8873f;
+  --chart-3: #4a7c6a;
+  --chart-4: #c0533a;
+  --chart-5: #7b5ea7;
+  --chart-6: #2d7da8;
+  --chart-7: #c47a2d;
+  --chart-8: #3d7a5c;
+
+  --radius: 8px;
+  --shadow: 0 1px 3px rgba(28,32,32,.06), 0 4px 16px rgba(28,32,32,.06);
+}
+
+html { font-size: 15px; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Loading overlay ──────────────────────────────────── */
+#loading {
+  position: fixed; inset: 0;
+  background: var(--bg);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 16px; z-index: 999;
+}
+.loading-title {
+  font-family: 'Fraunces', serif;
+  font-size: 2rem; font-weight: 600;
+  color: var(--navy);
+}
+.loading-sub {
+  font-size: .85rem; color: var(--muted);
+  letter-spacing: .08em; text-transform: uppercase;
+}
+.spinner {
+  width: 32px; height: 32px;
+  border: 2.5px solid var(--border);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Page wrapper ─────────────────────────────────────── */
+#app { display: none; max-width: 1180px; margin: 0 auto; padding: 32px 24px 64px; }
+
+/* ── Header ───────────────────────────────────────────── */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 36px;
+  padding-bottom: 24px;
+  border-bottom: 1.5px solid var(--border);
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.header-brand {}
+.brand-eyebrow {
+  font-size: .7rem;
+  font-weight: 500;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 4px;
+}
+.brand-title {
+  font-family: 'Fraunces', serif;
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--navy);
+  line-height: 1.1;
+}
+.brand-sub {
+  font-size: .8rem;
+  color: var(--muted);
+  margin-top: 5px;
+}
+.header-controls {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.ctrl-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.ctrl-label {
+  font-size: .68rem;
+  font-weight: 500;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+select {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: .85rem;
+  padding: 7px 30px 7px 11px;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%238a8277' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  cursor: pointer;
+  transition: border-color .15s;
+}
+select:focus { outline: none; border-color: var(--navy); }
+
+.btn-pdf {
+  background: var(--navy);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-family: 'DM Sans', sans-serif;
+  font-size: .8rem;
+  font-weight: 500;
+  letter-spacing: .05em;
+  padding: 8px 18px;
+  cursor: pointer;
+  transition: background .15s, transform .1s;
+  align-self: flex-end;
+}
+.btn-pdf:hover { background: var(--navy-light); transform: translateY(-1px); }
+.btn-pdf:active { transform: translateY(0); }
+
+/* ── KPI cards ────────────────────────────────────────── */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-bottom: 28px;
+}
+.kpi-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 18px 16px;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--gold);
+  opacity: 0;
+  transition: opacity .3s;
+}
+.kpi-card:hover::before { opacity: 1; }
+.kpi-label {
+  font-size: .68rem;
+  font-weight: 500;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.kpi-value {
+  font-family: 'Fraunces', serif;
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--navy);
+  line-height: 1;
+}
+.kpi-unit {
+  font-size: .75rem;
+  color: var(--muted);
+  margin-top: 5px;
+}
+
+/* ── Chart section ────────────────────────────────────── */
+.section-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--navy);
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  letter-spacing: -.01em;
+}
+.charts-row {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.charts-row.cols-2 { grid-template-columns: 1fr 1fr; }
+.charts-row.cols-3 { grid-template-columns: 2fr 1fr 1fr; }
+
+.chart-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px 22px 18px;
+  box-shadow: var(--shadow);
+}
+.chart-card-title {
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+.chart-canvas-wrap {
+  position: relative;
+  height: 220px;
+}
+.chart-canvas-wrap.tall { height: 260px; }
+
+/* ── Data table ───────────────────────────────────────── */
+.table-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  margin-top: 8px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .82rem;
+}
+thead { background: var(--navy); }
+thead th {
+  color: rgba(255,255,255,.75);
+  font-size: .66rem;
+  font-weight: 500;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  padding: 12px 16px;
+  text-align: left;
+}
+thead th:not(:first-child) { text-align: right; }
+tbody tr { border-bottom: 1px solid var(--border); transition: background .12s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--bg); }
+tbody td {
+  padding: 11px 16px;
+  color: var(--text);
+  vertical-align: middle;
+}
+tbody td:not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }
+.td-month { font-weight: 500; color: var(--navy); }
+.td-zero { color: var(--muted); }
+tfoot td {
+  padding: 11px 16px;
+  font-weight: 600;
+  color: var(--navy);
+  background: var(--gold-pale);
+  font-size: .83rem;
+  border-top: 1.5px solid var(--border);
+}
+tfoot td:not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* ── Product breakdown ────────────────────────────────── */
+.product-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+/* ── Footer ───────────────────────────────────────────── */
+.page-footer {
+  margin-top: 40px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.footer-copy {
+  font-size: .72rem;
+  color: var(--muted);
+  letter-spacing: .04em;
+}
+.footer-update {
+  font-size: .72rem;
+  color: var(--muted);
+}
+
+/* ── Error banner ─────────────────────────────────────── */
+.error-banner {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius);
+  color: #991b1b;
+  padding: 14px 18px;
+  font-size: .85rem;
+  margin-bottom: 20px;
+  display: none;
+}
+
+/* ── Print ────────────────────────────────────────────── */
+@media print {
+  body { background: #fff !important; }
+  #app { padding: 16px 20px 32px; max-width: 100%; display: block !important; }
+  .btn-pdf, .header-controls select { display: none !important; }
+  .chart-card, .table-wrap, .kpi-card { box-shadow: none !important; break-inside: avoid; }
+  .charts-row { break-inside: avoid; }
+  .kpi-grid { grid-template-columns: repeat(5, 1fr) !important; }
+  @page { margin: 20mm; size: A4 landscape; }
+}
+
+/* ── Responsive ───────────────────────────────────────── */
+@media (max-width: 900px) {
+  .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+  .charts-row.cols-2, .charts-row.cols-3, .product-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .page-header { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<!-- Loading -->
+<div id="loading">
+  <div class="loading-title">Board Academy</div>
+  <div class="loading-sub">Carregando relatório de licenciados</div>
+  <div class="spinner"></div>
+</div>
+
+<!-- App -->
+<div id="app">
+  <div class="error-banner" id="errorBanner"></div>
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-brand">
+      <div class="brand-eyebrow">Board Academy</div>
+      <div class="brand-title">Relatório — Licenciados</div>
+      <div class="brand-sub" id="headerSub">Carregando período...</div>
+    </div>
+    <div class="header-controls">
+      <div class="ctrl-group">
+        <span class="ctrl-label">De</span>
+        <select id="selFrom"></select>
+      </div>
+      <div class="ctrl-group">
+        <span class="ctrl-label">Até</span>
+        <select id="selTo"></select>
+      </div>
+      <button class="btn-pdf" onclick="exportPDF()">↓ Exportar PDF</button>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">Leads Criados</div>
+      <div class="kpi-value" id="kLeads">—</div>
+      <div class="kpi-unit">no período</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Negócios Ganhos</div>
+      <div class="kpi-value" id="kWon">—</div>
+      <div class="kpi-unit">fechamentos</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Receita Total</div>
+      <div class="kpi-value" id="kRevenue">—</div>
+      <div class="kpi-unit">valor realizado</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Ticket Médio</div>
+      <div class="kpi-value" id="kTicket">—</div>
+      <div class="kpi-unit">por fechamento</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Conversão</div>
+      <div class="kpi-value" id="kConversion">—</div>
+      <div class="kpi-unit">leads → ganhos</div>
+    </div>
+  </div>
+
+  <!-- Charts row 1: Leads e Ganhos por mês -->
+  <div class="section-title">Evolução Mensal</div>
+  <div class="charts-row cols-2" style="margin-bottom: 20px;">
+    <div class="chart-card">
+      <div class="chart-card-title">Leads Criados por Mês</div>
+      <div class="chart-canvas-wrap"><canvas id="cLeads"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">Volume de Ganhos por Mês</div>
+      <div class="chart-canvas-wrap"><canvas id="cWon"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Chart row 2: Receita e Ticket -->
+  <div class="charts-row cols-2" style="margin-bottom: 28px;">
+    <div class="chart-card">
+      <div class="chart-card-title">Receita por Mês (R$)</div>
+      <div class="chart-canvas-wrap"><canvas id="cRevenue"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">Ticket Médio por Mês (R$)</div>
+      <div class="chart-canvas-wrap"><canvas id="cTicket"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Product breakdown -->
+  <div class="section-title">Quebra por Produto</div>
+  <div class="product-grid" style="margin-bottom: 28px;">
+    <div class="chart-card">
+      <div class="chart-card-title">Volume por Produto (ganhos)</div>
+      <div class="chart-canvas-wrap tall"><canvas id="cProdVol"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">Receita por Produto (R$)</div>
+      <div class="chart-canvas-wrap tall"><canvas id="cProdRev"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Monthly table -->
+  <div class="section-title">Detalhe por Mês</div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Mês</th>
+          <th>Leads</th>
+          <th>Ganhos</th>
+          <th>Receita</th>
+          <th>Ticket Médio</th>
+          <th>Conversão</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+      <tfoot id="tableFoot"></tfoot>
+    </table>
+  </div>
+
+  <!-- Footer -->
+  <div class="page-footer">
+    <div class="footer-copy">Board Academy · Relatório de Licenciados</div>
+    <div class="footer-update" id="footerUpdate"></div>
+  </div>
+</div>
+
+<script>
+// ── Formatters ─────────────────────────────────────────────
+const brl  = v => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 0, maximumFractionDigits: 0 });
+const brlK = v => v >= 1000 ? 'R$ ' + (v / 1000).toFixed(0) + 'k' : 'R$ ' + v.toFixed(0);
+const pct  = v => v.toFixed(1) + '%';
+const labelMes = ym => {
+  const [y, m] = ym.split('-');
+  const months = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  return months[parseInt(m) - 1] + '/' + y.slice(2);
+};
+
+// ── State ──────────────────────────────────────────────────
+let ALL_DATA   = [];
+let charts     = {};
+const PALETTE  = ['#1c2b3a','#b8873f','#4a7c6a','#c0533a','#7b5ea7','#2d7da8','#c47a2d','#3d7a5c'];
+
+// ── Chart factory ──────────────────────────────────────────
+const GRID_COLOR   = 'rgba(28,32,32,.06)';
+const TICK_COLOR   = '#8a8277';
+const baseScaleX   = () => ({ grid: { display: false }, ticks: { color: TICK_COLOR, font: { size: 10 } }, border: { color: 'transparent' } });
+const baseScaleY   = () => ({ grid: { color: GRID_COLOR }, ticks: { color: TICK_COLOR, font: { size: 10 } }, border: { color: 'transparent' } });
+
+function makeBar(id, labels, datasets, yCallback) {
+  if (charts[id]) charts[id].destroy();
+  charts[id] = new Chart(document.getElementById(id), {
+    type: 'bar',
+    data: { labels, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: { duration: 600, easing: 'easeOutQuart' },
+      plugins: { legend: { display: datasets.length > 1, position: 'bottom', labels: { color: TICK_COLOR, font: { size: 10 }, boxWidth: 10, padding: 12 } }, tooltip: { callbacks: { label: ctx => yCallback ? yCallback(ctx.parsed.y) : ctx.parsed.y } } },
+      scales: {
+        x: baseScaleX(),
+        y: { ...baseScaleY(), ticks: { ...baseScaleY().ticks, callback: yCallback || (v => v) } }
+      }
+    }
+  });
+}
+
+function makeLine(id, labels, data, color, yCallback) {
+  if (charts[id]) charts[id].destroy();
+  const ctx = document.getElementById(id).getContext('2d');
+  const grad = ctx.createLinearGradient(0, 0, 0, 220);
+  grad.addColorStop(0, color + '30');
+  grad.addColorStop(1, color + '00');
+  charts[id] = new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets: [{ data, borderColor: color, borderWidth: 2, pointRadius: 4, pointBackgroundColor: color, pointHoverRadius: 6, tension: .3, fill: true, backgroundColor: grad }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: { duration: 600 },
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => yCallback ? yCallback(ctx.parsed.y) : ctx.parsed.y } } },
+      scales: {
+        x: baseScaleX(),
+        y: { ...baseScaleY(), ticks: { ...baseScaleY().ticks, callback: yCallback || (v => v) } }
+      }
+    }
+  });
+}
+
+function makeDoughnut(id, labels, data, colors) {
+  if (charts[id]) charts[id].destroy();
+  charts[id] = new Chart(document.getElementById(id), {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data, backgroundColor: colors, borderColor: '#fff', borderWidth: 2, hoverOffset: 6 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: { duration: 600 },
+      cutout: '55%',
+      plugins: {
+        legend: { position: 'right', labels: { color: TICK_COLOR, font: { size: 10 }, padding: 10, boxWidth: 10 } },
+        tooltip: { callbacks: { label: ctx => `${ctx.label}: ${ctx.parsed}` } }
+      }
+    }
+  });
+}
+
+function makeHorizontalBar(id, labels, data, colors) {
+  if (charts[id]) charts[id].destroy();
+  charts[id] = new Chart(document.getElementById(id), {
+    type: 'bar',
+    data: { labels, datasets: [{ data, backgroundColor: colors, borderRadius: 4, borderSkipped: false }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      indexAxis: 'y',
+      animation: { duration: 600 },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => brl(ctx.parsed.x) } }
+      },
+      scales: {
+        x: { ...baseScaleY(), ticks: { ...baseScaleY().ticks, callback: v => brlK(v) } },
+        y: { grid: { display: false }, ticks: { color: TICK_COLOR, font: { size: 10 } }, border: { color: 'transparent' } }
+      }
+    }
+  });
+}
+
+// ── Render ─────────────────────────────────────────────────
+function render(data) {
+  if (!data.length) {
+    document.getElementById('kLeads').textContent      = '0';
+    document.getElementById('kWon').textContent        = '0';
+    document.getElementById('kRevenue').textContent    = 'R$ 0';
+    document.getElementById('kTicket').textContent     = '—';
+    document.getElementById('kConversion').textContent = '—';
+    return;
+  }
+
+  const labels   = data.map(d => labelMes(d.month));
+  const leads    = data.map(d => d.leads);
+  const won      = data.map(d => d.won);
+  const revenue  = data.map(d => d.revenue);
+  const tickets  = data.map(d => d.avgTicket);
+
+  const totLeads   = leads.reduce((a, b) => a + b, 0);
+  const totWon     = won.reduce((a, b) => a + b, 0);
+  const totRevenue = revenue.reduce((a, b) => a + b, 0);
+  const avgTicket  = totWon > 0 ? totRevenue / totWon : 0;
+  const convPct    = totLeads > 0 ? (totWon / totLeads) * 100 : 0;
+
+  // KPIs
+  document.getElementById('kLeads').textContent      = totLeads.toLocaleString('pt-BR');
+  document.getElementById('kWon').textContent        = totWon.toLocaleString('pt-BR');
+  document.getElementById('kRevenue').textContent    = brlK(totRevenue);
+  document.getElementById('kTicket').textContent     = avgTicket > 0 ? brlK(avgTicket) : '—';
+  document.getElementById('kConversion').textContent = pct(convPct);
+
+  // Header subtitle
+  const first = labelMes(data[0].month);
+  const last  = labelMes(data[data.length - 1].month);
+  document.getElementById('headerSub').textContent = first === last ? first : `${first} a ${last}`;
+
+  // Charts
+  makeLine('cLeads',   labels, leads,   PALETTE[0], v => v);
+  makeLine('cWon',     labels, won,     PALETTE[1], v => v);
+  makeLine('cRevenue', labels, revenue, PALETTE[2], v => brlK(v));
+  makeLine('cTicket',  labels, tickets, PALETTE[3], v => brlK(v));
+
+  // Product breakdown
+  const productMap = {};
+  for (const d of data) {
+    for (const [prod, vals] of Object.entries(d.products)) {
+      if (!productMap[prod]) productMap[prod] = { count: 0, revenue: 0 };
+      productMap[prod].count   += vals.count;
+      productMap[prod].revenue += vals.revenue;
+    }
+  }
+  const prodEntries = Object.entries(productMap).sort((a, b) => b[1].revenue - a[1].revenue);
+  const prodLabels  = prodEntries.map(([k]) => k);
+  const prodCounts  = prodEntries.map(([, v]) => v.count);
+  const prodRevs    = prodEntries.map(([, v]) => v.revenue);
+  const prodColors  = prodLabels.map((_, i) => PALETTE[i % PALETTE.length]);
+
+  makeDoughnut('cProdVol', prodLabels, prodCounts, prodColors);
+  makeHorizontalBar('cProdRev', prodLabels, prodRevs, prodColors);
+
+  // Table
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+  data.forEach(d => {
+    const tr = document.createElement('tr');
+    const zero = v => v === 0 ? '<span class="td-zero">—</span>' : v;
+    tr.innerHTML = `
+      <td class="td-month">${labelMes(d.month)}</td>
+      <td>${zero(d.leads)}</td>
+      <td>${zero(d.won)}</td>
+      <td>${d.revenue > 0 ? brl(d.revenue) : '<span class="td-zero">—</span>'}</td>
+      <td>${d.avgTicket > 0 ? brl(d.avgTicket) : '<span class="td-zero">—</span>'}</td>
+      <td>${d.leads > 0 ? pct(d.conversion) : '<span class="td-zero">—</span>'}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  const tfoot = document.getElementById('tableFoot');
+  tfoot.innerHTML = `
+    <tr>
+      <td>Total / Média</td>
+      <td>${totLeads.toLocaleString('pt-BR')}</td>
+      <td>${totWon.toLocaleString('pt-BR')}</td>
+      <td>${brl(totRevenue)}</td>
+      <td>${avgTicket > 0 ? brl(avgTicket) : '—'}</td>
+      <td>${pct(convPct)}</td>
+    </tr>
+  `;
+
+  // Footer timestamp
+  document.getElementById('footerUpdate').textContent =
+    'Atualizado em ' + new Date().toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+}
+
+// ── Period selectors ───────────────────────────────────────
+function buildSelectors(data) {
+  const months = data.map(d => d.month);
+  const from   = document.getElementById('selFrom');
+  const to     = document.getElementById('selTo');
+
+  months.forEach(m => {
+    const o1 = document.createElement('option');
+    o1.value = m; o1.textContent = labelMes(m);
+    from.appendChild(o1);
+    const o2 = document.createElement('option');
+    o2.value = m; o2.textContent = labelMes(m);
+    to.appendChild(o2);
+  });
+
+  from.value = months[0];
+  to.value   = months[months.length - 1];
+
+  const applyFilter = () => {
+    const f = from.value, t = to.value;
+    if (f > t) { to.value = f; }
+    render(ALL_DATA.filter(d => d.month >= from.value && d.month <= to.value));
+  };
+  from.addEventListener('change', applyFilter);
+  to.addEventListener('change', applyFilter);
+}
+
+// ── Export PDF ─────────────────────────────────────────────
+function exportPDF() { window.print(); }
+
+// ── Init ───────────────────────────────────────────────────
+async function init() {
+  try {
+    const res  = await fetch('/api/report');
+    const json = await res.json();
+
+    if (!json.ok) throw new Error(json.error || 'Erro desconhecido');
+
+    ALL_DATA = json.data;
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('app').style.display     = 'block';
+
+    buildSelectors(ALL_DATA);
+    render(ALL_DATA);
+  } catch (e) {
+    console.error(e);
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('app').style.display     = 'block';
+    const banner = document.getElementById('errorBanner');
+    banner.style.display  = 'block';
+    banner.textContent    = `Erro ao carregar dados: ${e.message}`;
+  }
+}
+
+init();
+</script>
+</body>
+</html>
