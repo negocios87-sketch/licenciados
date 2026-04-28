@@ -11,37 +11,65 @@
 
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 :root {
-  --bg:      #f2ede6;
-  --surface: #ffffff;
-  --navy:    #1c2b3a;
-  --navyL:   #2d4459;
-  --gold:    #b8873f;
-  --goldP:   #f5e9d6;
-  --sage:    #4a7c6a;
-  --rust:    #c0533a;
-  --muted:   #8a8277;
-  --border:  #e0d9d0;
-  --text:    #1c2020;
-  --radius:  8px;
-  --shadow:  0 1px 3px rgba(28,32,32,.06), 0 4px 16px rgba(28,32,32,.06);
+  --bg:      #f2ede6; --surface: #ffffff; --navy: #1c2b3a; --navyL: #2d4459;
+  --gold: #b8873f; --goldP: #f5e9d6; --sage: #4a7c6a; --rust: #c0533a;
+  --muted: #8a8277; --border: #e0d9d0; --text: #1c2020; --radius: 8px;
+  --shadow: 0 1px 3px rgba(28,32,32,.06), 0 4px 16px rgba(28,32,32,.06);
 }
-
 html { font-size: 14px; }
 body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; -webkit-font-smoothing:antialiased; }
 
-/* ── Loading ────────────────────────────────────────── */
-#loading { position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:999; }
-.loading-title { font-family:'Fraunces',serif;font-size:2rem;font-weight:600;color:var(--navy); }
-.loading-sub { font-size:.82rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase; }
-.spinner { width:30px;height:30px;border:2.5px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite; }
+/* ── Login screen ──────────────────────────────────────── */
+#loginScreen {
+  position:fixed; inset:0; background:var(--navy);
+  display:flex; align-items:center; justify-content:center; z-index:1000;
+}
+.login-card {
+  background:#ffffff; border-radius:12px; padding:40px 36px 32px;
+  width:100%; max-width:380px; box-shadow:0 24px 64px rgba(0,0,0,.35);
+}
+.login-logo {
+  font-family:'Fraunces',serif; font-size:1.1rem; font-weight:600;
+  color:var(--gold); letter-spacing:.06em; text-transform:uppercase;
+  margin-bottom:4px;
+}
+.login-title {
+  font-family:'Fraunces',serif; font-size:1.6rem; font-weight:600;
+  color:var(--navy); margin-bottom:28px; line-height:1.2;
+}
+.login-field { display:flex; flex-direction:column; gap:5px; margin-bottom:14px; }
+.login-label { font-size:.68rem; font-weight:600; letter-spacing:.09em; text-transform:uppercase; color:var(--muted); }
+.login-input {
+  border:1.5px solid var(--border); border-radius:var(--radius);
+  font-family:'DM Sans',sans-serif; font-size:.9rem; color:var(--text);
+  padding:10px 13px; transition:border-color .15s; outline:none; background:#fff;
+}
+.login-input:focus { border-color:var(--navy); }
+.login-btn {
+  width:100%; margin-top:8px; background:var(--navy); color:#fff; border:none;
+  border-radius:var(--radius); font-family:'DM Sans',sans-serif; font-size:.9rem;
+  font-weight:600; padding:12px; cursor:pointer; transition:background .15s, transform .1s;
+  letter-spacing:.03em;
+}
+.login-btn:hover { background:var(--navyL); }
+.login-btn:active { transform:scale(.98); }
+.login-btn:disabled { opacity:.5; cursor:default; }
+.login-error {
+  background:#fef2f2; border:1px solid #fecaca; border-radius:6px;
+  color:#991b1b; font-size:.78rem; padding:9px 12px; margin-top:12px; display:none;
+}
+.login-spinner {
+  display:inline-block; width:14px; height:14px;
+  border:2px solid rgba(255,255,255,.3); border-top-color:#fff;
+  border-radius:50%; animation:spin .7s linear infinite; vertical-align:middle; margin-right:6px;
+}
 @keyframes spin { to { transform:rotate(360deg); } }
 
-/* ── App ────────────────────────────────────────────── */
-#app { display:none;max-width:1200px;margin:0 auto;padding:24px 20px 48px; }
+/* ── App ───────────────────────────────────────────────── */
+#app { display:none; max-width:1200px; margin:0 auto; padding:24px 20px 48px; }
 
-/* ── Header ─────────────────────────────────────────── */
+/* Header */
 .page-header { display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:18px;border-bottom:1.5px solid var(--border);flex-wrap:wrap;gap:16px; }
 .brand-eyebrow { font-size:.68rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:3px; }
 .brand-title { font-family:'Fraunces',serif;font-size:1.7rem;font-weight:600;color:var(--navy);line-height:1.1;transition:all .3s; }
@@ -52,23 +80,27 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 select { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.82rem;padding:6px 28px 6px 10px;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%238a8277' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;cursor:pointer;transition:border-color .15s; }
 select:focus { outline:none;border-color:var(--navy); }
 #selPipeline { border-color:var(--gold);font-weight:500;color:var(--navy); }
-.btn-pdf { background:var(--navy);color:#fff;border:none;border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:500;letter-spacing:.05em;padding:7px 16px;cursor:pointer;transition:background .15s,transform .1s;align-self:flex-end; }
-.btn-pdf:hover { background:var(--navyL);transform:translateY(-1px); }
+.btn-row { display:flex;gap:8px;align-self:flex-end; }
+.btn { border:none;border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:500;letter-spacing:.04em;padding:7px 14px;cursor:pointer;transition:background .15s,transform .1s; }
+.btn-pdf { background:var(--navy);color:#fff; }
+.btn-pdf:hover { background:var(--navyL); }
+.btn-logout { background:transparent;color:var(--muted);border:1px solid var(--border); }
+.btn-logout:hover { background:var(--bg);color:var(--text); }
 
-/* ── Section labels ─────────────────────────────────── */
+/* Section labels */
 .sec-label { font-size:.64rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:8px; }
 .sec-label::after { content:'';flex:1;height:1px;background:var(--border); }
 .sec-title { font-family:'Fraunces',serif;font-size:1rem;font-weight:600;color:var(--navy);margin-bottom:12px;padding-bottom:7px;border-bottom:1px solid var(--border); }
 
-/* ── Top section: funnel + KPIs ─────────────────────── */
+/* Top section */
 .top-section { display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px; }
 
-/* Funnel visualization */
+/* Funnel */
 .funnel-card { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow); }
 .funnel-card-title { font-size:.64rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:14px; }
 .funnel-viz { display:flex;flex-direction:column;align-items:center;gap:0;width:100%; }
 .fv-row { width:100%;display:flex;flex-direction:column;align-items:center; }
-.fv-bar { height:54px;border-radius:6px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;color:#fff;transition:width 1s cubic-bezier(.4,0,.2,1);cursor:default; }
+.fv-bar { height:54px;border-radius:6px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;color:#fff;transition:width 1s cubic-bezier(.4,0,.2,1); }
 .fv-bar-navy  { background:linear-gradient(135deg,#1c2b3a,#2d4459); }
 .fv-bar-gold  { background:linear-gradient(135deg,#8c6428,#c99440); }
 .fv-bar-sage  { background:linear-gradient(135deg,#2e5c4a,#4a7c6a); }
@@ -78,7 +110,7 @@ select:focus { outline:none;border-color:var(--navy); }
 .fv-connector-line { flex:1;max-width:60px;height:1px;background:var(--border); }
 .fv-connector-pct { font-weight:600;color:var(--navy);font-size:.72rem; }
 
-/* Right side KPIs + gauge */
+/* Right KPIs + Gauge */
 .right-section { display:flex;flex-direction:column;gap:12px; }
 .kpi-2x2 { display:grid;grid-template-columns:1fr 1fr;gap:10px; }
 .kpi-card { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 16px 12px;box-shadow:var(--shadow);position:relative;overflow:hidden; }
@@ -98,19 +130,16 @@ select:focus { outline:none;border-color:var(--navy); }
 .gauge-info-value { font-family:'Fraunces',serif;font-size:1.1rem;font-weight:600;color:var(--navy); }
 .gauge-no-meta { font-size:.75rem;color:var(--muted);font-style:italic; }
 
-/* ── Charts ──────────────────────────────────────────── */
+/* Charts */
 .charts-row { display:grid;gap:12px;margin-bottom:14px; }
 .charts-row.cols-2 { grid-template-columns:1fr 1fr; }
-.charts-row.cols-4 { grid-template-columns:1fr 1fr 1fr 1fr; }
 .chart-card { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 16px 12px;box-shadow:var(--shadow); }
 .chart-card-title { font-size:.64rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:12px; }
 .chart-canvas-wrap { position:relative;height:180px; }
 .chart-canvas-wrap.tall { height:220px; }
-
-/* ── Products ────────────────────────────────────────── */
 .product-grid { display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px; }
 
-/* ── Table ───────────────────────────────────────────── */
+/* Table */
 .table-wrap { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden; }
 table { width:100%;border-collapse:collapse;font-size:.78rem; }
 thead { background:var(--navy); }
@@ -126,43 +155,54 @@ tbody td:not(:first-child) { text-align:right;font-variant-numeric:tabular-nums;
 tfoot td { padding:9px 13px;font-weight:600;color:var(--navy);background:var(--goldP);font-size:.79rem;border-top:1.5px solid var(--border); }
 tfoot td:not(:first-child) { text-align:right;font-variant-numeric:tabular-nums; }
 
-/* ── Footer ──────────────────────────────────────────── */
+/* Footer */
 .page-footer { margin-top:28px;padding-top:12px;border-top:1px solid var(--border);display:flex;justify-content:space-between; }
 .footer-copy,.footer-update { font-size:.68rem;color:var(--muted); }
 
-/* ── Error ───────────────────────────────────────────── */
+/* Error */
 .error-banner { background:#fef2f2;border:1px solid #fecaca;border-radius:var(--radius);color:#991b1b;padding:12px 16px;font-size:.82rem;margin-bottom:16px;display:none; }
 
-/* ── Print — single page ─────────────────────────────── */
+/* Print */
 @media print {
   @page { size: A4 landscape; margin: 6mm; }
-  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-  body { background: #fff !important; zoom: 0.62; }
-  #app { display: block !important; max-width: 100% !important; padding: 12px 16px 20px; }
-  .btn-pdf, .ctrl-group, .ctrl-label { display: none !important; }
-  .chart-card, .table-wrap, .kpi-card, .funnel-card, .gauge-card { box-shadow: none !important; }
-  .charts-row.cols-2 { grid-template-columns: 1fr 1fr; }
-  .product-grid { grid-template-columns: 1fr 1fr; }
+  * { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
+  body { background:#fff !important; zoom:0.62; }
+  #loginScreen { display:none !important; }
+  #app { display:block !important; max-width:100% !important; padding:12px 16px 20px; }
+  .btn,.ctrl-group,.ctrl-label { display:none !important; }
+  .chart-card,.table-wrap,.kpi-card,.funnel-card,.gauge-card { box-shadow:none !important; }
 }
 
-@media (max-width: 860px) {
-  .top-section, .charts-row.cols-2, .product-grid { grid-template-columns: 1fr; }
-  .kpi-2x2 { grid-template-columns: 1fr 1fr; }
+@media (max-width:860px) {
+  .top-section,.charts-row.cols-2,.product-grid { grid-template-columns:1fr; }
+  .kpi-2x2 { grid-template-columns:1fr 1fr; }
 }
 </style>
 </head>
 <body>
 
-<div id="loading">
-  <div class="loading-title">Board Academy</div>
-  <div class="loading-sub">Carregando relatório</div>
-  <div class="spinner"></div>
+<!-- ── Login ─────────────────────────────────────────────── -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">Board Academy</div>
+    <div class="login-title">Relatório<br>Licenciados</div>
+    <div class="login-field">
+      <label class="login-label">Usuário</label>
+      <input class="login-input" id="loginUser" type="text" placeholder="seu usuário" autocomplete="username">
+    </div>
+    <div class="login-field">
+      <label class="login-label">Senha</label>
+      <input class="login-input" id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="login-btn" id="loginBtn" onclick="doLogin()">Entrar</button>
+    <div class="login-error" id="loginError"></div>
+  </div>
 </div>
 
+<!-- ── App ───────────────────────────────────────────────── -->
 <div id="app">
   <div class="error-banner" id="errorBanner"></div>
 
-  <!-- Header -->
   <div class="page-header">
     <div>
       <div class="brand-eyebrow">Board Academy</div>
@@ -182,19 +222,18 @@ tfoot td:not(:first-child) { text-align:right;font-variant-numeric:tabular-nums;
         <span class="ctrl-label">Até</span>
         <select id="selTo"></select>
       </div>
-      <button class="btn-pdf" onclick="window.print()">↓ PDF</button>
+      <div class="btn-row">
+        <button class="btn btn-pdf" onclick="window.print()">↓ PDF</button>
+        <button class="btn btn-logout" onclick="doLogout()">Sair</button>
+      </div>
     </div>
   </div>
 
-  <!-- Top: Funnel + KPIs + Gauge -->
   <div class="sec-label">Funil de Negócios — por data de criação</div>
   <div class="top-section">
-
-    <!-- Funnel viz -->
     <div class="funnel-card">
       <div class="funnel-card-title">Fluxo de Negócios</div>
-      <div class="funnel-viz" id="funnelViz">
-        <!-- Criados -->
+      <div class="funnel-viz">
         <div class="fv-row">
           <div class="fv-bar fv-bar-navy" id="fvBarCriados" style="width:100%">
             <span class="fv-bar-label">Criados</span>
@@ -206,7 +245,6 @@ tfoot td:not(:first-child) { text-align:right;font-variant-numeric:tabular-nums;
           <span class="fv-connector-pct" id="fvPct1">0%</span>
           <div class="fv-connector-line"></div>
         </div>
-        <!-- Finalizados -->
         <div class="fv-row">
           <div class="fv-bar fv-bar-gold" id="fvBarFin" style="width:85%">
             <span class="fv-bar-label">Finalizados</span>
@@ -218,7 +256,6 @@ tfoot td:not(:first-child) { text-align:right;font-variant-numeric:tabular-nums;
           <span class="fv-connector-pct" id="fvPct2">0%</span>
           <div class="fv-connector-line"></div>
         </div>
-        <!-- Ganhos -->
         <div class="fv-row">
           <div class="fv-bar fv-bar-sage" id="fvBarGan" style="width:40%">
             <span class="fv-bar-label">Ganhos</span>
@@ -228,9 +265,7 @@ tfoot td:not(:first-child) { text-align:right;font-variant-numeric:tabular-nums;
       </div>
     </div>
 
-    <!-- Right: KPIs + Gauge -->
     <div class="right-section">
-      <!-- 2x2 KPIs -->
       <div class="kpi-2x2">
         <div class="kpi-card">
           <div class="kpi-label">Receita Total</div>
@@ -253,23 +288,18 @@ tfoot td:not(:first-child) { text-align:right;font-variant-numeric:tabular-nums;
           <div class="kpi-sub">criados → ganhos</div>
         </div>
       </div>
-
-      <!-- Gauge meta -->
       <div class="gauge-card">
         <div class="gauge-wrap">
           <svg class="gauge-svg" viewBox="0 0 200 115">
-            <!-- BG arc -->
             <path d="M 15 105 A 85 85 0 0 1 185 105" fill="none" stroke="#e0d9d0" stroke-width="14" stroke-linecap="round"/>
-            <!-- Progress arc -->
             <path id="gaugeArc" d="M 15 105 A 85 85 0 0 1 185 105" fill="none" stroke="#4a7c6a" stroke-width="14" stroke-linecap="round"
                   stroke-dasharray="267" stroke-dashoffset="267" style="transition:stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1),stroke .4s;"/>
-            <!-- % text -->
             <text id="gaugePctText" x="100" y="95" text-anchor="middle" font-size="26" font-weight="700" fill="#1c2b3a" font-family="Fraunces, serif">—</text>
             <text x="100" y="112" text-anchor="middle" font-size="9.5" fill="#8a8277" font-family="DM Sans, sans-serif">meta atingida</text>
           </svg>
         </div>
-        <div class="gauge-info" id="gaugeInfo">
-          <div class="gauge-no-meta" id="gaugeNoMeta">Meta não configurada para o período</div>
+        <div class="gauge-info">
+          <div class="gauge-no-meta" id="gaugeNoMeta">Meta não configurada</div>
           <div id="gaugeDetails" style="display:none">
             <div class="gauge-info-row">
               <span class="gauge-info-label">Meta</span>
@@ -289,7 +319,6 @@ tfoot td:not(:first-child) { text-align:right;font-variant-numeric:tabular-nums;
     </div>
   </div>
 
-  <!-- Charts: Evolução -->
   <div class="sec-title" id="secTitleEvo">Evolução Mensal</div>
   <div class="charts-row cols-2" style="margin-bottom:14px">
     <div class="chart-card">
@@ -312,7 +341,6 @@ tfoot td:not(:first-child) { text-align:right;font-variant-numeric:tabular-nums;
     </div>
   </div>
 
-  <!-- Products -->
   <div class="sec-title" id="secTitleProd">Quebra por Produto</div>
   <div class="product-grid" style="margin-bottom:18px">
     <div class="chart-card">
@@ -325,20 +353,13 @@ tfoot td:not(:first-child) { text-align:right;font-variant-numeric:tabular-nums;
     </div>
   </div>
 
-  <!-- Table -->
   <div class="sec-title">Detalhe por Mês</div>
   <div class="table-wrap">
     <table>
       <thead>
         <tr>
-          <th>Mês</th>
-          <th>Criados</th>
-          <th>Finalizados</th>
-          <th>Ganhos (cri.)</th>
-          <th>Won (rec.)</th>
-          <th>Receita</th>
-          <th>Ticket Médio</th>
-          <th>Conversão</th>
+          <th>Mês</th><th>Criados</th><th>Finalizados</th><th>Ganhos (cri.)</th>
+          <th>Won (rec.)</th><th>Receita</th><th>Ticket Médio</th><th>Conversão</th>
         </tr>
       </thead>
       <tbody id="tableBody"></tbody>
@@ -347,7 +368,7 @@ tfoot td:not(:first-child) { text-align:right;font-variant-numeric:tabular-nums;
   </div>
 
   <div class="page-footer">
-    <span class="footer-copy">Board Academy · Licenciados</span>
+    <span class="footer-copy">Board Academy · Licenciados · <span id="footerUser"></span></span>
     <span class="footer-update" id="footerUpdate"></span>
   </div>
 </div>
@@ -355,456 +376,319 @@ tfoot td:not(:first-child) { text-align:right;font-variant-numeric:tabular-nums;
 <script>
 Chart.register(ChartDataLabels);
 
+// ── Token management ────────────────────────────────────────
+let AUTH_TOKEN = sessionStorage.getItem('ba_token') || null;
+
+function setToken(token, user) {
+  AUTH_TOKEN = token;
+  sessionStorage.setItem('ba_token', token);
+  sessionStorage.setItem('ba_user', user);
+}
+function clearToken() {
+  AUTH_TOKEN = null;
+  sessionStorage.removeItem('ba_token');
+  sessionStorage.removeItem('ba_user');
+}
+function getUser() { return sessionStorage.getItem('ba_user') || ''; }
+
+async function authFetch(url, opts = {}) {
+  const res = await fetch(url, {
+    ...opts,
+    headers: { ...(opts.headers||{}), 'Authorization': `Bearer ${AUTH_TOKEN}` }
+  });
+  if (res.status === 401) { clearToken(); showLogin(); throw new Error('Sessão expirada.'); }
+  return res;
+}
+
+// ── Login ───────────────────────────────────────────────────
+function showLogin() {
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+}
+function hideLogin() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+}
+
+async function doLogin() {
+  const btn   = document.getElementById('loginBtn');
+  const errEl = document.getElementById('loginError');
+  const user  = document.getElementById('loginUser').value.trim();
+  const pass  = document.getElementById('loginPass').value;
+
+  if (!user || !pass) { showErr('Preencha usuário e senha.'); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="login-spinner"></span>Entrando...';
+  errEl.style.display = 'none';
+
+  try {
+    const res  = await fetch('/api/login', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ usuario: user, senha: pass })
+    });
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.error || 'Erro ao entrar.');
+    setToken(json.token, json.user);
+    hideLogin();
+    await loadReport();
+  } catch (e) {
+    showErr(e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Entrar';
+  }
+}
+
+function showErr(msg) {
+  const el = document.getElementById('loginError');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+async function doLogout() {
+  try { await authFetch('/api/logout', { method:'POST' }); } catch {}
+  clearToken();
+  showLogin();
+}
+
+// Enter key on login
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('loginScreen').style.display !== 'none') doLogin();
+});
+
 // ── Formatters ──────────────────────────────────────────────
 const brl  = v => v.toLocaleString('pt-BR',{style:'currency',currency:'BRL',minimumFractionDigits:0,maximumFractionDigits:0});
-const brlK = v => v >= 1000 ? 'R$'+(v/1000).toFixed(0)+'k' : 'R$'+v.toFixed(0);
+const brlK = v => v>=1000 ? 'R$'+(v/1000).toFixed(0)+'k' : 'R$'+v.toFixed(0);
 const pct  = v => v.toFixed(1)+'%';
 const labelMes = ym => {
   const [y,m] = ym.split('-');
   return ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][+m-1]+'/'+y.slice(2);
 };
 
-// ── State ───────────────────────────────────────────────────
-let API = null;
-let charts = {};
+let API = null, charts = {}, licPipelines = [];
 const PALETTE = ['#1c2b3a','#b8873f','#4a7c6a','#c0533a','#7b5ea7','#2d7da8','#c47a2d','#3d7a5c'];
 
 // ── Gauge ───────────────────────────────────────────────────
 function updateGauge(metaVal, realVal) {
-  const arc  = document.getElementById('gaugeArc');
-  const txt  = document.getElementById('gaugePctText');
-  const det  = document.getElementById('gaugeDetails');
-  const nom  = document.getElementById('gaugeNoMeta');
-
-  if (!metaVal || metaVal === 0) {
-    arc.style.strokeDashoffset = 267;
-    txt.textContent = '—';
-    nom.style.display = 'block';
-    det.style.display = 'none';
+  const arc = document.getElementById('gaugeArc');
+  const txt = document.getElementById('gaugePctText');
+  if (!metaVal) {
+    arc.style.strokeDashoffset = 267; txt.textContent = '—';
+    document.getElementById('gaugeNoMeta').style.display = 'block';
+    document.getElementById('gaugeDetails').style.display = 'none';
     return;
   }
-
-  const p     = (realVal / metaVal) * 100;
-  const clamped = Math.min(p, 100);
-  const offset  = 267 * (1 - clamped / 100);
-  const color   = p >= 100 ? '#4a7c6a' : p >= 70 ? '#b8873f' : '#c0533a';
-  const diff    = realVal - metaVal;
-
-  arc.style.strokeDashoffset = offset;
+  const p = (realVal/metaVal)*100;
+  const color = p>=100?'#4a7c6a':p>=70?'#b8873f':'#c0533a';
+  arc.style.strokeDashoffset = 267*(1-Math.min(p,100)/100);
   arc.style.stroke = color;
-  txt.textContent  = p.toFixed(0) + '%';
-  txt.style.fill   = color;
-
+  txt.textContent = p.toFixed(0)+'%';
+  txt.style.fill = color;
+  const diff = realVal-metaVal;
   document.getElementById('gaugeMetaVal').textContent = brl(metaVal);
   document.getElementById('gaugeRealVal').textContent = brl(realVal);
-  document.getElementById('gaugeDiffVal').textContent = (diff >= 0 ? '+' : '') + brl(diff);
-  document.getElementById('gaugeDiffVal').style.color = diff >= 0 ? '#4a7c6a' : '#c0533a';
-
-  nom.style.display = 'none';
-  det.style.display = 'block';
+  document.getElementById('gaugeDiffVal').textContent = (diff>=0?'+':'')+brl(diff);
+  document.getElementById('gaugeDiffVal').style.color = diff>=0?'#4a7c6a':'#c0533a';
+  document.getElementById('gaugeNoMeta').style.display = 'none';
+  document.getElementById('gaugeDetails').style.display = 'block';
 }
 
 // ── Meta matching ───────────────────────────────────────────
 const PT_MONTHS = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
-
-function findMeta(metaRows, pipelineName, fromYM, toYM) {
-  if (!metaRows || !metaRows.length) return null;
-
-  const headers = Object.keys(metaRows[0]).map(h => h.toLowerCase().trim());
-  const find = (...keys) => headers.find(h => keys.some(k => h.includes(k)));
-
-  const anoCol  = find('ano','year');
-  const mesCol  = find('mes','mês','month');
-  const metaCol = find('meta','goal','objetivo','alvo');
-  const pipeCol = find('pipeline','funil','licenciado','lic');
-
+function findMeta(rows, pipeName, fromYM, toYM) {
+  if (!rows?.length) return null;
+  const headers = Object.keys(rows[0]);
+  const find = (...terms) => headers.find(h => terms.some(t => h.toLowerCase().includes(t)));
+  const anoCol=find('ano','year'), mesCol=find('mes','mês','month'), metaCol=find('meta','goal','objetivo'), pipeCol=find('licenciado','pipeline','funil','lic');
   if (!metaCol) return null;
-
-  const parseMonth = (raw) => {
-    if (!raw) return -1;
-    const n = parseInt(raw);
-    if (!isNaN(n)) return n;
-    const idx = PT_MONTHS.findIndex(m => raw.toLowerCase().includes(m));
-    return idx >= 0 ? idx + 1 : -1;
-  };
-
-  let total = 0, matched = 0;
-
-  for (const row of metaRows) {
-    const lrow = Object.fromEntries(Object.entries(row).map(([k,v]) => [k.toLowerCase().trim(), v]));
-
-    // Pipeline match (optional)
-    if (pipeCol && pipelineName) {
-      const rp = (lrow[pipeCol] || '').toLowerCase();
-      const pn = pipelineName.toLowerCase();
+  const parseM = raw => { const n=parseInt(raw); if(!isNaN(n)) return n; const i=PT_MONTHS.findIndex(m=>raw?.toLowerCase().includes(m)); return i>=0?i+1:-1; };
+  let total=0, matched=0;
+  for (const row of rows) {
+    const lrow = Object.fromEntries(Object.entries(row).map(([k,v])=>[k.toLowerCase().trim(),v]));
+    if (pipeCol && pipeName) {
+      const rp=(lrow[pipeCol.toLowerCase()]||'').toLowerCase();
+      const pn=pipeName.toLowerCase();
       if (rp && !pn.includes(rp) && !rp.includes(pn.replace('lic-','').trim())) continue;
     }
-
-    // Build YYYY-MM for this row
-    const ano = anoCol ? parseInt(lrow[anoCol]) : null;
-    const mes = mesCol ? parseMonth(lrow[mesCol]) : null;
-
-    if (mes && mes > 0) {
-      const year = ano || parseInt(fromYM.split('-')[0]);
-      const ym   = `${year}-${String(mes).padStart(2,'0')}`;
-      if (ym < fromYM || ym > toYM) continue;
+    const ano=anoCol?parseInt(lrow[anoCol.toLowerCase()]):null;
+    const mes=mesCol?parseM(lrow[mesCol.toLowerCase()]):null;
+    if (mes && mes>0) {
+      const year=ano||parseInt(fromYM.split('-')[0]);
+      const ym=`${year}-${String(mes).padStart(2,'0')}`;
+      if (ym<fromYM||ym>toYM) continue;
     }
-
-    const raw = (lrow[metaCol] || '').replace(/[^\d.,]/g,'').replace(',','.');
-    const val = parseFloat(raw);
-    if (!isNaN(val) && val > 0) { total += val; matched++; }
+    const raw=(lrow[metaCol.toLowerCase()]||'').replace(/[^\d.,]/g,'').replace(',','.');
+    const val=parseFloat(raw);
+    if (!isNaN(val)&&val>0) { total+=val; matched++; }
   }
-
-  return matched > 0 ? total : null;
+  return matched>0?total:null;
 }
 
-// ── Funnel update ───────────────────────────────────────────
+// ── Funnel ──────────────────────────────────────────────────
 function updateFunnel(criados, finalizados, ganhos) {
   document.getElementById('fvCriados').textContent    = criados.toLocaleString('pt-BR');
   document.getElementById('fvFinalizados').textContent= finalizados.toLocaleString('pt-BR');
   document.getElementById('fvGanhos').textContent     = ganhos.toLocaleString('pt-BR');
-
-  const pFin = criados > 0 ? (finalizados/criados*100).toFixed(1) : '0.0';
-  const pGan = criados > 0 ? (ganhos/criados*100).toFixed(1) : '0.0';
-  document.getElementById('fvPct1').textContent = pFin + '%';
-  document.getElementById('fvPct2').textContent = pGan + '%';
-
-  // Animate widths proportionally
-  const max = Math.max(criados, 1);
-  const wFin = Math.max(30, Math.round(finalizados/max*100));
-  const wGan = Math.max(20, Math.round(ganhos/max*100));
-  setTimeout(() => {
-    document.getElementById('fvBarFin').style.width = wFin + '%';
-    document.getElementById('fvBarGan').style.width = wGan + '%';
-  }, 100);
+  const pFin=criados>0?(finalizados/criados*100).toFixed(1):'0.0';
+  const pGan=criados>0?(ganhos/criados*100).toFixed(1):'0.0';
+  document.getElementById('fvPct1').textContent=pFin+'%';
+  document.getElementById('fvPct2').textContent=pGan+'%';
+  const max=Math.max(criados,1);
+  setTimeout(()=>{
+    document.getElementById('fvBarFin').style.width=Math.max(30,Math.round(finalizados/max*100))+'%';
+    document.getElementById('fvBarGan').style.width=Math.max(20,Math.round(ganhos/max*100))+'%';
+  },100);
 }
 
-// ── Chart helpers ───────────────────────────────────────────
-const GC = 'rgba(28,32,32,.06)', TC = '#8a8277';
+// ── Charts ──────────────────────────────────────────────────
+const GC='rgba(28,32,32,.06)',TC='#8a8277';
+const dlBar=fmt=>({ display:ctx=>ctx.dataset.data[ctx.dataIndex]>0, formatter:fmt, color:'#1c2b3a', font:{family:'DM Sans',size:9,weight:'600'}, anchor:'end',align:'end',offset:2,clamp:true });
+const dlLine=fmt=>({ display:ctx=>{ const d=ctx.dataset.data,i=ctx.dataIndex,v=d[i]; return v>0&&v>=(d[i-1]||0)&&v>=(d[i+1]||0); }, formatter:fmt, color:ctx=>ctx.dataset.borderColor, font:{family:'DM Sans',size:9,weight:'600'}, anchor:'end',align:'top',offset:4 });
 
-const dlBar = (fmt) => ({
-  display: ctx => ctx.dataset.data[ctx.dataIndex] > 0,
-  formatter: fmt,
-  color: '#1c2b3a',
-  font: { family:'DM Sans', size:9, weight:'600' },
-  anchor:'end', align:'end', offset:2, clamp:true,
-});
-const dlLine = (fmt) => ({
-  display: ctx => {
-    const d=ctx.dataset.data, i=ctx.dataIndex, v=d[i];
-    return v > 0 && v >= (d[i-1]||0) && v >= (d[i+1]||0);
-  },
-  formatter: fmt,
-  color: ctx => ctx.dataset.borderColor,
-  font: { family:'DM Sans', size:9, weight:'600' },
-  anchor:'end', align:'top', offset:4,
-});
-
-function makeBar(id, labels, data, color, fmt) {
-  if (charts[id]) charts[id].destroy();
-  charts[id] = new Chart(document.getElementById(id), {
-    type:'bar',
-    data:{ labels, datasets:[{ data, backgroundColor:color+'cc', borderColor:color, borderWidth:1.5, borderRadius:5, borderSkipped:false }] },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      animation:{ duration:600, easing:'easeOutQuart' },
-      layout:{ padding:{ top:22 } },
-      plugins:{ legend:{ display:false }, datalabels:dlBar(fmt), tooltip:{ callbacks:{ label:ctx=>fmt(ctx.parsed.y) } } },
-      scales:{
-        x:{ grid:{ display:false }, ticks:{ color:TC,font:{size:9} }, border:{ color:'transparent' } },
-        y:{ grid:{ color:GC }, ticks:{ color:TC,font:{size:9},callback:fmt }, border:{ color:'transparent' } }
-      }
-    }
-  });
+function makeBar(id,labels,data,color,fmt) {
+  if(charts[id]) charts[id].destroy();
+  charts[id]=new Chart(document.getElementById(id),{ type:'bar', data:{ labels, datasets:[{ data, backgroundColor:color+'cc', borderColor:color, borderWidth:1.5, borderRadius:5, borderSkipped:false }] }, options:{ responsive:true, maintainAspectRatio:false, animation:{duration:600,easing:'easeOutQuart'}, layout:{padding:{top:22}}, plugins:{ legend:{display:false}, datalabels:dlBar(fmt), tooltip:{callbacks:{label:ctx=>fmt(ctx.parsed.y)}} }, scales:{ x:{grid:{display:false},ticks:{color:TC,font:{size:9}},border:{color:'transparent'}}, y:{grid:{color:GC},ticks:{color:TC,font:{size:9},callback:fmt},border:{color:'transparent'}} } } });
 }
 
-function makeLine(id, labels, data, color, fmt) {
-  if (charts[id]) charts[id].destroy();
-  const ctx  = document.getElementById(id).getContext('2d');
-  const grad = ctx.createLinearGradient(0,0,0,180);
-  grad.addColorStop(0, color+'28'); grad.addColorStop(1, color+'00');
-  charts[id] = new Chart(ctx, {
-    type:'line',
-    data:{ labels, datasets:[{ data, borderColor:color, borderWidth:2, pointRadius:3.5, pointBackgroundColor:color, pointHoverRadius:5, tension:.3, fill:true, backgroundColor:grad }] },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      animation:{ duration:600 },
-      layout:{ padding:{ top:22 } },
-      plugins:{ legend:{ display:false }, datalabels:dlLine(fmt), tooltip:{ callbacks:{ label:ctx=>fmt(ctx.parsed.y) } } },
-      scales:{
-        x:{ grid:{ display:false }, ticks:{ color:TC,font:{size:9} }, border:{ color:'transparent' } },
-        y:{ grid:{ color:GC }, ticks:{ color:TC,font:{size:9},callback:fmt }, border:{ color:'transparent' } }
-      }
-    }
-  });
+function makeLine(id,labels,data,color,fmt) {
+  if(charts[id]) charts[id].destroy();
+  const ctx=document.getElementById(id).getContext('2d');
+  const grad=ctx.createLinearGradient(0,0,0,180);
+  grad.addColorStop(0,color+'28'); grad.addColorStop(1,color+'00');
+  charts[id]=new Chart(ctx,{ type:'line', data:{ labels, datasets:[{ data, borderColor:color, borderWidth:2, pointRadius:3.5, pointBackgroundColor:color, tension:.3, fill:true, backgroundColor:grad }] }, options:{ responsive:true, maintainAspectRatio:false, animation:{duration:600}, layout:{padding:{top:22}}, plugins:{ legend:{display:false}, datalabels:dlLine(fmt), tooltip:{callbacks:{label:ctx=>fmt(ctx.parsed.y)}} }, scales:{ x:{grid:{display:false},ticks:{color:TC,font:{size:9}},border:{color:'transparent'}}, y:{grid:{color:GC},ticks:{color:TC,font:{size:9},callback:fmt},border:{color:'transparent'}} } } });
 }
 
-function makeDoughnut(id, labels, data, colors, tooltipFmt) {
-  if (charts[id]) charts[id].destroy();
-  const total = data.reduce((a,b)=>a+b, 0);
-  charts[id] = new Chart(document.getElementById(id), {
-    type:'doughnut',
-    data:{ labels, datasets:[{ data, backgroundColor:colors, borderColor:'#fff', borderWidth:2, hoverOffset:5 }] },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      animation:{ duration:600 },
-      cutout:'52%',
-      plugins:{
-        legend:{ position:'right', labels:{ color:TC, font:{size:9}, padding:9, boxWidth:9 } },
-        datalabels:{
-          display: ctx => ctx.dataset.data[ctx.dataIndex] > 0,
-          formatter: v => total > 0 ? ((v/total)*100).toFixed(0)+'%' : '',
-          color:'#fff',
-          font:{ family:'DM Sans', size:9, weight:'600' },
-        },
-        tooltip:{ callbacks:{ label:ctx=>`${ctx.label}: ${tooltipFmt(ctx.parsed)}` } }
-      }
-    }
-  });
+function makeDoughnut(id,labels,data,colors,tooltipFmt) {
+  if(charts[id]) charts[id].destroy();
+  const total=data.reduce((a,b)=>a+b,0);
+  charts[id]=new Chart(document.getElementById(id),{ type:'doughnut', data:{ labels, datasets:[{ data, backgroundColor:colors, borderColor:'#fff', borderWidth:2, hoverOffset:5 }] }, options:{ responsive:true, maintainAspectRatio:false, animation:{duration:600}, cutout:'52%', plugins:{ legend:{position:'right',labels:{color:TC,font:{size:9},padding:9,boxWidth:9}}, datalabels:{ display:ctx=>ctx.dataset.data[ctx.dataIndex]>0, formatter:v=>total>0?((v/total)*100).toFixed(0)+'%':'', color:'#fff', font:{family:'DM Sans',size:9,weight:'600'} }, tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${tooltipFmt(ctx.parsed)}`}} } } });
 }
 
-function makeHBar(id, labels, data, colors, fmt) {
-  if (charts[id]) charts[id].destroy();
-  charts[id] = new Chart(document.getElementById(id), {
-    type:'bar',
-    data:{ labels, datasets:[{ data, backgroundColor:colors, borderRadius:4, borderSkipped:false }] },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      indexAxis:'y',
-      animation:{ duration:600 },
-      layout:{ padding:{ right:52 } },
-      plugins:{
-        legend:{ display:false },
-        datalabels:{
-          display: ctx => ctx.dataset.data[ctx.dataIndex] > 0,
-          formatter: fmt,
-          color:'#1c2b3a',
-          font:{ family:'DM Sans', size:9, weight:'600' },
-          anchor:'end', align:'right', offset:4,
-        },
-        tooltip:{ callbacks:{ label:ctx=>fmt(ctx.parsed.x) } }
-      },
-      scales:{
-        x:{ grid:{ color:GC }, ticks:{ color:TC,font:{size:9},callback:fmt }, border:{ color:'transparent' } },
-        y:{ grid:{ display:false }, ticks:{ color:TC,font:{size:9} }, border:{ color:'transparent' } }
-      }
-    }
-  });
+function makeHBar(id,labels,data,colors,fmt) {
+  if(charts[id]) charts[id].destroy();
+  charts[id]=new Chart(document.getElementById(id),{ type:'bar', data:{ labels, datasets:[{ data, backgroundColor:colors, borderRadius:4, borderSkipped:false }] }, options:{ responsive:true, maintainAspectRatio:false, indexAxis:'y', animation:{duration:600}, layout:{padding:{right:52}}, plugins:{ legend:{display:false}, datalabels:{ display:ctx=>ctx.dataset.data[ctx.dataIndex]>0, formatter:fmt, color:'#1c2b3a', font:{family:'DM Sans',size:9,weight:'600'}, anchor:'end',align:'right',offset:4 }, tooltip:{callbacks:{label:ctx=>fmt(ctx.parsed.x)}} }, scales:{ x:{grid:{color:GC},ticks:{color:TC,font:{size:9},callback:fmt},border:{color:'transparent'}}, y:{grid:{display:false},ticks:{color:TC,font:{size:9}},border:{color:'transparent'}} } } });
 }
 
-// ── Aggregate LIC- pipelines ────────────────────────────────
-function aggregateLIC(licIds, fromYM, toYM) {
-  const combined = {};
+// ── Aggregate ───────────────────────────────────────────────
+function aggregateLIC(licIds,fromYM,toYM) {
+  const combined={};
   for (const pid of licIds) {
-    for (const d of (API.byPipeline[pid] || [])) {
-      if (d.month < fromYM || d.month > toYM) continue;
-      if (!combined[d.month]) combined[d.month] = {
-        month:d.month, criados:0, finalizados:0, ganhos:0, won:0, revenue:0, products:{}
-      };
-      const c = combined[d.month];
-      c.criados     += d.criados;
-      c.finalizados += d.finalizados;
-      c.ganhos      += d.ganhos;
-      c.won         += d.won;
-      c.revenue     += d.revenue;
-      for (const [prod,vals] of Object.entries(d.products)) {
-        if (!c.products[prod]) c.products[prod] = { count:0, revenue:0 };
-        c.products[prod].count   += vals.count;
-        c.products[prod].revenue += vals.revenue;
-      }
+    for (const d of (API.byPipeline[pid]||[])) {
+      if(d.month<fromYM||d.month>toYM) continue;
+      if(!combined[d.month]) combined[d.month]={ month:d.month, criados:0, finalizados:0, ganhos:0, won:0, revenue:0, products:{} };
+      const c=combined[d.month];
+      c.criados+=d.criados; c.finalizados+=d.finalizados; c.ganhos+=d.ganhos; c.won+=d.won; c.revenue+=d.revenue;
+      for(const [p,v] of Object.entries(d.products)) { if(!c.products[p]) c.products[p]={count:0,revenue:0}; c.products[p].count+=v.count; c.products[p].revenue+=v.revenue; }
     }
   }
-  return Object.values(combined).sort((a,b)=>a.month.localeCompare(b.month)).map(d=>({
-    ...d,
-    avgTicket:  d.won>0 ? d.revenue/d.won : 0,
-    conversion: d.criados>0 ? (d.won/d.criados)*100 : 0,
-  }));
+  return Object.values(combined).sort((a,b)=>a.month.localeCompare(b.month)).map(d=>({ ...d, avgTicket:d.won>0?d.revenue/d.won:0, conversion:d.criados>0?(d.won/d.criados)*100:0 }));
 }
 
 // ── Render ──────────────────────────────────────────────────
-function render(data, pipelineId, pipelines) {
-  const isAll = pipelineId === 'all';
-  const selPipe = isAll ? null : pipelines.find(p => p.id === pipelineId);
-  const pipeName = selPipe?.name || null;
+function render(data, pipelineId) {
+  const selPipe = pipelineId==='all'?null:API.pipelines.find(p=>p.id===pipelineId);
+  const pipeName = selPipe?.name||null;
+  document.getElementById('brandTitle').textContent = pipeName?`Relatório — ${pipeName}`:'Relatório — Licenciados';
+  document.getElementById('secTitleEvo').textContent = pipeName?`Evolução Mensal · ${pipeName}`:'Evolução Mensal';
+  document.getElementById('secTitleProd').textContent = pipeName?`Quebra por Produto · ${pipeName}`:'Quebra por Produto';
+  if(!data.length){ updateFunnel(0,0,0); updateGauge(null,0); return; }
 
-  document.getElementById('brandTitle').textContent =
-    isAll ? 'Relatório — Licenciados' : `Relatório — ${pipeName}`;
-  document.getElementById('secTitleEvo').textContent =
-    isAll ? 'Evolução Mensal' : `Evolução Mensal · ${pipeName}`;
-  document.getElementById('secTitleProd').textContent =
-    isAll ? 'Quebra por Produto' : `Quebra por Produto · ${pipeName}`;
+  const labels=data.map(d=>labelMes(d.month));
+  const totCriados=data.reduce((a,d)=>a+d.criados,0);
+  const totFin=data.reduce((a,d)=>a+d.finalizados,0);
+  const totGanhos=data.reduce((a,d)=>a+d.ganhos,0);
+  const totWon=data.reduce((a,d)=>a+d.won,0);
+  const totRev=data.reduce((a,d)=>a+d.revenue,0);
+  const avgTkt=totWon>0?totRev/totWon:0;
+  const conv=totCriados>0?(totWon/totCriados)*100:0;
 
-  if (!data.length) {
-    updateFunnel(0,0,0);
-    updateGauge(null, 0);
-    return;
-  }
+  const f=labelMes(data[0].month),l=labelMes(data[data.length-1].month);
+  document.getElementById('headerSub').textContent=f===l?f:`${f} a ${l}`;
+  document.getElementById('footerUser').textContent=getUser();
 
-  const labels   = data.map(d => labelMes(d.month));
-  const criados  = data.map(d => d.criados);
-  const finalizados = data.map(d => d.finalizados);
-  const ganhos   = data.map(d => d.ganhos);
-  const won      = data.map(d => d.won);
-  const revenue  = data.map(d => d.revenue);
-  const tickets  = data.map(d => d.avgTicket);
+  updateFunnel(totCriados,totFin,totGanhos);
+  document.getElementById('kRevenue').textContent=brlK(totRev);
+  document.getElementById('kTicket').textContent=avgTkt>0?brlK(avgTkt):'—';
+  document.getElementById('kWon').textContent=totWon.toLocaleString('pt-BR');
+  document.getElementById('kConversion').textContent=pct(conv);
 
-  const totCriados    = criados.reduce((a,b)=>a+b,0);
-  const totFinalizados= finalizados.reduce((a,b)=>a+b,0);
-  const totGanhos     = ganhos.reduce((a,b)=>a+b,0);
-  const totWon        = won.reduce((a,b)=>a+b,0);
-  const totRevenue    = revenue.reduce((a,b)=>a+b,0);
-  const avgTicket     = totWon>0 ? totRevenue/totWon : 0;
-  const convPct       = totCriados>0 ? (totWon/totCriados)*100 : 0;
+  const meta=findMeta(API.meta, pipeName, data[0].month, data[data.length-1].month);
+  updateGauge(meta, totRev);
 
-  // Header sub
-  const f = labelMes(data[0].month), l = labelMes(data[data.length-1].month);
-  document.getElementById('headerSub').textContent = f===l ? f : `${f} a ${l}`;
+  makeBar ('cLeads',labels,data.map(d=>d.criados),PALETTE[0],v=>v);
+  makeBar ('cWon',labels,data.map(d=>d.won),PALETTE[1],v=>v);
+  makeLine('cRevenue',labels,data.map(d=>d.revenue),PALETTE[2],v=>brlK(v));
+  makeLine('cTicket',labels,data.map(d=>d.avgTicket),PALETTE[3],v=>brlK(v));
 
-  // Funnel
-  updateFunnel(totCriados, totFinalizados, totGanhos);
+  const pm={};
+  for(const d of data) for(const [p,v] of Object.entries(d.products)) { if(!pm[p]) pm[p]={count:0,revenue:0}; pm[p].count+=v.count; pm[p].revenue+=v.revenue; }
+  const pe=Object.entries(pm).sort((a,b)=>b[1].revenue-a[1].revenue);
+  const pL=pe.map(([k])=>k), pC=pe.map(([,v])=>v.count), pR=pe.map(([,v])=>v.revenue), pCol=pL.map((_,i)=>PALETTE[i%PALETTE.length]);
+  makeDoughnut('cProdVol',pL,pC,pCol,v=>v+' ganhos');
+  makeHBar('cProdRev',pL,pR,pCol,v=>brlK(v));
 
-  // KPIs
-  document.getElementById('kRevenue').textContent   = brlK(totRevenue);
-  document.getElementById('kTicket').textContent    = avgTicket>0 ? brlK(avgTicket) : '—';
-  document.getElementById('kWon').textContent       = totWon.toLocaleString('pt-BR');
-  document.getElementById('kConversion').textContent= pct(convPct);
-
-  // Gauge
-  const fromYM = data[0].month, toYM = data[data.length-1].month;
-  const meta = findMeta(API.meta, pipeName, fromYM, toYM);
-  updateGauge(meta, totRevenue);
-
-  // Charts
-  makeBar ('cLeads',   labels, criados,  PALETTE[0], v=>v);
-  makeBar ('cWon',     labels, won,      PALETTE[1], v=>v);
-  makeLine('cRevenue', labels, revenue,  PALETTE[2], v=>brlK(v));
-  makeLine('cTicket',  labels, tickets,  PALETTE[3], v=>brlK(v));
-
-  // Products — only from won deals (already filtered in backend)
-  const productMap = {};
-  for (const d of data) {
-    for (const [prod,vals] of Object.entries(d.products)) {
-      if (!productMap[prod]) productMap[prod] = { count:0, revenue:0 };
-      productMap[prod].count   += vals.count;
-      productMap[prod].revenue += vals.revenue;
-    }
-  }
-  const prodE   = Object.entries(productMap).sort((a,b)=>b[1].revenue-a[1].revenue);
-  const pLabels = prodE.map(([k])=>k);
-  const pCounts = prodE.map(([,v])=>v.count);
-  const pRevs   = prodE.map(([,v])=>v.revenue);
-  const pColors = pLabels.map((_,i)=>PALETTE[i%PALETTE.length]);
-
-  makeDoughnut('cProdVol', pLabels, pCounts, pColors, v=>v+' ganhos');
-  makeHBar    ('cProdRev', pLabels, pRevs,   pColors, v=>brlK(v));
-
-  // Table
-  const tbody = document.getElementById('tableBody');
-  tbody.innerHTML = '';
-  data.forEach(d => {
-    const tr = document.createElement('tr');
-    const z = v => v===0 ? '<span class="td-zero">—</span>' : v.toLocaleString('pt-BR');
-    tr.innerHTML = `
-      <td class="td-month">${labelMes(d.month)}</td>
-      <td>${z(d.criados)}</td>
-      <td>${z(d.finalizados)}</td>
-      <td>${z(d.ganhos)}</td>
-      <td>${z(d.won)}</td>
-      <td>${d.revenue>0 ? brl(d.revenue) : '<span class="td-zero">—</span>'}</td>
-      <td>${d.avgTicket>0 ? brl(d.avgTicket) : '<span class="td-zero">—</span>'}</td>
-      <td>${d.criados>0 ? pct(d.conversion) : '<span class="td-zero">—</span>'}</td>
-    `;
-    tbody.appendChild(tr);
-  });
-
-  document.getElementById('tableFoot').innerHTML = `
-    <tr>
-      <td>Total / Média</td>
-      <td>${totCriados.toLocaleString('pt-BR')}</td>
-      <td>${totFinalizados.toLocaleString('pt-BR')}</td>
-      <td>${totGanhos.toLocaleString('pt-BR')}</td>
-      <td>${totWon.toLocaleString('pt-BR')}</td>
-      <td>${brl(totRevenue)}</td>
-      <td>${avgTicket>0 ? brl(avgTicket) : '—'}</td>
-      <td>${pct(convPct)}</td>
-    </tr>`;
-
-  document.getElementById('footerUpdate').textContent =
-    'Atualizado em '+new Date().toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'});
+  const tbody=document.getElementById('tableBody'); tbody.innerHTML='';
+  const z=v=>v===0?'<span class="td-zero">—</span>':v.toLocaleString('pt-BR');
+  data.forEach(d=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td class="td-month">${labelMes(d.month)}</td><td>${z(d.criados)}</td><td>${z(d.finalizados)}</td><td>${z(d.ganhos)}</td><td>${z(d.won)}</td><td>${d.revenue>0?brl(d.revenue):'<span class="td-zero">—</span>'}</td><td>${d.avgTicket>0?brl(d.avgTicket):'<span class="td-zero">—</span>'}</td><td>${d.criados>0?pct(d.conversion):'<span class="td-zero">—</span>'}</td>`; tbody.appendChild(tr); });
+  document.getElementById('tableFoot').innerHTML=`<tr><td>Total / Média</td><td>${totCriados.toLocaleString('pt-BR')}</td><td>${totFin.toLocaleString('pt-BR')}</td><td>${totGanhos.toLocaleString('pt-BR')}</td><td>${totWon.toLocaleString('pt-BR')}</td><td>${brl(totRev)}</td><td>${avgTkt>0?brl(avgTkt):'—'}</td><td>${pct(conv)}</td></tr>`;
+  document.getElementById('footerUpdate').textContent='Atualizado em '+new Date().toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'});
 }
 
 // ── Selectors ───────────────────────────────────────────────
-let licPipelines = [];
-
 function applyFilters() {
-  const pipeId = document.getElementById('selPipeline').value;
-  const fromYM = document.getElementById('selFrom').value;
-  const toYM   = document.getElementById('selTo').value;
-
-  const data = pipeId === 'all'
-    ? aggregateLIC(licPipelines.map(p=>p.id), fromYM, toYM)
-    : (API.byPipeline[pipeId]||[]).filter(d=>d.month>=fromYM && d.month<=toYM);
-
-  render(data, pipeId, API.pipelines);
+  const pipeId=document.getElementById('selPipeline').value;
+  const fromYM=document.getElementById('selFrom').value;
+  const toYM=document.getElementById('selTo').value;
+  const data=pipeId==='all'?aggregateLIC(licPipelines.map(p=>p.id),fromYM,toYM):(API.byPipeline[pipeId]||[]).filter(d=>d.month>=fromYM&&d.month<=toYM);
+  render(data,pipeId);
 }
 
 function buildSelectors(pipelines) {
-  // Only LIC- pipelines
-  licPipelines = pipelines.filter(p => p.name.toUpperCase().startsWith('LIC-'));
-
-  const selPipe = document.getElementById('selPipeline');
-  const optAll  = new Option('Todos os Licenciados','all');
-  selPipe.appendChild(optAll);
-  licPipelines.forEach(p => selPipe.appendChild(new Option(p.name, p.id)));
-
-  // Build month range from all LIC- data
-  const allMonths = new Set();
-  licPipelines.forEach(p => {
-    (API.byPipeline[p.id]||[]).forEach(d => allMonths.add(d.month));
-  });
-  const months = [...allMonths].sort();
-
-  const selFrom = document.getElementById('selFrom');
-  const selTo   = document.getElementById('selTo');
-  months.forEach(m => {
-    selFrom.appendChild(new Option(labelMes(m), m));
-    selTo.appendChild(new Option(labelMes(m), m));
-  });
-  if (months.length) {
-    selFrom.value = months[0];
-    selTo.value   = months[months.length-1];
-  }
-
-  selPipe.addEventListener('change', applyFilters);
-  selFrom.addEventListener('change', () => { if (selFrom.value>selTo.value) selTo.value=selFrom.value; applyFilters(); });
-  selTo.addEventListener('change',   () => { if (selTo.value<selFrom.value) selFrom.value=selTo.value; applyFilters(); });
+  licPipelines=pipelines.filter(p=>p.name.toUpperCase().startsWith('LIC-'));
+  const selPipe=document.getElementById('selPipeline');
+  selPipe.appendChild(new Option('Todos os Licenciados','all'));
+  licPipelines.forEach(p=>selPipe.appendChild(new Option(p.name,p.id)));
+  const allMonths=new Set();
+  licPipelines.forEach(p=>(API.byPipeline[p.id]||[]).forEach(d=>allMonths.add(d.month)));
+  const months=[...allMonths].sort();
+  const sF=document.getElementById('selFrom'), sT=document.getElementById('selTo');
+  months.forEach(m=>{ sF.appendChild(new Option(labelMes(m),m)); sT.appendChild(new Option(labelMes(m),m)); });
+  if(months.length){ sF.value=months[0]; sT.value=months[months.length-1]; }
+  selPipe.addEventListener('change',applyFilters);
+  sF.addEventListener('change',()=>{ if(sF.value>sT.value)sT.value=sF.value; applyFilters(); });
+  sT.addEventListener('change',()=>{ if(sT.value<sF.value)sF.value=sT.value; applyFilters(); });
 }
 
-// ── Init ────────────────────────────────────────────────────
-async function init() {
+// ── Load report ─────────────────────────────────────────────
+async function loadReport() {
   try {
-    const res  = await fetch('/api/report');
+    document.getElementById('footerUser').textContent = getUser();
+    const res  = await authFetch('/api/report');
     const json = await res.json();
-    if (!json.ok) throw new Error(json.error || 'Erro desconhecido');
-
+    if(!json.ok) throw new Error(json.error);
     API = json;
-
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('app').style.display     = 'block';
-
+    // Clear selectors in case of re-login
+    ['selPipeline','selFrom','selTo'].forEach(id=>{ const el=document.getElementById(id); while(el.firstChild) el.removeChild(el.firstChild); });
+    Object.keys(charts).forEach(k=>{ if(charts[k]) charts[k].destroy(); });
+    charts={};
     buildSelectors(json.pipelines);
     applyFilters();
-  } catch (e) {
-    console.error(e);
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('app').style.display     = 'block';
-    const b = document.getElementById('errorBanner');
-    b.style.display = 'block';
-    b.textContent   = `Erro: ${e.message}`;
+  } catch(e) {
+    if(e.message!=='Sessão expirada.') {
+      const b=document.getElementById('errorBanner');
+      b.style.display='block'; b.textContent=`Erro: ${e.message}`;
+    }
   }
 }
 
-init();
+// ── Init ─────────────────────────────────────────────────────
+if (AUTH_TOKEN) {
+  hideLogin();
+  loadReport();
+} else {
+  showLogin();
+}
 </script>
 </body>
 </html>
