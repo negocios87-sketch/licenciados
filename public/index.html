@@ -9,9 +9,7 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#f2ede6;--surface:#fff;--navy:#1c2b3a;--navyL:#2d4459;--gold:#b8873f;--goldP:#f5e9d6;--sage:#4a7c6a;--rust:#c0533a;--muted:#8a8277;--border:#e0d9d0;--text:#1c2020;--radius:8px;--shadow:0 1px 3px rgba(28,32,32,.06),0 4px 16px rgba(28,32,32,.06)}
-html{font-size:14px}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
-/* LOGIN */
+html{font-size:14px}body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
 #loginScreen{position:fixed;inset:0;background:var(--navy);display:flex;align-items:center;justify-content:center;z-index:1000}
 .lcard{background:#fff;border-radius:12px;padding:40px 36px 32px;width:100%;max-width:380px;box-shadow:0 24px 64px rgba(0,0,0,.35)}
 .llogo{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:600;color:var(--gold);letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
@@ -25,7 +23,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .lerr{background:#fef2f2;border:1px solid #fecaca;border-radius:6px;color:#991b1b;font-size:.78rem;padding:9px 12px;margin-top:12px;display:none}
 .lspinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
 @keyframes spin{to{transform:rotate(360deg)}}
-/* SHELL */
 #shell{display:none}
 .topbar{background:var(--navy);padding:0 24px;display:flex;align-items:stretch;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.18)}
 .tb-left{display:flex;align-items:stretch}
@@ -39,12 +36,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .tb-user{font-size:.72rem;color:rgba(255,255,255,.4);letter-spacing:.04em}
 .tbtn{background:none;border:1px solid rgba(255,255,255,.18);border-radius:6px;color:rgba(255,255,255,.7);font-family:'DM Sans',sans-serif;font-size:.75rem;font-weight:500;padding:5px 12px;cursor:pointer;transition:all .15s}
 .tbtn:hover{background:rgba(255,255,255,.1);color:#fff}.tbtn:disabled{opacity:.5;cursor:default}
-/* PAGES */
 .page{display:none;max-width:1200px;margin:0 auto;padding:24px 20px 56px}.page.active{display:block}
-/* CONTROLS */
 .ph-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:16px;border-bottom:1.5px solid var(--border);flex-wrap:wrap;gap:14px}
-.ph-eyebrow{font-size:.68rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:3px}
-.ph-title{font-family:'Fraunces',serif;font-size:1.6rem;font-weight:600;color:var(--navy);line-height:1.1}
+.ph-eye{font-size:.68rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:3px}
+.ph-ttl{font-family:'Fraunces',serif;font-size:1.6rem;font-weight:600;color:var(--navy);line-height:1.1}
 .ph-sub{font-size:.75rem;color:var(--muted);margin-top:4px}
 .ctrl-row{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap}
 .cg{display:flex;flex-direction:column;gap:3px}
@@ -52,11 +47,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 select{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.82rem;padding:6px 28px 6px 10px;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%238a8277' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;cursor:pointer}
 select:focus{outline:none;border-color:var(--navy)}
 #p1Pipe{border-color:var(--gold);font-weight:500;color:var(--navy)}
-/* SECTION */
 .sec-lbl{font-size:.64rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:8px}
 .sec-lbl::after{content:'';flex:1;height:1px;background:var(--border)}
 .sec-ttl{font-family:'Fraunces',serif;font-size:1rem;font-weight:600;color:var(--navy);margin-bottom:12px;padding-bottom:7px;border-bottom:1px solid var(--border)}
-/* KPI */
 .kpi2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 16px 12px;box-shadow:var(--shadow);position:relative;overflow:hidden}
 .kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2.5px;background:var(--gold);opacity:0;transition:opacity .3s}
@@ -64,10 +57,8 @@ select:focus{outline:none;border-color:var(--navy)}
 .kpi .lbl{font-size:.64rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
 .kpi .val{font-family:'Fraunces',serif;font-size:1.55rem;font-weight:600;color:var(--navy);line-height:1}
 .kpi .sub{font-size:.7rem;color:var(--muted);margin-top:4px}
-/* TOP SECTION */
 .tsec{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
 .rsec{display:flex;flex-direction:column;gap:12px}
-/* FUNNEL */
 .fcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow)}
 .fcard-ttl{font-size:.64rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
 .fv-row{width:100%;display:flex;flex-direction:column;align-items:center}
@@ -75,13 +66,11 @@ select:focus{outline:none;border-color:var(--navy)}
 .fbar.navy{background:linear-gradient(135deg,#1c2b3a,#2d4459)}
 .fbar.gold{background:linear-gradient(135deg,#8c6428,#c99440)}
 .fbar.sage{background:linear-gradient(135deg,#2e5c4a,#4a7c6a)}
-.fbar.rust{background:linear-gradient(135deg,#8a2a1a,#c0533a)}
-.fbar .flbl{font-size:.68rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;opacity:.85}
-.fbar .fval{font-family:'Fraunces',serif;font-size:1.4rem;font-weight:600}
-.fcon{display:flex;align-items:center;justify-content:center;gap:6px;padding:4px 0;font-size:.7rem;color:var(--muted)}
+.flbl{font-size:.68rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;opacity:.85}
+.fval{font-family:'Fraunces',serif;font-size:1.4rem;font-weight:600}
+.fcon{display:flex;align-items:center;justify-content:center;gap:6px;padding:4px 0}
 .fcon-line{flex:1;max-width:60px;height:1px;background:var(--border)}
 .fcon-pct{font-weight:600;color:var(--navy);font-size:.72rem}
-/* GAUGE */
 .gcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;box-shadow:var(--shadow);display:flex;align-items:center;gap:20px}
 .gwrap{flex-shrink:0;width:160px}
 .gsvg{width:100%;overflow:visible}
@@ -90,7 +79,6 @@ select:focus{outline:none;border-color:var(--navy)}
 .gi-lbl{font-size:.62rem;font-weight:500;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
 .gi-val{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:600;color:var(--navy)}
 .gnom{font-size:.75rem;color:var(--muted);font-style:italic}
-/* CHARTS */
 .charts-row{display:grid;gap:12px;margin-bottom:14px}
 .cols-2{grid-template-columns:1fr 1fr}
 .ccard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 16px 12px;box-shadow:var(--shadow)}
@@ -99,7 +87,6 @@ select:focus{outline:none;border-color:var(--navy)}
 .cwrap.tall{height:240px}
 .cwrap.xtall{height:300px}
 .pgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
-/* TABLE */
 .twrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:auto}
 table{width:100%;border-collapse:collapse;font-size:.78rem}
 thead{background:var(--navy)}
@@ -110,10 +97,12 @@ tbody tr:last-child{border-bottom:none}
 tbody tr:hover{background:var(--bg)}
 tbody td{padding:9px 13px;color:var(--text);white-space:nowrap}
 tbody td:not(:first-child){text-align:right;font-variant-numeric:tabular-nums}
-.tdn{font-weight:500;color:var(--navy)}
-.tdz{color:var(--muted)}
+.tdn{font-weight:500;color:var(--navy)}.tdz{color:var(--muted)}
 tfoot td{padding:9px 13px;font-weight:600;color:var(--navy);background:var(--goldP);font-size:.79rem;border-top:1.5px solid var(--border)}
 tfoot td:not(:first-child){text-align:right;font-variant-numeric:tabular-nums}
+/* pct badge on table */
+.pct-badge{display:inline-block;padding:2px 7px;border-radius:20px;font-size:.7rem;font-weight:600}
+.pct-hi{background:#e8f5f0;color:#2e5c4a}.pct-md{background:#fef3e2;color:#8c6428}.pct-lo{background:#fef2f2;color:#8a2a1a}
 /* HEAT */
 .mwrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:auto;margin-bottom:14px}
 .mtable{width:100%;border-collapse:collapse;font-size:.75rem}
@@ -124,17 +113,14 @@ tfoot td:not(:first-child){text-align:right;font-variant-numeric:tabular-nums}
 .mtable tbody td{padding:7px 10px;text-align:center;font-variant-numeric:tabular-nums}
 .mtable tbody td:first-child{text-align:left;font-weight:600;color:var(--navy);background:var(--bg);border-right:1px solid var(--border);white-space:nowrap;padding-right:14px}
 .hcell{border-radius:4px;padding:4px 8px;display:inline-block;min-width:32px;font-weight:600;font-size:.75rem;text-align:center}
-/* ERR */
 .errbanner{background:#fef2f2;border:1px solid #fecaca;border-radius:var(--radius);color:#991b1b;padding:12px 16px;font-size:.82rem;margin-bottom:16px;display:none}
-/* FOOTER */
 .pfooter{margin-top:28px;padding-top:12px;border-top:1px solid var(--border);display:flex;justify-content:space-between}
 .pfooter span{font-size:.68rem;color:var(--muted)}
-/* PRINT */
 @media print{
   @page{size:A4 landscape;margin:6mm}
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
   body{background:#fff!important;zoom:.6}
-  #loginScreen,#shell .topbar{display:none!important}
+  #loginScreen,.topbar{display:none!important}
   .page.active{display:block!important;max-width:100%!important;padding:12px 16px 20px}
   .tbtn,.cg{display:none!important}
   .ccard,.twrap,.kpi,.fcard,.gcard,.mwrap{box-shadow:none!important}
@@ -177,7 +163,7 @@ tfoot td:not(:first-child){text-align:right;font-variant-numeric:tabular-nums}
   <div class="page active" id="p1">
     <div class="errbanner" id="p1Err"></div>
     <div class="ph-row">
-      <div><div class="ph-eyebrow">Board Academy</div><div class="ph-title" id="p1Title">Relatório — Licenciados</div><div class="ph-sub" id="p1Sub">—</div></div>
+      <div><div class="ph-eye">Board Academy</div><div class="ph-ttl" id="p1Title">Relatório — Licenciados</div><div class="ph-sub" id="p1Sub">—</div></div>
       <div class="ctrl-row">
         <div class="cg"><span class="cl">Licenciado</span><select id="p1Pipe"></select></div>
         <div class="cg"><span class="cl">De</span><select id="p1From"></select></div>
@@ -194,8 +180,6 @@ tfoot td:not(:first-child){text-align:right;font-variant-numeric:tabular-nums}
         <div class="fv-row"><div class="fbar gold" id="p1BF" style="width:85%"><span class="flbl">Finalizados</span><span class="fval" id="p1VF">0</span></div></div>
         <div class="fcon"><div class="fcon-line"></div><span class="fcon-pct" id="p1Pct2">0%</span><div class="fcon-line"></div></div>
         <div class="fv-row"><div class="fbar sage" id="p1BG" style="width:40%"><span class="flbl">Ganhos</span><span class="fval" id="p1VG">0</span></div></div>
-        <div class="fcon"><div class="fcon-line"></div><span class="fcon-pct" id="p1Pct3">0%</span><div class="fcon-line"></div></div>
-        <div class="fv-row"><div class="fbar rust" id="p1BP" style="width:30%"><span class="flbl">Perdidos</span><span class="fval" id="p1VP">0</span></div></div>
       </div>
       <div class="rsec">
         <div class="kpi2">
@@ -227,8 +211,8 @@ tfoot td:not(:first-child){text-align:right;font-variant-numeric:tabular-nums}
 
     <div class="sec-ttl" id="p1SecE">Evolução Mensal</div>
     <div class="charts-row cols-2" style="margin-bottom:14px">
-      <div class="ccard"><div class="ccard-ttl">Criados por Mês</div><div class="cwrap"><canvas id="p1CL"></canvas></div></div>
-      <div class="ccard"><div class="ccard-ttl">Ganhos por Mês — volume</div><div class="cwrap"><canvas id="p1CW"></canvas></div></div>
+      <div class="ccard"><div class="ccard-ttl">Leads Criados por Mês — por status</div><div class="cwrap tall"><canvas id="p1CL"></canvas></div></div>
+      <div class="ccard"><div class="ccard-ttl">Ganhos por Mês — volume</div><div class="cwrap tall"><canvas id="p1CW"></canvas></div></div>
     </div>
     <div class="charts-row cols-2" style="margin-bottom:18px">
       <div class="ccard"><div class="ccard-ttl">Receita por Mês (R$)</div><div class="cwrap"><canvas id="p1CR"></canvas></div></div>
@@ -252,7 +236,7 @@ tfoot td:not(:first-child){text-align:right;font-variant-numeric:tabular-nums}
   <!-- PAGE 2 -->
   <div class="page" id="p2">
     <div class="ph-row">
-      <div><div class="ph-eyebrow">Board Academy</div><div class="ph-title">Comparativo — Licenciados</div><div class="ph-sub" id="p2Sub">—</div></div>
+      <div><div class="ph-eye">Board Academy</div><div class="ph-ttl">Comparativo — Licenciados</div><div class="ph-sub" id="p2Sub">—</div></div>
       <div class="ctrl-row">
         <div class="cg"><span class="cl">De</span><select id="p2From"></select></div>
         <div class="cg"><span class="cl">Até</span><select id="p2To"></select></div>
@@ -260,7 +244,7 @@ tfoot td:not(:first-child){text-align:right;font-variant-numeric:tabular-nums}
     </div>
 
     <div class="sec-ttl">Criados por Licenciado — data de criação</div>
-    <div class="ccard" style="margin-bottom:14px"><div class="ccard-ttl">Volume de Leads Criados</div><div class="cwrap tall"><canvas id="p2CC"></canvas></div></div>
+    <div class="ccard" style="margin-bottom:14px"><div class="ccard-ttl">Leads Criados por Status</div><div class="cwrap tall"><canvas id="p2CC"></canvas></div></div>
 
     <div class="sec-ttl">Ganhos por Licenciado — data de ganho</div>
     <div class="charts-row cols-2" style="margin-bottom:14px">
@@ -277,9 +261,9 @@ tfoot td:not(:first-child){text-align:right;font-variant-numeric:tabular-nums}
     <div class="sec-ttl" style="margin-top:14px">Etapa de Perda por Licenciado</div>
     <div class="mwrap" id="p2MS"></div>
 
-    <div class="sec-ttl" style="margin-top:14px">Resumo Geral</div>
+    <div class="sec-ttl" style="margin-top:14px">Resumo Geral por Licenciado</div>
     <div class="twrap">
-      <table><thead><tr><th>Licenciado</th><th>Criados</th><th>Ganhos</th><th>Perdidos</th><th>Receita</th><th>Ticket Médio</th><th>Conversão</th></tr></thead>
+      <table><thead><tr><th>Licenciado</th><th>Criados</th><th>Ganhos</th><th>Perdidos</th><th>Receita</th><th>Ticket Médio</th><th>Conversão</th><th>Meta</th><th>Atingimento</th></tr></thead>
       <tbody id="p2TB"></tbody><tfoot id="p2TF"></tfoot></table>
     </div>
     <div class="pfooter"><span>Board Academy · Comparativo</span><span id="p2FU"></span></div>
@@ -292,6 +276,7 @@ Chart.register(ChartDataLabels);
 const MASKS={'LIC-BC':'Balneário Camboriú','LIC-BEL':'Belém','LIC-BH':'Belo Horizonte','LIC-BSB':'Brasília','LIC-CWB':'Curitiba','LIC-REC':'Recife','LIC-RIO':'Rio de Janeiro','LIC-SAL':'Salvador','LIC-SJC':'São José dos Campos'};
 function mask(name){for(const[k,v]of Object.entries(MASKS))if(name.toUpperCase().includes(k))return v;return name}
 
+// ── Auth ─────────────────────────────────────────────────────
 let TOKEN=sessionStorage.getItem('ba_tok')||null;
 function setTok(t,u){TOKEN=t;sessionStorage.setItem('ba_tok',t);sessionStorage.setItem('ba_usr',u)}
 function clrTok(){TOKEN=null;sessionStorage.removeItem('ba_tok');sessionStorage.removeItem('ba_usr')}
@@ -319,6 +304,7 @@ function switchTab(id){
   document.querySelectorAll('.nav-tab')[id==='p1'?0:1].classList.add('active');
 }
 
+// ── Formatters ────────────────────────────────────────────────
 const brl=v=>v.toLocaleString('pt-BR',{style:'currency',currency:'BRL',minimumFractionDigits:0,maximumFractionDigits:0});
 const brlK=v=>v>=1000?'R$'+(v/1000).toFixed(0)+'k':'R$'+v.toFixed(0);
 const pct=v=>v.toFixed(1)+'%';
@@ -328,21 +314,66 @@ let API=null,CH={},licP=[];
 const PAL=['#1c2b3a','#b8873f','#4a7c6a','#c0533a','#7b5ea7','#2d7da8','#c47a2d','#3d7a5c','#a05c8a','#5a8a6a'];
 const GC='rgba(28,32,32,.06)',TC='#8a8277';
 
-const dlB=fmt=>({display:ctx=>ctx.dataset.data[ctx.dataIndex]>0,formatter:fmt,color:'#1c2b3a',font:{family:'DM Sans',size:9,weight:'600'},anchor:'end',align:'end',offset:2,clamp:true});
+const dlB=fmt=>({display:ctx=>ctx.dataset.data[ctx.dataIndex]>0,formatter:fmt,color:'#fff',font:{family:'DM Sans',size:8,weight:'600'},anchor:'center',align:'center'});
 const dlL=fmt=>({display:ctx=>{const d=ctx.dataset.data,i=ctx.dataIndex,v=d[i];return v>0&&v>=(d[i-1]||0)&&v>=(d[i+1]||0)},formatter:fmt,color:ctx=>ctx.dataset.borderColor,font:{family:'DM Sans',size:9,weight:'600'},anchor:'end',align:'top',offset:4});
-const dlH=fmt=>({display:ctx=>ctx.dataset.data[ctx.dataIndex]>0,formatter:fmt,color:'#1c2b3a',font:{family:'DM Sans',size:9,weight:'600'},anchor:'end',align:'right',offset:4});
+const dlHoriz=fmt=>({display:ctx=>ctx.dataset.data[ctx.dataIndex]>0,formatter:fmt,color:'#1c2b3a',font:{family:'DM Sans',size:9,weight:'600'},anchor:'end',align:'right',offset:4});
 
 function dk(id){if(CH[id]){CH[id].destroy();delete CH[id]}}
 
-function mkBar(id,labels,data,color,fmt,horiz=false){
+// Grouped column chart (for criados by status)
+function mkGroupedBar(id,labels,datasets){
   dk(id);
   CH[id]=new Chart(document.getElementById(id),{type:'bar',
-    data:{labels,datasets:[{data,backgroundColor:color+'cc',borderColor:color,borderWidth:1.5,borderRadius:5,borderSkipped:false}]},
-    options:{responsive:true,maintainAspectRatio:false,indexAxis:horiz?'y':'x',
-      animation:{duration:600,easing:'easeOutQuart'},layout:{padding:{top:horiz?4:22,right:horiz?52:4}},
-      plugins:{legend:{display:false},datalabels:horiz?dlH(fmt):dlB(fmt),tooltip:{callbacks:{label:ctx=>fmt(horiz?ctx.parsed.x:ctx.parsed.y)}}},
-      scales:{x:{grid:{color:horiz?GC:'transparent',display:horiz},ticks:{color:TC,font:{size:9},callback:horiz?fmt:undefined},border:{color:'transparent'}},
-              y:{grid:{color:horiz?'transparent':GC,display:!horiz},ticks:{color:TC,font:{size:9},callback:horiz?undefined:fmt},border:{color:'transparent'}}}}});
+    data:{labels,datasets:datasets.map(d=>({...d,borderRadius:4,borderSkipped:false,borderWidth:0}))},
+    options:{responsive:true,maintainAspectRatio:false,
+      animation:{duration:600,easing:'easeOutQuart'},
+      layout:{padding:{top:8}},
+      plugins:{
+        legend:{display:true,position:'bottom',labels:{color:TC,font:{size:9},padding:12,boxWidth:10}},
+        datalabels:{display:false},
+        tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.parsed.y}`}}
+      },
+      scales:{
+        x:{grid:{display:false},ticks:{color:TC,font:{size:9}},border:{color:'transparent'}},
+        y:{grid:{color:GC},ticks:{color:TC,font:{size:9}},border:{color:'transparent'}}
+      }}
+  });
+}
+
+// Horizontal bar — FIXED: explicit category scale for y
+function mkHorizBar(id,labels,data,color,fmt){
+  dk(id);
+  CH[id]=new Chart(document.getElementById(id),{type:'bar',
+    data:{labels,datasets:[{data,backgroundColor:color+'cc',borderColor:color,borderWidth:1,borderRadius:4,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',
+      animation:{duration:600,easing:'easeOutQuart'},
+      layout:{padding:{right:52}},
+      plugins:{legend:{display:false},datalabels:dlHoriz(fmt),tooltip:{callbacks:{label:ctx=>fmt(ctx.parsed.x)}}},
+      scales:{
+        x:{type:'linear',grid:{color:GC},ticks:{color:TC,font:{size:9},callback:fmt},border:{color:'transparent'}},
+        y:{type:'category',grid:{display:false},ticks:{color:TC,font:{size:10}},border:{color:'transparent'}}
+      }}
+  });
+}
+
+// Horizontal multi-bar (comparison p2)
+function mkHorizMulti(id,labels,datasets,fmt){
+  dk(id);
+  CH[id]=new Chart(document.getElementById(id),{type:'bar',
+    data:{labels,datasets:datasets.map((d,i)=>({label:d.label,data:d.data,backgroundColor:PAL[i%PAL.length]+'cc',borderColor:PAL[i%PAL.length],borderWidth:1,borderRadius:3,borderSkipped:false}))},
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',
+      animation:{duration:600},
+      layout:{padding:{right:52}},
+      plugins:{
+        legend:{display:true,position:'bottom',labels:{color:TC,font:{size:9},padding:8,boxWidth:10}},
+        datalabels:{display:false},
+        tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${fmt(ctx.parsed.x)}`}}
+      },
+      scales:{
+        x:{type:'linear',grid:{color:GC},ticks:{color:TC,font:{size:9},callback:fmt},border:{color:'transparent'}},
+        y:{type:'category',grid:{display:false},ticks:{color:TC,font:{size:10}},border:{color:'transparent'}}
+      }}
+  });
 }
 
 function mkLine(id,labels,data,color,fmt){
@@ -363,28 +394,31 @@ function mkDnut(id,labels,data,colors,tFmt){
         tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${tFmt(ctx.parsed)}`}}}}});
 }
 
-function mkHBar(id,labels,data,colors,fmt){
+function mkHBarRevenue(id,labels,data,colors,fmt){
   dk(id);
   CH[id]=new Chart(document.getElementById(id),{type:'bar',data:{labels,datasets:[{data,backgroundColor:colors,borderRadius:4,borderSkipped:false}]},
     options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',animation:{duration:600},layout:{padding:{right:52}},
-      plugins:{legend:{display:false},datalabels:dlH(fmt),tooltip:{callbacks:{label:ctx=>fmt(ctx.parsed.x)}}},
-      scales:{x:{grid:{color:GC},ticks:{color:TC,font:{size:9},callback:fmt},border:{color:'transparent'}},y:{grid:{display:false},ticks:{color:TC,font:{size:9}},border:{color:'transparent'}}}}});
+      plugins:{legend:{display:false},datalabels:dlHoriz(fmt),tooltip:{callbacks:{label:ctx=>fmt(ctx.parsed.x)}}},
+      scales:{x:{type:'linear',grid:{color:GC},ticks:{color:TC,font:{size:9},callback:fmt},border:{color:'transparent'}},
+              y:{type:'category',grid:{display:false},ticks:{color:TC,font:{size:10}},border:{color:'transparent'}}}}});
 }
 
+// ── Heat matrix ───────────────────────────────────────────────
 function buildHeat(containerId,rows,cols,matrix){
+  if(!cols.length){document.getElementById(containerId).innerHTML='<p style="padding:14px;font-size:.8rem;color:var(--muted)">Nenhum dado disponível.</p>';return}
   const maxR=rows.map((_,ri)=>Math.max(...cols.map((_,ci)=>matrix[ri][ci]||0),1));
   let h=`<table class="mtable"><thead><tr><th>Licenciado</th>`;
-  cols.forEach(c=>{h+=`<th title="${c}">${c.length>18?c.slice(0,16)+'…':c}</th>`});
+  cols.forEach(c=>{h+=`<th title="${c}">${c.length>20?c.slice(0,18)+'…':c}</th>`});
   h+=`<th>Total</th></tr></thead><tbody>`;
   rows.forEach((row,ri)=>{
     const tot=cols.reduce((a,_,ci)=>a+(matrix[ri][ci]||0),0);
     h+=`<tr><td>${row}</td>`;
     cols.forEach((_,ci)=>{
-      const v=matrix[ri][ci]||0,rel=v/maxR[ri];
+      const v=matrix[ri][ci]||0,rel=maxR[ri]>0?v/maxR[ri]:0;
       let bg='transparent',fg='var(--text)';
       if(v>0){
-        if(rel>=.7){bg=`rgba(192,83,58,${(.3+rel*.7).toFixed(2)})`;fg=rel>.5?'#fff':'var(--rust)'}
-        else if(rel>=.35){bg=`rgba(184,135,63,${(.2+rel*.6).toFixed(2)})`;fg=rel>.5?'#fff':'var(--gold)'}
+        if(rel>=.7){bg=`rgba(192,83,58,${(.3+rel*.6).toFixed(2)})`;fg='#fff'}
+        else if(rel>=.35){bg=`rgba(184,135,63,${(.2+rel*.6).toFixed(2)})`;fg=rel>.4?'#fff':'var(--gold)'}
         else{bg=`rgba(74,124,106,${(.15+rel*.5).toFixed(2)})`;fg='var(--sage)'}
       }
       h+=`<td><span class="hcell" style="background:${bg};color:${fg}">${v>0?v:'—'}</span></td>`;
@@ -395,6 +429,7 @@ function buildHeat(containerId,rows,cols,matrix){
   document.getElementById(containerId).innerHTML=h;
 }
 
+// ── Gauge ─────────────────────────────────────────────────────
 function gauge(pfx,meta,real){
   const arc=document.getElementById(pfx+'A'),txt=document.getElementById(pfx+'T');
   if(!meta){arc.style.strokeDashoffset=267;txt.textContent='—';document.getElementById(pfx+'N').style.display='block';document.getElementById(pfx+'D').style.display='none';return}
@@ -408,6 +443,7 @@ function gauge(pfx,meta,real){
   document.getElementById(pfx+'N').style.display='none';document.getElementById(pfx+'D').style.display='block';
 }
 
+// ── Meta ─────────────────────────────────────────────────────
 const PTM=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 function findMeta(rows,pname,f,t){
   if(!rows?.length)return null;
@@ -421,18 +457,22 @@ function findMeta(rows,pname,f,t){
     if(pC&&pname){const rp=(lr[pC.toLowerCase()]||'').toLowerCase(),pn=pname.toLowerCase();if(rp&&!pn.includes(rp)&&!rp.includes(pn.replace('lic-','').trim()))continue}
     const ano=aC?parseInt(lr[aC.toLowerCase()]):null,mes=mC?pM(lr[mC.toLowerCase()]):null;
     if(mes&&mes>0){const yr=ano||parseInt(f.split('-')[0]),ym=`${yr}-${String(mes).padStart(2,'0')}`;if(ym<f||ym>t)continue}
-    const rv=(lr[mtC.toLowerCase()]||'').replace(/[^\d.,]/g,'').replace(',','.');const vl=parseFloat(rv);if(!isNaN(vl)&&vl>0){tot+=vl;hit++}
+    const rv=(lr[mtC.toLowerCase()]||'').replace(/[^\d.,]/g,'').replace(',','.');const vl=parseFloat(rv);
+    if(!isNaN(vl)&&vl>0){tot+=vl;hit++}
   }
   return hit>0?tot:null;
 }
 
+// ── Aggregate ─────────────────────────────────────────────────
 function agg(ids,f,t){
   const c={};
   for(const pid of ids){for(const d of(API.byPipeline[pid]||[])){
     if(d.month<f||d.month>t)continue;
-    if(!c[d.month])c[d.month]={month:d.month,criados:0,finalizados:0,ganhos:0,won:0,revenue:0,products:{},perdidos:0,lostReasons:{},lostStages:{}};
+    if(!c[d.month])c[d.month]={month:d.month,criados:0,finalizados:0,ganhos:0,criadosAberto:0,criadosGanho:0,criadosPerdido:0,won:0,revenue:0,products:{},perdidos:0,lostReasons:{},lostStages:{}};
     const m=c[d.month];
-    m.criados+=d.criados;m.finalizados+=d.finalizados;m.ganhos+=d.ganhos;m.won+=d.won;m.revenue+=d.revenue;m.perdidos+=d.perdidos;
+    m.criados+=d.criados;m.finalizados+=d.finalizados;m.ganhos+=d.ganhos;
+    m.criadosAberto+=d.criadosAberto||0;m.criadosGanho+=d.criadosGanho||0;m.criadosPerdido+=d.criadosPerdido||0;
+    m.won+=d.won;m.revenue+=d.revenue;m.perdidos+=d.perdidos;
     for(const[k,v]of Object.entries(d.products)){if(!m.products[k])m.products[k]={count:0,revenue:0};m.products[k].count+=v.count;m.products[k].revenue+=v.revenue}
     for(const[k,v]of Object.entries(d.lostReasons)){if(!m.lostReasons[k])m.lostReasons[k]=0;m.lostReasons[k]+=v}
     for(const[k,v]of Object.entries(d.lostStages)){if(!m.lostStages[k])m.lostStages[k]=0;m.lostStages[k]+=v}
@@ -440,6 +480,7 @@ function agg(ids,f,t){
   return Object.values(c).sort((a,b)=>a.month.localeCompare(b.month)).map(d=>({...d,avgTicket:d.won>0?d.revenue/d.won:0,conversion:d.criados>0?(d.won/d.criados)*100:0}));
 }
 
+// ── PAGE 1 ────────────────────────────────────────────────────
 function renderP1(data,pid){
   const pp=pid==='all'?null:API.pipelines.find(p=>p.id===pid);
   const pn=pp?.name||null,dn=pn?mask(pn):null;
@@ -452,34 +493,41 @@ function renderP1(data,pid){
   const tG=data.reduce((a,d)=>a+d.ganhos,0),tW=data.reduce((a,d)=>a+d.won,0);
   const tR=data.reduce((a,d)=>a+d.revenue,0),tP=data.reduce((a,d)=>a+d.perdidos,0);
   const at=tW>0?tR/tW:0,cv=tC>0?(tW/tC)*100:0;
-  const f=lMes(data[0].month),l=lMes(data[data.length-1].month);
-  document.getElementById('p1Sub').textContent=f===l?f:`${f} a ${l}`;
+  const fl=lMes(data[0].month),tl=lMes(data[data.length-1].month);
+  document.getElementById('p1Sub').textContent=fl===tl?fl:`${fl} a ${tl}`;
   const mx=Math.max(tC,1);
   document.getElementById('p1VC').textContent=tC.toLocaleString('pt-BR');
   document.getElementById('p1VF').textContent=tF.toLocaleString('pt-BR');
   document.getElementById('p1VG').textContent=tG.toLocaleString('pt-BR');
-  document.getElementById('p1VP').textContent=tP.toLocaleString('pt-BR');
   document.getElementById('p1Pct1').textContent=tC>0?(tF/tC*100).toFixed(1)+'%':'0%';
   document.getElementById('p1Pct2').textContent=tC>0?(tG/tC*100).toFixed(1)+'%':'0%';
-  document.getElementById('p1Pct3').textContent=tC>0?(tP/tC*100).toFixed(1)+'%':'0%';
   setTimeout(()=>{
     document.getElementById('p1BF').style.width=Math.max(25,Math.round(tF/mx*100))+'%';
     document.getElementById('p1BG').style.width=Math.max(15,Math.round(tG/mx*100))+'%';
-    document.getElementById('p1BP').style.width=Math.max(10,Math.round(tP/mx*100))+'%';
   },100);
   document.getElementById('p1KR').textContent=brlK(tR);
   document.getElementById('p1KT').textContent=at>0?brlK(at):'—';
   document.getElementById('p1KW').textContent=tW.toLocaleString('pt-BR');
   document.getElementById('p1KC').textContent=pct(cv);
   gauge('p1G',findMeta(API.meta,pn,data[0].month,data[data.length-1].month),tR);
-  mkBar('p1CL',labels,data.map(d=>d.criados),PAL[0],v=>v);
-  mkBar('p1CW',labels,data.map(d=>d.won),PAL[1],v=>v);
+
+  // Criados grouped by status
+  mkGroupedBar('p1CL',labels,[
+    {label:'Aberto',   data:data.map(d=>d.criadosAberto),  backgroundColor:'#1c2b3acc',borderColor:'#1c2b3a'},
+    {label:'Ganho',    data:data.map(d=>d.criadosGanho),   backgroundColor:'#4a7c6acc',borderColor:'#4a7c6a'},
+    {label:'Perdido',  data:data.map(d=>d.criadosPerdido), backgroundColor:'#c0533acc',borderColor:'#c0533a'},
+  ]);
+
+  mkHorizBar('p1CW',labels,data.map(d=>d.won),PAL[1],v=>v);
   mkLine('p1CR',labels,data.map(d=>d.revenue),PAL[2],v=>brlK(v));
   mkLine('p1CT',labels,data.map(d=>d.avgTicket),PAL[3],v=>brlK(v));
+
   const pm={};for(const d of data)for(const[p,v]of Object.entries(d.products)){if(!pm[p])pm[p]={count:0,revenue:0};pm[p].count+=v.count;pm[p].revenue+=v.revenue}
   const pe=Object.entries(pm).sort((a,b)=>b[1].revenue-a[1].revenue);
   const pL=pe.map(([k])=>k),pC=pe.map(([,v])=>v.count),pR=pe.map(([,v])=>v.revenue),pCl=pL.map((_,i)=>PAL[i%PAL.length]);
-  mkDnut('p1CPV',pL,pC,pCl,v=>v+' ganhos');mkHBar('p1CPR',pL,pR,pCl,v=>brlK(v));
+  mkDnut('p1CPV',pL,pC,pCl,v=>v+' ganhos');
+  mkHBarRevenue('p1CPR',pL,pR,pCl,v=>brlK(v));
+
   const tb=document.getElementById('p1TB');tb.innerHTML='';
   const z=v=>v===0?'<span class="tdz">—</span>':v.toLocaleString('pt-BR');
   data.forEach(d=>{const tr=document.createElement('tr');tr.innerHTML=`<td class="tdn">${lMes(d.month)}</td><td>${z(d.criados)}</td><td>${z(d.finalizados)}</td><td>${z(d.ganhos)}</td><td>${z(d.won)}</td><td>${z(d.perdidos)}</td><td>${d.revenue>0?brl(d.revenue):'<span class="tdz">—</span>'}</td><td>${d.avgTicket>0?brl(d.avgTicket):'<span class="tdz">—</span>'}</td><td>${d.criados>0?pct(d.conversion):'<span class="tdz">—</span>'}</td>`;tb.appendChild(tr)});
@@ -487,45 +535,78 @@ function renderP1(data,pid){
   document.getElementById('p1FU').textContent='Atualizado em '+new Date().toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'});
 }
 
+// ── PAGE 2 ────────────────────────────────────────────────────
 function renderP2(f,t){
   const fl=lMes(f),tl=lMes(t);
   document.getElementById('p2Sub').textContent=fl===tl?fl:`${fl} a ${tl}`;
+
   const rows=licP.map(p=>{
     const data=agg([p.id],f,t);
-    return{id:p.id,name:mask(p.name),
-      criados:data.reduce((a,d)=>a+d.criados,0),ganhos:data.reduce((a,d)=>a+d.ganhos,0),
-      won:data.reduce((a,d)=>a+d.won,0),revenue:data.reduce((a,d)=>a+d.revenue,0),
+    const pipeName=p.name;
+    const meta=findMeta(API.meta,pipeName,f,t);
+    return{
+      id:p.id,name:mask(p.name),pipeName,
+      criados:data.reduce((a,d)=>a+d.criados,0),
+      criadosAberto:data.reduce((a,d)=>a+(d.criadosAberto||0),0),
+      criadosGanho:data.reduce((a,d)=>a+(d.criadosGanho||0),0),
+      criadosPerdido:data.reduce((a,d)=>a+(d.criadosPerdido||0),0),
+      ganhos:data.reduce((a,d)=>a+d.ganhos,0),
+      won:data.reduce((a,d)=>a+d.won,0),
+      revenue:data.reduce((a,d)=>a+d.revenue,0),
       perdidos:data.reduce((a,d)=>a+d.perdidos,0),
+      meta,
       lostReasons:data.reduce((a,d)=>{for(const[k,v]of Object.entries(d.lostReasons))a[k]=(a[k]||0)+v;return a},{}),
       lostStages:data.reduce((a,d)=>{for(const[k,v]of Object.entries(d.lostStages))a[k]=(a[k]||0)+v;return a},{}),
     };
   }).filter(r=>r.criados>0||r.won>0||r.perdidos>0);
+
   if(!rows.length)return;
   const names=rows.map(r=>r.name);
-  mkBar('p2CC',names,rows.map(r=>r.criados),PAL[0],v=>v,true);
-  mkBar('p2CW',names,rows.map(r=>r.won),PAL[1],v=>v,true);
-  mkHBar('p2CR',names,rows.map(r=>r.revenue),rows.map((_,i)=>PAL[i%PAL.length]),v=>brlK(v));
-  mkBar('p2CP',names,rows.map(r=>r.perdidos),PAL[3],v=>v,true);
+
+  // Criados grouped by status — horizontal multi
+  mkHorizMulti('p2CC',names,[
+    {label:'Aberto',  data:rows.map(r=>r.criadosAberto)},
+    {label:'Ganho',   data:rows.map(r=>r.criadosGanho)},
+    {label:'Perdido', data:rows.map(r=>r.criadosPerdido)},
+  ],v=>v);
+
+  mkHorizBar('p2CW',names,rows.map(r=>r.won),PAL[1],v=>v);
+  mkHBarRevenue('p2CR',names,rows.map(r=>r.revenue),rows.map((_,i)=>PAL[i%PAL.length]),v=>brlK(v));
+  mkHorizBar('p2CP',names,rows.map(r=>r.perdidos),PAL[3],v=>v);
+
+  // Heat matrices
   const aR={};rows.forEach(r=>Object.entries(r.lostReasons).forEach(([k,v])=>{aR[k]=(aR[k]||0)+v}));
   const top10=Object.entries(aR).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([k])=>k);
   buildHeat('p2MR',names,top10,rows.map(r=>top10.map(k=>r.lostReasons[k]||0)));
+
   const aS={};rows.forEach(r=>Object.entries(r.lostStages).forEach(([k,v])=>{aS[k]=(aS[k]||0)+v}));
   const stages=Object.entries(aS).sort((a,b)=>b[1]-a[1]).map(([k])=>k);
   buildHeat('p2MS',names,stages,rows.map(r=>stages.map(k=>r.lostStages[k]||0)));
+
+  // Summary table with META
   const tb=document.getElementById('p2TB');tb.innerHTML='';
-  const tots={c:0,g:0,p:0,r:0,w:0};
+  const tots={c:0,g:0,p:0,r:0,w:0,m:0};
   rows.forEach(r=>{
-    const at=r.won>0?r.revenue/r.won:0,cv=r.criados>0?(r.won/r.criados)*100:0;
-    const tr=document.createElement('tr');tr.innerHTML=`<td class="tdn">${r.name}</td><td>${r.criados.toLocaleString('pt-BR')}</td><td>${r.ganhos.toLocaleString('pt-BR')}</td><td>${r.perdidos.toLocaleString('pt-BR')}</td><td>${r.revenue>0?brl(r.revenue):'<span class="tdz">—</span>'}</td><td>${at>0?brl(at):'<span class="tdz">—</span>'}</td><td>${r.criados>0?pct(cv):'<span class="tdz">—</span>'}</td>`;
-    tb.appendChild(tr);tots.c+=r.criados;tots.g+=r.ganhos;tots.p+=r.perdidos;tots.r+=r.revenue;tots.w+=r.won;
+    const at=r.won>0?r.revenue/r.won:0;
+    const cv=r.criados>0?(r.won/r.criados)*100:0;
+    const atingPct=r.meta&&r.meta>0?(r.revenue/r.meta)*100:null;
+    const atingClass=atingPct===null?'':(atingPct>=100?'pct-hi':atingPct>=70?'pct-md':'pct-lo');
+    const atingTxt=atingPct!==null?`<span class="pct-badge ${atingClass}">${atingPct.toFixed(0)}%</span>`:'<span class="tdz">—</span>';
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td class="tdn">${r.name}</td><td>${r.criados.toLocaleString('pt-BR')}</td><td>${r.ganhos.toLocaleString('pt-BR')}</td><td>${r.perdidos.toLocaleString('pt-BR')}</td><td>${r.revenue>0?brl(r.revenue):'<span class="tdz">—</span>'}</td><td>${at>0?brl(at):'<span class="tdz">—</span>'}</td><td>${r.criados>0?pct(cv):'<span class="tdz">—</span>'}</td><td>${r.meta?brl(r.meta):'<span class="tdz">—</span>'}</td><td>${atingTxt}</td>`;
+    tb.appendChild(tr);
+    tots.c+=r.criados;tots.g+=r.ganhos;tots.p+=r.perdidos;tots.r+=r.revenue;tots.w+=r.won;if(r.meta)tots.m+=r.meta;
   });
   const tat=tots.w>0?tots.r/tots.w:0,tcv=tots.c>0?(tots.w/tots.c)*100:0;
-  document.getElementById('p2TF').innerHTML=`<tr><td>Total</td><td>${tots.c.toLocaleString('pt-BR')}</td><td>${tots.g.toLocaleString('pt-BR')}</td><td>${tots.p.toLocaleString('pt-BR')}</td><td>${brl(tots.r)}</td><td>${tat>0?brl(tat):'—'}</td><td>${pct(tcv)}</td></tr>`;
+  const tatP=tots.m>0?(tots.r/tots.m)*100:null;
+  const tatClass=tatP===null?'':(tatP>=100?'pct-hi':tatP>=70?'pct-md':'pct-lo');
+  document.getElementById('p2TF').innerHTML=`<tr><td>Total</td><td>${tots.c.toLocaleString('pt-BR')}</td><td>${tots.g.toLocaleString('pt-BR')}</td><td>${tots.p.toLocaleString('pt-BR')}</td><td>${brl(tots.r)}</td><td>${tat>0?brl(tat):'—'}</td><td>${pct(tcv)}</td><td>${tots.m>0?brl(tots.m):'—'}</td><td>${tatP!==null?`<span class="pct-badge ${tatClass}">${tatP.toFixed(0)}%</span>`:'—'}</td></tr>`;
   document.getElementById('p2FU').textContent='Atualizado em '+new Date().toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'});
 }
 
+// ── Selectors ─────────────────────────────────────────────────
 function ap1(){const pid=document.getElementById('p1Pipe').value,f=document.getElementById('p1From').value,t=document.getElementById('p1To').value;const data=pid==='all'?agg(licP.map(p=>p.id),f,t):(API.byPipeline[pid]||[]).filter(d=>d.month>=f&&d.month<=t);renderP1(data,pid)}
-function ap2(){const f=document.getElementById('p2From').value,t=document.getElementById('p2To').value;renderP2(f,t)}
+function ap2(){renderP2(document.getElementById('p2From').value,document.getElementById('p2To').value)}
 
 function buildSel(pipelines){
   licP=pipelines.filter(p=>p.name.toUpperCase().startsWith('LIC-'));
