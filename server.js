@@ -1,659 +1,1295 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Licenciados — Board Academy</title>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@300;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#f2ede6;--surface:#fff;--navy:#1c2b3a;--navyL:#2d4459;--gold:#b8873f;--goldP:#f5e9d6;--sage:#4a7c6a;--rust:#c0533a;--muted:#8a8277;--border:#e0d9d0;--text:#1c2020;--radius:8px;--shadow:0 1px 3px rgba(28,32,32,.06),0 4px 16px rgba(28,32,32,.06)}
-html{font-size:14px}body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
-#loginScreen{position:fixed;inset:0;background:var(--navy);display:flex;align-items:center;justify-content:center;z-index:1000}
-.lcard{background:#fff;border-radius:12px;padding:40px 36px 32px;width:100%;max-width:380px;box-shadow:0 24px 64px rgba(0,0,0,.35)}
-.llogo{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:600;color:var(--gold);letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
-.ltitle{font-family:'Fraunces',serif;font-size:1.6rem;font-weight:600;color:var(--navy);margin-bottom:28px;line-height:1.2}
-.lfield{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
-.llabel{font-size:.68rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
-.linput{border:1.5px solid var(--border);border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--text);padding:10px 13px;transition:border-color .15s;outline:none;background:#fff}
-.linput:focus{border-color:var(--navy)}
-.lbtn{width:100%;margin-top:8px;background:var(--navy);color:#fff;border:none;border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:600;padding:12px;cursor:pointer;letter-spacing:.03em}
-.lbtn:hover{background:var(--navyL)}.lbtn:disabled{opacity:.5;cursor:default}
-.lerr{background:#fef2f2;border:1px solid #fecaca;border-radius:6px;color:#991b1b;font-size:.78rem;padding:9px 12px;margin-top:12px;display:none}
-.lspinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
-@keyframes spin{to{transform:rotate(360deg)}}
-#shell{display:none}
-.topbar{background:var(--navy);padding:0 24px;display:flex;align-items:stretch;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.18)}
-.tb-left{display:flex;align-items:stretch}
-.tb-brand{display:flex;align-items:center;padding:14px 0}
-.tb-logo{font-family:'Fraunces',serif;font-size:1rem;font-weight:600;color:var(--gold);letter-spacing:.05em}
-.tb-sep{width:1px;background:rgba(255,255,255,.12);margin:10px 16px}
-.tb-nav{display:flex;align-items:stretch;gap:2px}
-.nav-tab{background:none;border:none;color:rgba(255,255,255,.55);font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:500;padding:0 18px;cursor:pointer;letter-spacing:.04em;border-bottom:2.5px solid transparent;transition:color .15s,border-color .15s}
-.nav-tab:hover{color:rgba(255,255,255,.85)}.nav-tab.active{color:#fff;border-bottom-color:var(--gold)}
-.tb-right{display:flex;align-items:center;gap:8px}
-.tb-user{font-size:.72rem;color:rgba(255,255,255,.4);letter-spacing:.04em}
-.tbtn{background:none;border:1px solid rgba(255,255,255,.18);border-radius:6px;color:rgba(255,255,255,.7);font-family:'DM Sans',sans-serif;font-size:.75rem;font-weight:500;padding:5px 12px;cursor:pointer;transition:all .15s}
-.tbtn:hover{background:rgba(255,255,255,.1);color:#fff}.tbtn:disabled{opacity:.5;cursor:default}
-.page{display:none;max-width:1200px;margin:0 auto;padding:24px 20px 56px}.page.active{display:block}
-.ph-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:16px;border-bottom:1.5px solid var(--border);flex-wrap:wrap;gap:14px}
-.ph-eye{font-size:.68rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:3px}
-.ph-ttl{font-family:'Fraunces',serif;font-size:1.6rem;font-weight:600;color:var(--navy);line-height:1.1}
-.ph-sub{font-size:.75rem;color:var(--muted);margin-top:4px}
-.ctrl-row{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap}
-.cg{display:flex;flex-direction:column;gap:3px}
-.cl{font-size:.64rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-select{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.82rem;padding:6px 28px 6px 10px;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%238a8277' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;cursor:pointer}
-select:focus{outline:none;border-color:var(--navy)}
-#p1Pipe{border-color:var(--gold);font-weight:500;color:var(--navy)}
-.sec-lbl{font-size:.64rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:8px}
-.sec-lbl::after{content:'';flex:1;height:1px;background:var(--border)}
-.sec-ttl{font-family:'Fraunces',serif;font-size:1rem;font-weight:600;color:var(--navy);margin-bottom:12px;padding-bottom:7px;border-bottom:1px solid var(--border)}
-.kpi2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 16px 12px;box-shadow:var(--shadow);position:relative;overflow:hidden}
-.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2.5px;background:var(--gold);opacity:0;transition:opacity .3s}
-.kpi:hover::before{opacity:1}
-.kpi .lbl{font-size:.64rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
-.kpi .val{font-family:'Fraunces',serif;font-size:1.55rem;font-weight:600;color:var(--navy);line-height:1}
-.kpi .sub{font-size:.7rem;color:var(--muted);margin-top:4px}
-.tsec{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
-.rsec{display:flex;flex-direction:column;gap:12px}
-.fcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow)}
-.fcard-ttl{font-size:.64rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
-.fv-row{width:100%;display:flex;flex-direction:column;align-items:center}
-.fbar{height:54px;border-radius:6px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;color:#fff;transition:width 1s cubic-bezier(.4,0,.2,1)}
-.fbar.navy{background:linear-gradient(135deg,#1c2b3a,#2d4459)}
-.fbar.gold{background:linear-gradient(135deg,#8c6428,#c99440)}
-.fbar.sage{background:linear-gradient(135deg,#2e5c4a,#4a7c6a)}
-.flbl{font-size:.68rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;opacity:.85}
-.fval{font-family:'Fraunces',serif;font-size:1.4rem;font-weight:600}
-.fcon{display:flex;align-items:center;justify-content:center;gap:6px;padding:4px 0}
-.fcon-line{flex:1;max-width:60px;height:1px;background:var(--border)}
-.fcon-pct{font-weight:600;color:var(--navy);font-size:.72rem}
-.gcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;box-shadow:var(--shadow);display:flex;align-items:center;gap:20px}
-.gwrap{flex-shrink:0;width:160px}
-.gsvg{width:100%;overflow:visible}
-.ginfo{flex:1;display:flex;flex-direction:column;gap:8px}
-.gi-row{display:flex;flex-direction:column;gap:1px}
-.gi-lbl{font-size:.62rem;font-weight:500;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
-.gi-val{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:600;color:var(--navy)}
-.gnom{font-size:.75rem;color:var(--muted);font-style:italic}
-.charts-row{display:grid;gap:12px;margin-bottom:14px}
-.cols-2{grid-template-columns:1fr 1fr}
-.ccard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 16px 12px;box-shadow:var(--shadow)}
-.ccard-ttl{font-size:.64rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
-.cwrap{position:relative;height:180px}
-.cwrap.tall{height:240px}
-.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
-.twrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:auto}
-table{width:100%;border-collapse:collapse;font-size:.78rem}
-thead{background:var(--navy)}
-thead th{color:rgba(255,255,255,.75);font-size:.62rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;padding:10px 13px;text-align:left;white-space:nowrap}
-thead th:not(:first-child){text-align:right}
-tbody tr{border-bottom:1px solid var(--border);transition:background .12s}
-tbody tr:last-child{border-bottom:none}
-tbody tr:hover{background:var(--bg)}
-tbody td{padding:9px 13px;color:var(--text);white-space:nowrap}
-tbody td:not(:first-child){text-align:right;font-variant-numeric:tabular-nums}
-.tdn{font-weight:500;color:var(--navy)}.tdz{color:var(--muted)}
-tfoot td{padding:9px 13px;font-weight:600;color:var(--navy);background:var(--goldP);font-size:.79rem;border-top:1.5px solid var(--border)}
-tfoot td:not(:first-child){text-align:right;font-variant-numeric:tabular-nums}
-.pct-badge{display:inline-block;padding:2px 7px;border-radius:20px;font-size:.7rem;font-weight:600}
-.pct-hi{background:#e8f5f0;color:#2e5c4a}.pct-md{background:#fef3e2;color:#8c6428}.pct-lo{background:#fef2f2;color:#8a2a1a}
-/* HEAT — cell background, no box */
-.mwrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:auto;margin-bottom:14px}
-.mtable{width:100%;border-collapse:collapse;font-size:.78rem}
-.mtable thead th{background:var(--navy);color:rgba(255,255,255,.75);font-size:.6rem;font-weight:500;letter-spacing:.09em;text-transform:uppercase;padding:9px 12px;text-align:center;white-space:nowrap}
-.mtable thead th:first-child{text-align:left;min-width:130px}
-.mtable tbody tr{border-bottom:1px solid var(--border)}
-.mtable tbody tr:last-child{border-bottom:none}
-.mtable tbody td{padding:9px 12px;text-align:right;font-variant-numeric:tabular-nums;font-size:.78rem;transition:filter .12s}
-.mtable tbody td:first-child{text-align:left;font-weight:600;color:var(--navy);background:var(--bg)!important;border-right:1.5px solid var(--border);white-space:nowrap}
-.mtable tbody td.heat-total{font-weight:700;color:var(--navy);background:var(--goldP)!important;border-left:1.5px solid var(--border)}
-.mtable tbody tr:hover td{filter:brightness(.95)}
-.errbanner{background:#fef2f2;border:1px solid #fecaca;border-radius:var(--radius);color:#991b1b;padding:12px 16px;font-size:.82rem;margin-bottom:16px;display:none}
-.pfooter{margin-top:28px;padding-top:12px;border-top:1px solid var(--border);display:flex;justify-content:space-between}
-.pfooter span{font-size:.68rem;color:var(--muted)}
-@media print{
-  @page{size:A4 landscape;margin:6mm}
-  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
-  body{background:#fff!important;zoom:.6}
-  #loginScreen,.topbar{display:none!important}
-  .page.active{display:block!important;max-width:100%!important;padding:12px 16px 20px}
-  .tbtn,.cg{display:none!important}
-  .ccard,.twrap,.kpi,.fcard,.gcard,.mwrap{box-shadow:none!important}
-}
-@media(max-width:860px){.tsec,.cols-2,.pgrid{grid-template-columns:1fr}.kpi2{grid-template-columns:1fr 1fr}}
-</style>
-</head>
-<body>
+"""
+Board Academy — Forecast Dashboard
+Deploy: Render.com
+"""
 
-<div id="loginScreen">
-  <div class="lcard">
-    <div class="llogo">Board Academy</div>
-    <div class="ltitle">Relatório<br>Licenciados</div>
-    <div class="lfield"><label class="llabel">Usuário</label><input class="linput" id="lUser" type="text" autocomplete="username"></div>
-    <div class="lfield"><label class="llabel">Senha</label><input class="linput" id="lPass" type="password" autocomplete="current-password"></div>
-    <button class="lbtn" id="lBtn" onclick="doLogin()">Entrar</button>
-    <div class="lerr" id="lErr"></div>
-  </div>
-</div>
+from flask import Flask, jsonify, request, session, redirect, render_template
+import requests as req
+import pandas as pd
+import os
+import unicodedata
+import calendar
+import math
+from datetime import date, datetime, timedelta
+from io import StringIO
 
-<div id="shell">
-  <div class="topbar">
-    <div class="tb-left">
-      <div class="tb-brand"><span class="tb-logo">Board Academy</span></div>
-      <div class="tb-sep"></div>
-      <div class="tb-nav">
-        <button class="nav-tab active" onclick="switchTab('p1')">Relatório</button>
-        <button class="nav-tab" onclick="switchTab('p2')">Comparativo</button>
-      </div>
-    </div>
-    <div class="tb-right">
-      <span class="tb-user" id="tbUser"></span>
-      <button class="tbtn" onclick="window.print()">↓ PDF</button>
-      <button class="tbtn" id="btnRefresh" onclick="doRefresh()">↺ Atualizar</button>
-      <button class="tbtn" onclick="doLogout()">Sair</button>
-    </div>
-  </div>
+app = Flask(__name__, template_folder='.')
+app.secret_key = os.environ.get("SECRET_KEY", "boardacademy2026secret")
 
-  <!-- PAGE 1 -->
-  <div class="page active" id="p1">
-    <div class="errbanner" id="p1Err"></div>
-    <div class="ph-row">
-      <div><div class="ph-eye">Board Academy</div><div class="ph-ttl" id="p1Title">Relatório — Licenciados</div><div class="ph-sub" id="p1Sub">—</div></div>
-      <div class="ctrl-row">
-        <div class="cg"><span class="cl">Licenciado</span><select id="p1Pipe"></select></div>
-        <div class="cg"><span class="cl">De</span><select id="p1From"></select></div>
-        <div class="cg"><span class="cl">Até</span><select id="p1To"></select></div>
-      </div>
-    </div>
+API_KEY           = os.environ.get("PIPE_API_KEY", "")
 
-    <div class="sec-lbl">Funil de negócios — por data de criação</div>
-    <div class="tsec">
-      <div class="fcard">
-        <div class="fcard-ttl">Fluxo de Negócios</div>
-        <div class="fv-row"><div class="fbar navy" id="p1BC" style="width:100%"><span class="flbl">Criados</span><span class="fval" id="p1VC">0</span></div></div>
-        <div class="fcon"><div class="fcon-line"></div><span class="fcon-pct" id="p1Pct1">0%</span><div class="fcon-line"></div></div>
-        <div class="fv-row"><div class="fbar gold" id="p1BF" style="width:85%"><span class="flbl">Finalizados</span><span class="fval" id="p1VF">0</span></div></div>
-        <div class="fcon"><div class="fcon-line"></div><span class="fcon-pct" id="p1Pct2">0%</span><div class="fcon-line"></div></div>
-        <div class="fv-row"><div class="fbar sage" id="p1BG" style="width:40%"><span class="flbl">Ganhos</span><span class="fval" id="p1VG">0</span></div></div>
-      </div>
-      <div class="rsec">
-        <div class="kpi2">
-          <div class="kpi"><div class="lbl">Receita Total</div><div class="val" id="p1KR">—</div><div class="sub">por data de ganho</div></div>
-          <div class="kpi"><div class="lbl">Ticket Médio</div><div class="val" id="p1KT">—</div><div class="sub">por fechamento</div></div>
-          <div class="kpi"><div class="lbl">Negócios Ganhos</div><div class="val" id="p1KW">—</div><div class="sub">por data de ganho</div></div>
-          <div class="kpi"><div class="lbl">Conversão</div><div class="val" id="p1KC">—</div><div class="sub">criados → ganhos</div></div>
-        </div>
-        <div class="gcard">
-          <div class="gwrap">
-            <svg class="gsvg" viewBox="0 0 200 115">
-              <path d="M 15 105 A 85 85 0 0 1 185 105" fill="none" stroke="#e0d9d0" stroke-width="14" stroke-linecap="round"/>
-              <path id="p1GA" d="M 15 105 A 85 85 0 0 1 185 105" fill="none" stroke="#4a7c6a" stroke-width="14" stroke-linecap="round" stroke-dasharray="267" stroke-dashoffset="267" style="transition:stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1),stroke .4s"/>
-              <text id="p1GT" x="100" y="95" text-anchor="middle" font-size="26" font-weight="700" fill="#1c2b3a" font-family="Fraunces,serif">—</text>
-              <text x="100" y="112" text-anchor="middle" font-size="9.5" fill="#8a8277" font-family="DM Sans,sans-serif">meta atingida</text>
-            </svg>
-          </div>
-          <div class="ginfo">
-            <div class="gnom" id="p1GN">Meta não configurada</div>
-            <div id="p1GD" style="display:none">
-              <div class="gi-row"><span class="gi-lbl">Meta</span><span class="gi-val" id="p1GM">—</span></div>
-              <div class="gi-row" style="margin-top:8px"><span class="gi-lbl">Realizado</span><span class="gi-val" id="p1GR">—</span></div>
-              <div class="gi-row" style="margin-top:8px"><span class="gi-lbl">Diferença</span><span class="gi-val" id="p1GDf" style="font-size:.95rem">—</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+BASE_V1           = "https://boardacademy.pipedrive.com/api/v1"
+BASE_V2           = "https://boardacademy.pipedrive.com/api/v2"
+FILTER_DEALS      = int(os.environ.get("FILTER_DEALS",      "74674"))
+FILTER_DEALS_RV   = int(os.environ.get("FILTER_DEALS_RV",   "1431880"))
+FILTER_ACTIVITIES = int(os.environ.get("FILTER_ACTIVITIES", "1310451"))
 
-    <div class="sec-ttl" id="p1SecE">Evolução Mensal</div>
-    <div class="charts-row cols-2" style="margin-bottom:14px">
-      <div class="ccard"><div class="ccard-ttl">Leads Criados por Mês — por status</div><div class="cwrap tall"><canvas id="p1CL"></canvas></div></div>
-      <div class="ccard"><div class="ccard-ttl">Ganhos por Mês — volume</div><div class="cwrap tall"><canvas id="p1CW"></canvas></div></div>
-    </div>
-    <div class="charts-row cols-2" style="margin-bottom:18px">
-      <div class="ccard"><div class="ccard-ttl">Receita por Mês (R$)</div><div class="cwrap"><canvas id="p1CR"></canvas></div></div>
-      <div class="ccard"><div class="ccard-ttl">Ticket Médio por Mês (R$)</div><div class="cwrap"><canvas id="p1CT"></canvas></div></div>
-    </div>
+CF_MULTIPLICADOR = "7e0e43c2734751f77be292a72527f638a850ad50"
+CF_QUALIFICADOR  = "a6f13cc27c8d041f3af4091283ce0d4fe0913875"
+CF_REUNIAO_VALID = "7299bf170c5deab9b4fd8c2275f55faf51984dea"
 
-    <div class="sec-ttl" id="p1SecP">Quebra por Produto</div>
-    <div class="pgrid" style="margin-bottom:18px">
-      <div class="ccard"><div class="ccard-ttl">Volume por Produto</div><div class="cwrap tall"><canvas id="p1CPV"></canvas></div></div>
-      <div class="ccard"><div class="ccard-ttl">Receita por Produto (R$)</div><div class="cwrap tall"><canvas id="p1CPR"></canvas></div></div>
-    </div>
+URL_COLAB    = os.environ.get("URL_COLAB",    "https://docs.google.com/spreadsheets/d/e/2PACX-1vSvwO3Ag2f2cbkVgR1pJZp6fANQcbualGKlAG50fmOljuEGKZ1gJBbSAjRdO3SomXUEVQOWnTvlfHRd/pub?gid=1782440078&single=true&output=csv")
+URL_METAS    = os.environ.get("URL_METAS",    "https://docs.google.com/spreadsheets/d/e/2PACX-1vSvwO3Ag2f2cbkVgR1pJZp6fANQcbualGKlAG50fmOljuEGKZ1gJBbSAjRdO3SomXUEVQOWnTvlfHRd/pub?gid=0&single=true&output=csv")
+URL_USERS    = os.environ.get("URL_USERS",    "https://docs.google.com/spreadsheets/d/e/2PACX-1vSvwO3Ag2f2cbkVgR1pJZp6fANQcbualGKlAG50fmOljuEGKZ1gJBbSAjRdO3SomXUEVQOWnTvlfHRd/pub?gid=160245570&single=true&output=csv")
+URL_FERIADOS = os.environ.get("URL_FERIADOS", "https://docs.google.com/spreadsheets/d/e/2PACX-1vSvwO3Ag2f2cbkVgR1pJZp6fANQcbualGKlAG50fmOljuEGKZ1gJBbSAjRdO3SomXUEVQOWnTvlfHRd/pub?gid=1010928978&single=true&output=csv")
 
-    <div class="sec-ttl">Detalhe por Mês</div>
-    <div class="twrap">
-      <table><thead><tr><th>Mês</th><th>Criados</th><th>Finalizados</th><th>Ganhos(cri.)</th><th>Won(rec.)</th><th>Perdidos</th><th>Receita</th><th>Ticket Médio</th><th>Conversão</th></tr></thead>
-      <tbody id="p1TB"></tbody><tfoot id="p1TF"></tfoot></table>
-    </div>
-    <div class="pfooter"><span>Board Academy · Licenciados</span><span id="p1FU"></span></div>
-  </div>
+# ── HELPERS ───────────────────────────────────────────────────
+def norm(s):
+    if not s: return ""
+    s = str(s).strip().lower()
+    return unicodedata.normalize("NFD", s).encode("ascii", "ignore").decode()
 
-  <!-- PAGE 2 -->
-  <div class="page" id="p2">
-    <div class="ph-row">
-      <div><div class="ph-eye">Board Academy</div><div class="ph-ttl">Comparativo — Licenciados</div><div class="ph-sub" id="p2Sub">—</div></div>
-      <div class="ctrl-row">
-        <div class="cg"><span class="cl">De</span><select id="p2From"></select></div>
-        <div class="cg"><span class="cl">Até</span><select id="p2To"></select></div>
-      </div>
-    </div>
+SUPERUSERS_RAW = os.environ.get("SUPERUSERS", "farias souza")
+MASTERS_RAW   = os.environ.get("MASTERS", "rodrigo leira,matheus paz,farias souza")
+GITHUB_TOKEN  = os.environ.get("GITHUB_TOKEN", "")
+GITHUB_REPO   = "negocios87-sketch/gerente_comercial"
+GITHUB_BRANCH = "main"
 
-    <div class="sec-ttl">Criados por Licenciado — data de criação</div>
-    <div class="ccard" style="margin-bottom:14px"><div class="ccard-ttl">Leads Criados por Status — ordem decrescente por total</div><div class="cwrap tall"><canvas id="p2CC"></canvas></div></div>
+def arred(v):
+    try:
+        f = float(v)
+        return 0.0 if math.isnan(f) or math.isinf(f) else round(f, 2)
+    except: return 0.0
 
-    <div class="sec-ttl">Ganhos por Licenciado — data de ganho</div>
-    <div class="charts-row cols-2" style="margin-bottom:14px">
-      <div class="ccard"><div class="ccard-ttl">Volume de Ganhos — ordem decrescente</div><div class="cwrap tall"><canvas id="p2CW"></canvas></div></div>
-      <div class="ccard"><div class="ccard-ttl">Receita — ordem decrescente</div><div class="cwrap tall"><canvas id="p2CR"></canvas></div></div>
-    </div>
+def safe_div(a, b):
+    try: return float(a) / float(b) if b else 0.0
+    except: return 0.0
 
-    <div class="sec-ttl">Perdidos por Licenciado — data de perda</div>
-    <div class="ccard" style="margin-bottom:14px"><div class="ccard-ttl">Volume de Perdidos — ordem decrescente</div><div class="cwrap tall"><canvas id="p2CP"></canvas></div></div>
+def cf(deal, key):
+    val = deal.get(key)
+    if val is None: return None
+    if isinstance(val, dict): return val.get("value") or val.get("label")
+    return val
 
-    <div class="sec-ttl">Motivo de Perda por Licenciado — Top 10</div>
-    <div class="mwrap" id="p2MR"></div>
+def get_owner_name(deal):
+    uid = deal.get("user_id")
+    if isinstance(uid, dict): return uid.get("name", "")
+    return ""
 
-    <div class="sec-ttl" style="margin-top:14px">Etapa de Perda por Licenciado</div>
-    <div class="mwrap" id="p2MS"></div>
+def get_owner_id(deal):
+    uid = deal.get("user_id")
+    if isinstance(uid, dict): return uid.get("id")
+    return uid
 
-    <div class="sec-ttl" style="margin-top:14px">Resumo Geral por Licenciado</div>
-    <div class="twrap">
-      <table><thead><tr><th>Licenciado</th><th>Criados</th><th>Ganhos</th><th>Perdidos</th><th>Receita</th><th>Ticket Médio</th><th>Conversão</th><th>Meta</th><th>Atingimento</th></tr></thead>
-      <tbody id="p2TB"></tbody><tfoot id="p2TF"></tfoot></table>
-    </div>
-    <div class="pfooter"><span>Board Academy · Comparativo</span><span id="p2FU"></span></div>
-  </div>
-</div>
+def du_mes_total(ano, mes, feriados=set()):
+    return sum(1 for d in range(1, calendar.monthrange(ano, mes)[1] + 1)
+               if date(ano, mes, d).weekday() < 5 and date(ano, mes, d) not in feriados)
 
-<script>
-Chart.register(ChartDataLabels);
+def du_passados(ano, mes, feriados=set()):
+    hoje = date.today()
+    return max(sum(1 for d in range(1, min(hoje.day, calendar.monthrange(ano, mes)[1]) + 1)
+                   if date(ano, mes, d).weekday() < 5 and date(ano, mes, d) not in feriados), 1)
 
-const MASKS={'LIC-BC':'Balneário Camboriú','LIC-BEL':'Belém','LIC-BH':'Belo Horizonte','LIC-BSB':'Brasília','LIC-CWB':'Curitiba','LIC-REC':'Recife','LIC-RIO':'Rio de Janeiro','LIC-SAL':'Salvador','LIC-SJC':'São José dos Campos'};
-function mask(name){for(const[k,v]of Object.entries(MASKS))if(name.toUpperCase().includes(k))return v;return name}
+def du_restantes(ano, mes, feriados=set()):
+    hoje = date.today()
+    ultimo = calendar.monthrange(ano, mes)[1]
+    return sum(1 for d in range(hoje.day + 1, ultimo + 1)
+               if date(ano, mes, d).weekday() < 5 and date(ano, mes, d) not in feriados)
 
-let TOKEN=sessionStorage.getItem('ba_tok')||null;
-function setTok(t,u){TOKEN=t;sessionStorage.setItem('ba_tok',t);sessionStorage.setItem('ba_usr',u)}
-function clrTok(){TOKEN=null;sessionStorage.removeItem('ba_tok');sessionStorage.removeItem('ba_usr')}
-function usr(){return sessionStorage.getItem('ba_usr')||''}
-async function aFetch(url,opts={}){const r=await fetch(url,{...opts,headers:{...(opts.headers||{}),'Authorization':`Bearer ${TOKEN}`}});if(r.status===401){clrTok();showLogin();throw new Error('Sessão expirada.')}return r}
-function showLogin(){document.getElementById('loginScreen').style.display='flex';document.getElementById('shell').style.display='none'}
-function hideLogin(){document.getElementById('loginScreen').style.display='none';document.getElementById('shell').style.display='block'}
+def limpar_nans(obj):
+    if isinstance(obj, dict): return {k: limpar_nans(v) for k, v in obj.items()}
+    if isinstance(obj, list): return [limpar_nans(v) for v in obj]
+    if isinstance(obj, float) and (math.isnan(obj) or math.isinf(obj)): return None
+    return obj
 
-async function doLogin(){
-  const btn=document.getElementById('lBtn'),err=document.getElementById('lErr');
-  const u=document.getElementById('lUser').value.trim(),p=document.getElementById('lPass').value;
-  if(!u||!p){showE('Preencha usuário e senha.');return}
-  btn.disabled=true;btn.innerHTML='<span class="lspinner"></span>Entrando...';err.style.display='none';
-  try{const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({usuario:u,senha:p})});const j=await r.json();if(!j.ok)throw new Error(j.error);setTok(j.token,j.user);hideLogin();await load()}
-  catch(e){showE(e.message)}finally{btn.disabled=false;btn.textContent='Entrar'}
-}
-function showE(m){const e=document.getElementById('lErr');e.textContent=m;e.style.display='block'}
-async function doLogout(){try{await aFetch('/api/logout',{method:'POST'})}catch{}clrTok();showLogin()}
-document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('loginScreen').style.display!=='none')doLogin()});
+# ── SHEETS ────────────────────────────────────────────────────
+def ler_sheet(url):
+    resp = req.get(url, timeout=15)
+    resp.encoding = "utf-8"
+    resp.raise_for_status()
+    return pd.read_csv(StringIO(resp.text))
 
-function switchTab(id){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  document.querySelectorAll('.nav-tab')[id==='p1'?0:1].classList.add('active');
-}
+def buscar_usuario(usuario, senha):
+    df = ler_sheet(URL_USERS)
+    df.columns = [c.strip().lower() for c in df.columns]
+    for _, row in df.iterrows():
+        if (norm(str(row.get("usuario", ""))) == norm(usuario) and
+                str(row.get("senha", "")).strip() == str(senha).strip()):
+            return str(row.get("usuario", ""))
+    return None
 
-const brl=v=>v.toLocaleString('pt-BR',{style:'currency',currency:'BRL',minimumFractionDigits:0,maximumFractionDigits:0});
-const brlK=v=>v>=1000?'R$'+(v/1000).toFixed(0)+'k':'R$'+v.toFixed(0);
-const pct=v=>v.toFixed(1)+'%';
-const lMes=ym=>{const[y,m]=ym.split('-');return['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][+m-1]+'/'+y.slice(2)};
+def buscar_colaboradores(mes=None, ano=None):
+    df = ler_sheet(URL_COLAB)
+    df.columns = [c.strip() for c in df.columns]
 
-let API=null,CH={},licP=[];
-const PAL=['#1c2b3a','#b8873f','#4a7c6a','#c0533a','#7b5ea7','#2d7da8','#c47a2d','#3d7a5c','#a05c8a','#5a8a6a'];
-const GC='rgba(28,32,32,.06)',TC='#8a8277';
-const STATUS_COLORS={aberto:'#1c2b3a',ganho:'#4a7c6a',perdido:'#c0533a'};
+    # Filtra por mês/ano de referência se as colunas existirem
+    mes_col = next((c for c in df.columns if "mes" in norm(c) and "ref" in norm(c)), None)
+    ano_col = next((c for c in df.columns if "ano" in norm(c) and "ref" in norm(c)), None)
 
-const dlL=fmt=>({display:ctx=>{const d=ctx.dataset.data,i=ctx.dataIndex,v=d[i];return v>0&&v>=(d[i-1]||0)&&v>=(d[i+1]||0)},formatter:fmt,color:ctx=>ctx.dataset.borderColor,font:{family:'DM Sans',size:9,weight:'600'},anchor:'end',align:'top',offset:4});
-const dlHoriz=fmt=>({display:ctx=>ctx.dataset.data[ctx.dataIndex]>0,formatter:fmt,color:'#1c2b3a',font:{family:'DM Sans',size:9,weight:'600'},anchor:'end',align:'right',offset:4});
+    if mes_col and ano_col and mes and ano:
+        def to_int(v):
+            try: return int(float(str(v)))
+            except: return 0
+        mask = (df[mes_col].apply(to_int) == mes) & (df[ano_col].apply(to_int) == ano)
+        df = df[mask].copy() if not df.empty else df
+        # Fallback: se não encontrar nenhuma linha, usa sem filtro
+        if df.empty:
+            df = ler_sheet(URL_COLAB)
+            df.columns = [c.strip() for c in df.columns]
 
-function dk(id){if(CH[id]){CH[id].destroy();delete CH[id]}}
+    status_col = next((c for c in df.columns if "status" in norm(c)), None)
+    if status_col:
+        df = df[df[status_col].apply(lambda x: norm(str(x)) == "ativo")]
+    return df
 
-// ── Stacked bar (vertical) for status breakdown ──────────────
-function mkStacked(id,labels,datasets){
-  dk(id);
-  CH[id]=new Chart(document.getElementById(id),{type:'bar',
-    data:{labels,datasets:datasets.map(d=>({...d,borderWidth:0,borderRadius:0,borderSkipped:false}))},
-    options:{responsive:true,maintainAspectRatio:false,
-      animation:{duration:600,easing:'easeOutQuart'},
-      layout:{padding:{top:28}},
-      plugins:{
-        legend:{display:true,position:'bottom',labels:{color:TC,font:{size:9},padding:12,boxWidth:10}},
-        datalabels:{
-          display:ctx=>{const v=ctx.dataset.data[ctx.dataIndex];return v>0},
-          formatter:v=>v,
-          color:'#fff',
-          font:{family:'DM Sans',size:8,weight:'600'},
-          anchor:'center',align:'center',
+def buscar_feriados():
+    try:
+        df = ler_sheet(URL_FERIADOS)
+        feriados = set()
+        for _, row in df.iterrows():
+            val = str(row.iloc[0]).strip()
+            for fmt in ("%d/%m/%Y", "%Y-%m-%d", "%m/%d/%Y"):
+                try:
+                    feriados.add(datetime.strptime(val, fmt).date())
+                    break
+                except: continue
+        return feriados
+    except: return set()
+
+def buscar_metas_todas(ano, mes):
+    df = ler_sheet(URL_METAS)
+    df.columns = [c.strip() for c in df.columns]
+
+    def to_num(v):
+        try:
+            if v is None: return 0.0
+            if isinstance(v, float) and math.isnan(v): return 0.0
+            return float(str(v).replace("R$","").replace(".","").replace(",",".").strip() or "0")
+        except: return 0.0
+
+    col_ano  = next((c for c in df.columns if norm(c) == "ano"), None)
+    col_mes  = next((c for c in df.columns if norm(c) == "mes"), None)
+    col_nome = next((c for c in df.columns if norm(c) == "nome"), None)
+    col_reu  = next((c for c in df.columns if "reuni" in norm(c) and "meta" in norm(c)), None)
+    col_fin  = next((c for c in df.columns if "financ" in norm(c)), None)
+    col_du   = next((c for c in df.columns if "util" in norm(c)), None)
+
+    rows = []
+    for _, row in df.iterrows():
+        try:
+            a = int(float(str(row[col_ano]))) if col_ano else 0
+            m = int(float(str(row[col_mes]))) if col_mes else 0
+        except: continue
+        if a != ano or m != mes: continue
+        nome_raw = str(row[col_nome]).strip() if col_nome else ""
+        meta_reu = to_num(row[col_reu]) if col_reu else 0.0
+        meta_fin = (to_num(row[col_fin]) if col_fin else 0.0) / 10
+        dias_ut  = 0
+        if col_du:
+            try: dias_ut = int(float(str(row[col_du] or 0)))
+            except: dias_ut = 0
+        rows.append({
+            "nome": nome_raw, "nome_norm": norm(nome_raw),
+            "meta_reu": meta_reu, "meta_fin": meta_fin, "dias_uteis": dias_ut,
+        })
+    return rows
+
+# ── PIPEDRIVE ─────────────────────────────────────────────────
+def buscar_users_pipe():
+    resp = req.get(f"{BASE_V1}/users", params={"api_token": API_KEY}, timeout=15)
+    resp.raise_for_status()
+    return {u["id"]: u["name"] for u in (resp.json().get("data") or [])}
+
+def buscar_qual_ids():
+    resp = req.get(f"{BASE_V1}/dealFields", params={"api_token": API_KEY}, timeout=15)
+    resp.raise_for_status()
+    for field in (resp.json().get("data") or []):
+        if field.get("key") == CF_QUALIFICADOR:
+            return {norm(opt.get("label", "")): str(opt.get("id")) for opt in (field.get("options") or [])}
+    return {}
+
+
+def won_time_br(deal):
+    """Converte won_time de UTC para UTC-3 (horário de Brasília)"""
+    wt = deal.get("won_time", "")
+    if not wt:
+        return ""
+    try:
+        dt = datetime.fromisoformat(str(wt).replace("Z", "+00:00"))
+        dt_br = dt - timedelta(hours=3)
+        return dt_br.strftime("%Y-%m-%d %H:%M:%S")
+    except:
+        return str(wt)
+
+def buscar_deals_mes(mes, ano):
+    todos, start = [], 0
+    mes_str = f"{ano}-{mes:02d}"
+    while True:
+        resp = req.get(f"{BASE_V1}/deals", params={
+            "filter_id": FILTER_DEALS, "status": "won",
+            "sort": "won_time DESC", "limit": 500,
+            "start": start, "api_token": API_KEY,
+        }, timeout=30)
+        resp.raise_for_status()
+        data = resp.json()
+        lote = data.get("data") or []
+        found_older = False
+        for deal in lote:
+            wt_br = won_time_br(deal)[:7]
+            if wt_br == mes_str: todos.append(deal)
+            elif wt_br < mes_str: found_older = True
+        mais = data.get("additional_data", {}).get("pagination", {}).get("more_items_in_collection", False)
+        if not mais or not lote or found_older: break
+        start += 500
+    return todos
+
+def buscar_activities_mes(mes, ano):
+    todos, cursor = [], None
+    mes_str = f"{ano}-{mes:02d}"
+    while True:
+        params = {"filter_id": FILTER_ACTIVITIES, "limit": 200}
+        if cursor: params["cursor"] = cursor
+        resp = req.get(f"{BASE_V2}/activities", params=params,
+                       headers={"x-api-token": API_KEY}, timeout=30)
+        resp.raise_for_status()
+        data = resp.json()
+        lote = data.get("data") or []
+        for act in lote:
+            if str(act.get("due_date", ""))[:7] == mes_str:
+                todos.append(act)
+        cursor = data.get("additional_data", {}).get("next_cursor")
+        if not cursor or not lote: break
+    return todos
+
+# ── CÁLCULO ───────────────────────────────────────────────────
+
+def buscar_deals_por_ids(deal_ids):
+    """Busca deals individuais para montar o mapa_rv."""
+    mapa = {}
+    for deal_id in set(deal_ids):
+        if not deal_id:
+            continue
+        try:
+            resp = req.get(f"{BASE_V1}/deals/{deal_id}",
+                params={"api_token": API_KEY}, timeout=10)
+            if resp.status_code == 200:
+                d = resp.json().get("data") or {}
+                mapa[deal_id] = cf(d, CF_REUNIAO_VALID)
+        except:
+            pass
+    return mapa
+
+
+def buscar_deals_rv_mes(mes, ano):
+    """Busca deals do filtro RV (reunião válida = Sim ou vazia, do mês)
+    Se o deal está nesse filtro, a reunião é válida por definição."""
+    deal_ids_validos = set()
+    mapa_owner = {}
+    start = 0
+    while True:
+        resp = req.get(f"{BASE_V1}/deals", params={
+            "filter_id": FILTER_DEALS_RV,
+            "status": "all_not_deleted",
+            "limit": 500, "start": start,
+            "api_token": API_KEY,
+        }, timeout=30)
+        resp.raise_for_status()
+        data = resp.json()
+        lote = data.get("data") or []
+        for d in lote:
+            did = d["id"]
+            uid = d.get("user_id")
+            deal_ids_validos.add(did)
+            mapa_owner[did] = uid.get("id") if isinstance(uid, dict) else uid
+        mais = data.get("additional_data", {}).get("pagination", {}).get("more_items_in_collection", False)
+        if not mais or not lote:
+            break
+        start += 500
+    return deal_ids_validos, mapa_owner
+
+def calcular_abril(mes=None, ano=None, head_filter=None):
+    hoje = date.today()
+    mes  = mes or hoje.month
+    ano  = ano or hoje.year
+
+    feriados  = buscar_feriados()
+    du_calc   = du_mes_total(ano, mes, feriados)
+    hoje      = date.today()
+    # Se o mês já passou completamente, du_passados = du_total e du_restantes = 0
+    if (ano < hoje.year) or (ano == hoje.year and mes < hoje.month):
+        du_pass = du_calc
+        du_rest = 0
+    else:
+        du_pass = du_passados(ano, mes, feriados)
+        du_rest = du_restantes(ano, mes, feriados)
+
+    colab_df   = buscar_colaboradores(mes=mes, ano=ano)
+    metas      = buscar_metas_todas(ano, mes)
+    users_pipe = buscar_users_pipe()
+    qual_ids   = buscar_qual_ids()
+    deals      = buscar_deals_mes(mes, ano)
+    activities = buscar_activities_mes(mes, ano)
+
+    # Coluna flexível
+    sub_col  = next((c for c in colab_df.columns if norm(c) == "subarea"), None)
+    nome_col = next((c for c in colab_df.columns if norm(c) == "nome"), "Nome")
+    head_col = next((c for c in colab_df.columns if "head" in norm(c)), None)
+
+    # Mapas
+    cargo_col = next((c for c in colab_df.columns if norm(c) == "cargo"), None)
+
+    nome_to_subarea = {}
+    nome_to_head    = {}
+    nome_to_cargo   = {}
+    for _, row in colab_df.iterrows():
+        nn  = norm(str(row.get(nome_col, "")))
+        sub = str(row.get(sub_col, "")).strip() if sub_col else ""
+        hd  = str(row.get(head_col, "")).strip() if head_col else ""
+        cg  = str(row.get(cargo_col, "")).strip() if cargo_col else ""
+        nome_to_subarea[nn] = sub
+        nome_to_head[nn]    = hd
+        nome_to_cargo[nn]   = cg
+
+    team_leaders = {nn for nn, cg in nome_to_cargo.items() if "team leader" in norm(cg) or "sales team leader" in norm(cg)}
+
+    # Squads sem SDR — líderes desses squads vão para Closer, não SDR
+    SQUADS_SEM_SDR = {"latam", "orion"}
+
+    uid_to_nome      = {uid: name for uid, name in users_pipe.items()}
+    uid_to_nome_norm = {uid: norm(name) for uid, name in users_pipe.items()}
+    nome_norm_to_uid = {norm(name): uid for uid, name in users_pipe.items()}
+
+    # Squads visíveis pelo head_filter
+    if head_filter is None:
+        squads_visiveis = None  # tudo
+    elif head_filter == "__none__":
+        squads_visiveis = set()  # nada
+    elif head_filter.startswith("__squad__:"):
+        sub_direto = norm(head_filter.replace("__squad__:", ""))
+        squads_visiveis = {sub_direto}
+    else:
+        head_nn = norm(head_filter)
+        squads_visiveis = set(
+            norm(sub) for nn, sub in nome_to_subarea.items()
+            if norm(nome_to_head.get(nn, "")) == head_nn and sub
+        )
+
+    def visivel(sub):
+        return squads_visiveis is None or norm(sub) in squads_visiveis
+
+    # ── Realizado por closer (owner) ──────────────────────────
+    closer_real = {}
+    for deal in deals:
+        owner_nome = norm(get_owner_name(deal))
+        if not owner_nome:
+            oid = get_owner_id(deal)
+            owner_nome = uid_to_nome_norm.get(oid, "")
+        if not owner_nome: continue
+        valor       = float(deal.get("value") or 0)
+        valor_multi = float(cf(deal, CF_MULTIPLICADOR) or 0)
+        if owner_nome not in closer_real:
+            closer_real[owner_nome] = {"valor": 0, "valor_multi": 0, "qtd": 0}
+        closer_real[owner_nome]["valor"]       += valor
+        closer_real[owner_nome]["valor_multi"] += valor_multi
+        closer_real[owner_nome]["qtd"]         += 1
+
+    # ── Atividades por owner ──────────────────────────────────
+    # Busca deals para mapa_rv (todos os status, paginado)
+    deal_ids_validos, mapa_deal_owner = buscar_deals_rv_mes(mes, ano)
+    # Completa mapa_owner com deals ganhos do mês
+    for d in deals:
+        did = d["id"]
+        if did not in mapa_deal_owner:
+            uid = d.get("user_id")
+            mapa_deal_owner[did] = uid.get("id") if isinstance(uid, dict) else uid
+    acts_by_owner = {}
+    for act in activities:
+        oid = str(act.get("owner_id", ""))
+        acts_by_owner.setdefault(oid, []).append(act)
+
+    def act_valida(act):
+        if not (act.get("done") is True or act.get("status") == "done"): return False
+        # SDR não pode agendar reunião para si mesmo
+        deal_id = act.get("deal_id")
+        act_owner = str(act.get("owner_id", ""))
+        deal_owner = str(mapa_deal_owner.get(deal_id, "")) if deal_id else ""
+        if act_owner and deal_owner and act_owner == deal_owner:
+            return False
+        # Deal deve estar no filtro de reuniões válidas
+        if deal_id and deal_id not in deal_ids_validos:
+            return False
+        return True
+
+    # Pesos do atingimento SDR por período
+    # A partir de maio/2026: 70% reuniões, 30% financeiro
+    # Antes: 50% / 50%
+    if (ano > 2026) or (ano == 2026 and mes >= 5):
+        PESO_REU = 0.70
+        PESO_FIN = 0.30
+    else:
+        PESO_REU = 0.50
+        PESO_FIN = 0.50
+
+    # ── Metas por tipo ────────────────────────────────────────
+    du_sheet = next((m["dias_uteis"] for m in metas if m["dias_uteis"] > 0), 0)
+    du_total = du_sheet if du_sheet > 0 else du_calc
+
+    closers_metas = [m for m in metas if m["meta_reu"] == 0 and m["meta_fin"] > 0]
+    sdrs_metas    = [m for m in metas if m["meta_reu"] > 0  and m["meta_fin"] > 0]
+
+    def build_closer_row(nome, meta, real, real_multi, qtd, is_head=False):
+        mtd = safe_div(meta, du_total) * du_pass if du_total else 0
+        return {
+            "nome": nome, "meta": arred(meta), "is_head": is_head,
+            "dias_uteis": du_total, "meta_du": arred(safe_div(meta, du_total)),
+            "realizado": arred(real),
+            "pct_atingido": arred(safe_div(real, meta) * 100),
+            "mtd": arred(mtd), "deficit_mtd": arred(mtd - real),
+            "pct_mtd": arred(safe_div(real, mtd) * 100),
+            "deficit_meta": arred(meta - real),
+            "meta_dia_100": arred(safe_div(meta - real, du_rest)) if du_rest else 0,
+            "realizado_multi": arred(real_multi),
+            "pct_atingido_multi": arred(safe_div(real_multi, meta) * 100),
+            "deficit_meta_multi": arred(meta - real_multi),
+            "meta_dia_multi": arred(safe_div(meta - real_multi, du_rest)) if du_rest else 0,
+            "qtd_ganhos": qtd,
+            "ticket_medio": arred(safe_div(real, qtd)) if qtd else 0,
+        }
+
+    # Coluna de líder
+    lider_col = next((c for c in colab_df.columns if "lider" in norm(c) and "team" in norm(c)), None)
+
+    # Mapa: nome_norm -> é líder de alguém
+    lider_nomes = set()
+    if lider_col:
+        for _, row in colab_df.iterrows():
+            lider_nome = norm(str(row.get(lider_col, "")))
+            membro_nome = norm(str(row.get(nome_col, "")))
+            if lider_nome and lider_nome != membro_nome:
+                lider_nomes.add(lider_nome)
+
+    # ── Organiza por Squad ─────────────────────────────────────
+    squads = {}  # sub -> {closers: [], sdrs: [], nome: sub}
+
+    def get_squad(sub):
+        if sub not in squads:
+            squads[sub] = {"nome": sub, "closers_ind": [], "sdrs_ind": [],
+                           "closer_total": None, "sdr_total": None}
+        return squads[sub]
+
+    # Closers
+    for m in closers_metas:
+        nn  = m["nome_norm"]
+        sub = nome_to_subarea.get(nn, "")
+        if not sub or not visivel(sub): continue
+        ri  = closer_real.get(nn, {"valor": 0, "valor_multi": 0, "qtd": 0})
+        get_squad(sub)["closers_ind"].append(
+            build_closer_row(m["nome"], m["meta_fin"], ri["valor"], ri["valor_multi"], ri["qtd"])
+        )
+
+    # Heads e Líderes de closer no próprio squad
+    for uid, uname in users_pipe.items():
+        nn      = norm(uname)
+        own_sub = nome_to_subarea.get(nn, "")
+        if not own_sub or not visivel(own_sub): continue
+        if nn not in closer_real: continue
+        # é head ou líder de closer (líder sem meta de reunião)
+        is_head_of  = any(norm(nome_to_head.get(n2, "")) == nn for n2 in nome_to_subarea)
+        is_lider_of = nn in lider_nomes and nn not in team_leaders
+        # Team leader de squad sem SDR também vai pra closer
+        is_tl_sem_sdr = nn in team_leaders and norm(own_sub) in SQUADS_SEM_SDR
+        if not is_head_of and not is_lider_of and not is_tl_sem_sdr: continue
+        existing = [norm(c["nome"]) for c in squads.get(own_sub, {}).get("closers_ind", [])]
+        if nn in existing: continue
+        ri = closer_real[nn]
+        get_squad(own_sub)["closers_ind"].append(
+            build_closer_row(uname, 0, ri["valor"], ri["valor_multi"], ri["qtd"], is_head=True)
+        )
+
+    # SDRs
+    for m in sdrs_metas:
+        nn  = m["nome_norm"]
+        sub = nome_to_subarea.get(nn, "")
+        if not sub or not visivel(sub): continue
+        meta_reu = m["meta_reu"] / 10
+        meta_fin = m["meta_fin"]
+        uid      = nome_norm_to_uid.get(nn)
+        uid_str  = str(uid) if uid else ""
+        acts_sdr = acts_by_owner.get(uid_str, [])
+        validadas     = [a for a in acts_sdr if act_valida(a)]
+        qtd_val       = len(validadas)
+        deveria_estar = arred(safe_div(meta_reu, du_total) * du_pass)
+        pct_reu       = arred(safe_div(qtd_val, meta_reu) * 100)
+        qual_id       = qual_ids.get(nn)
+        deals_sdr     = [d for d in deals if str(cf(d, CF_QUALIFICADOR)) == str(qual_id)] if qual_id else []
+        qtd_ganhos    = len(deals_sdr)
+        valor_ganho   = sum(float(d.get("value") or 0) for d in deals_sdr)
+        valor_multi   = sum(float(cf(d, CF_MULTIPLICADOR) or 0) for d in deals_sdr)
+        pct_ganhos    = arred(safe_div(valor_multi, meta_fin) * 100)
+        pct_final     = arred(pct_reu * PESO_REU + pct_ganhos * PESO_FIN)
+        get_squad(sub)["sdrs_ind"].append({
+            "nome": m["nome"], "subarea": sub,
+            "meta_reuniao": meta_reu,
+            "meta_diaria": arred(safe_div(meta_reu, du_total)),
+            "validadas": qtd_val,
+            "deveria_estar": deveria_estar,
+            "faltam": arred(deveria_estar - qtd_val),
+            "pct_reu": pct_reu,
+            "meta_ganho": arred(meta_fin),
+            "qtd_ganhos": qtd_ganhos,
+            "valor_ganho": arred(valor_ganho),
+            "valor_ganho_multi": arred(valor_multi),
+            "pct_ganhos": pct_ganhos,
+            "ticket_medio": arred(safe_div(valor_ganho, qtd_ganhos)) if qtd_ganhos else 0,
+            "pct_final": pct_final,
+        })
+
+    # ── Líderes de SDR sem meta mas com atividade/ganho ─────────
+    sdr_nomes_ja = {norm(s["nome"]) for sq in squads.values() for s in sq["sdrs_ind"]}
+    for uid, uname in users_pipe.items():
+        nn = norm(uname)
+        if nn not in lider_nomes and nn not in team_leaders: continue
+        if nn in sdr_nomes_ja: continue
+        if nn not in team_leaders: continue  # não é team leader, não vai pra SDR
+        own_sub = nome_to_subarea.get(nn, "")
+        if not own_sub or not visivel(own_sub): continue
+        if norm(own_sub) in SQUADS_SEM_SDR: continue  # squad sem SDR, vai pra closer
+
+        uid_str  = str(uid)
+        acts_sdr = acts_by_owner.get(uid_str, [])
+        validadas    = [a for a in acts_sdr if act_valida(a)]
+        qtd_val      = len(validadas)
+
+        qual_id      = qual_ids.get(nn)
+        deals_sdr    = [d for d in deals if str(cf(d, CF_QUALIFICADOR)) == str(qual_id)] if qual_id else []
+        qtd_ganhos   = len(deals_sdr)
+        valor_ganho  = sum(float(d.get("value") or 0) for d in deals_sdr)
+        valor_multi  = sum(float(cf(d, CF_MULTIPLICADOR) or 0) for d in deals_sdr)
+
+        if qtd_val == 0 and qtd_ganhos == 0: continue  # nada a mostrar
+
+        pct_final = 0.0  # sem meta, sem % calculado
+        get_squad(own_sub)["sdrs_ind"].append({
+            "nome": uname, "subarea": own_sub,
+            "is_lider": True,
+            "meta_reuniao": 0, "meta_diaria": 0,
+            "validadas": qtd_val, "deveria_estar": 0,
+            "faltam": 0, "pct_reu": 0,
+            "meta_ganho": 0,
+            "qtd_ganhos": qtd_ganhos,
+            "valor_ganho": arred(valor_ganho),
+            "valor_ganho_multi": arred(valor_multi),
+            "pct_ganhos": 0,
+            "ticket_medio": arred(safe_div(valor_ganho, qtd_ganhos)) if qtd_ganhos else 0,
+            "pct_final": pct_final,
+        })
+
+    # ── Totais por Squad ──────────────────────────────────────
+    def total_closers(ind):
+        if not ind: return None
+        t_meta = sum(c["meta"] for c in ind)
+        t_real = sum(c["realizado"] for c in ind)
+        t_multi= sum(c["realizado_multi"] for c in ind)
+        t_qtd  = sum(c["qtd_ganhos"] for c in ind)
+        return build_closer_row("TOTAL", t_meta, t_real, t_multi, t_qtd)
+
+    def total_sdrs(ind):
+        if not ind: return None
+        t_reu  = sum(s["meta_reuniao"] for s in ind)
+        t_val  = sum(s["validadas"] for s in ind)
+        t_dev  = sum(s["deveria_estar"] for s in ind)
+        t_mg   = sum(s["meta_ganho"] for s in ind)
+        t_ganho= sum(s["valor_ganho"] for s in ind)
+        t_multi= sum(s["valor_ganho_multi"] for s in ind)
+        t_qtd  = sum(s["qtd_ganhos"] for s in ind)
+        pct_r  = arred(safe_div(t_val, t_reu) * 100)
+        pct_g  = arred(safe_div(t_multi, t_mg) * 100)
+        return {
+            "nome": "TOTAL", "subarea": "",
+            "meta_reuniao": t_reu,
+            "meta_diaria": arred(safe_div(t_reu, du_total)),
+            "validadas": t_val, "deveria_estar": arred(t_dev),
+            "faltam": arred(t_dev - t_val),
+            "pct_reu": pct_r, "meta_ganho": arred(t_mg),
+            "qtd_ganhos": t_qtd, "valor_ganho": arred(t_ganho),
+            "valor_ganho_multi": arred(t_multi),
+            "pct_ganhos": pct_g,
+            "ticket_medio": arred(safe_div(t_ganho, t_qtd)) if t_qtd else 0,
+            "pct_final": arred(pct_r * PESO_REU + pct_g * PESO_FIN),
+        }
+
+    # Agrupa squads LIC-* em "Licenciados"
+    squads_final = {}
+    lic_closers = []
+    lic_sdrs    = []
+    squads_final = {}
+    for sub, sq in squads.items():
+        if sub.upper().startswith("LIC"):
+            lic_closers.extend(sq["closers_ind"])
+            lic_sdrs.extend(sq["sdrs_ind"])
+        else:
+            squads_final[sub] = sq
+
+    if lic_closers or lic_sdrs:
+        squads_final["Licenciados"] = {
+            "nome": "Licenciados",
+            "closers_ind": lic_closers,
+            "sdrs_ind": lic_sdrs,
+        }
+
+    # ── Total consolidado ─────────────────────────────────────
+    all_closers_ind = [c for sq in squads_final.values() for c in sq["closers_ind"]]
+    all_sdrs_ind    = [s for sq in squads_final.values() for s in sq["sdrs_ind"]]
+    total_geral_c   = total_closers(all_closers_ind)
+    total_geral_s   = total_sdrs(all_sdrs_ind)
+
+    # ── Resultado por Squad (usando squads_final com LIC agrupado) ──
+    squads_result = []
+    for sub, sq in squads_final.items():
+        tc = total_closers(sq["closers_ind"])
+        ts = total_sdrs(sq["sdrs_ind"])
+        ating_closer = tc["pct_atingido_multi"] if tc else 0
+        ating_sdr    = ts["pct_final"] if ts else None
+        resultado    = arred((ating_closer + ating_sdr) / 2) if ating_sdr is not None else ating_closer
+        squads_result.append({
+            "nome": sq.get("nome", sub),
+            "ating_closer": arred(ating_closer),
+            "ating_sdr": arred(ating_sdr) if ating_sdr is not None else None,
+            "resultado": arred(resultado),
+            "tem_sdr": ts is not None,
+            # Closer values
+            "closer_meta":   arred(tc["meta"]) if tc else 0,
+            "closer_bruto":  arred(tc["realizado"]) if tc else 0,
+            "closer_multi":  arred(tc["realizado_multi"]) if tc else 0,
+            "closer_vol":    tc["qtd_ganhos"] if tc else 0,
+            # SDR values
+            "sdr_meta_reu":  arred(ts["meta_reuniao"]) if ts else 0,
+            "sdr_meta_fin":  arred(ts["meta_ganho"]) if ts else 0,
+            "sdr_bruto":     arred(ts["valor_ganho"]) if ts else 0,
+            "sdr_multi":     arred(ts["valor_ganho_multi"]) if ts else 0,
+            "sdr_reunioes":  ts["validadas"] if ts else 0,
+        })
+
+    # Serializa squads
+    squads_out = []
+    for sub, sq in squads_final.items():
+        tc = total_closers(sq["closers_ind"])
+        ts = total_sdrs(sq["sdrs_ind"])
+        squads_out.append({
+            "nome": sq.get("nome", sub),
+            "closers": sq["closers_ind"],
+            "closer_total": tc,
+            "sdrs": sq["sdrs_ind"],
+            "sdr_total": ts,
+        })
+
+    # ── Card consolidado Denise (Elite + Sniper + MGM/Olympus) ──
+    DENISE_SQUADS = {"elite", "sniper", "mgm", "olympus"}
+    denise_squads = [r for r in squads_result if norm(r["nome"]) in DENISE_SQUADS]
+    if denise_squads:
+        d_closer = arred(safe_div(
+            sum(sq["ating_closer"] for sq in denise_squads),
+            len(denise_squads)
+        ))
+        d_sdr_vals = [sq["ating_sdr"] for sq in denise_squads if sq["ating_sdr"] is not None]
+        d_sdr = arred(sum(d_sdr_vals) / len(d_sdr_vals)) if d_sdr_vals else None
+        d_resultado = arred((d_closer + d_sdr) / 2) if d_sdr is not None else d_closer
+        squads_result.append({
+            "nome": "Denise Mussolin",
+            "ating_closer": d_closer,
+            "ating_sdr": d_sdr,
+            "resultado": d_resultado,
+            "tem_sdr": d_sdr is not None,
+            "is_consolidated": True,
+            "closer_meta":   arred(sum(sq.get("closer_meta", 0) for sq in denise_squads)),
+            "closer_bruto":  arred(sum(sq.get("closer_bruto", 0) for sq in denise_squads)),
+            "closer_multi":  arred(sum(sq.get("closer_multi", 0) for sq in denise_squads)),
+            "closer_vol":    sum(sq.get("closer_vol", 0) for sq in denise_squads),
+            "sdr_meta_reu":  sum(sq.get("sdr_meta_reu", 0) for sq in denise_squads),
+            "sdr_meta_fin":  arred(sum(sq.get("sdr_meta_fin", 0) for sq in denise_squads)),
+            "sdr_bruto":     arred(sum(sq.get("sdr_bruto", 0) for sq in denise_squads)),
+            "sdr_multi":     arred(sum(sq.get("sdr_multi", 0) for sq in denise_squads)),
+            "sdr_reunioes":  sum(sq.get("sdr_reunioes", 0) for sq in denise_squads),
+        })
+
+    # Debug Larissa
+    larissa_nn = norm("Larissa Vitor")
+    _debug_larissa = {
+        "in_closer_real": larissa_nn in closer_real,
+        "in_team_leaders": larissa_nn in team_leaders,
+        "in_lider_nomes": larissa_nn in lider_nomes,
+        "own_sub": nome_to_subarea.get(larissa_nn, "NAO ENCONTRADO"),
+        "closer_real_value": closer_real.get(larissa_nn, "NAO ENCONTRADO"),
+        "nome_to_cargo": nome_to_cargo.get(larissa_nn, "NAO ENCONTRADO"),
+        "latam_closers": [c["nome"] for sq in squads.values() if norm(sq.get("nome","")) == "latam" or True for c in sq.get("closers_ind",[])],
+    }
+
+    return {
+        "periodo": {
+            "mes": mes, "ano": ano,
+            "du_total": du_total, "du_passados": du_pass, "du_restantes": du_rest,
+            "atualizado_em": (datetime.now() - timedelta(hours=3)).strftime("%d/%m/%Y %H:%M"),
         },
-        tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.parsed.y}`}}
-      },
-      scales:{
-        x:{stacked:true,grid:{display:false},ticks:{color:TC,font:{size:9}},border:{color:'transparent'}},
-        y:{stacked:true,grid:{color:GC},ticks:{color:TC,font:{size:9}},border:{color:'transparent'}}
-      }}
-  });
-}
-
-// ── Horizontal stacked bar (for P2 criados comparison) ───────
-function mkHorizStacked(id,labels,datasets){
-  dk(id);
-  CH[id]=new Chart(document.getElementById(id),{type:'bar',
-    data:{labels,datasets:datasets.map(d=>({...d,borderWidth:0,borderSkipped:false}))},
-    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',
-      animation:{duration:600,easing:'easeOutQuart'},
-      layout:{padding:{right:50}},
-      plugins:{
-        legend:{display:true,position:'bottom',labels:{color:TC,font:{size:9},padding:12,boxWidth:10}},
-        datalabels:{
-          display:ctx=>ctx.dataset.data[ctx.dataIndex]>0,
-          formatter:v=>v,
-          color:'#fff',
-          font:{family:'DM Sans',size:8,weight:'600'},
-          anchor:'center',align:'center',
+        "squads": squads_out,
+        "resultados": squads_result,
+        "total_geral": {
+            "closer": total_geral_c,
+            "sdr": total_geral_s,
         },
-        tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.parsed.x}`}}
-      },
-      scales:{
-        x:{stacked:true,type:'linear',grid:{color:GC},ticks:{color:TC,font:{size:9}},border:{color:'transparent'}},
-        y:{stacked:true,type:'category',grid:{display:false},ticks:{color:TC,font:{size:10}},border:{color:'transparent'}}
-      }}
-  });
-}
+    }
 
-// ── Simple horizontal bar ────────────────────────────────────
-function mkHorizBar(id,labels,data,color,fmt){
-  dk(id);
-  CH[id]=new Chart(document.getElementById(id),{type:'bar',
-    data:{labels,datasets:[{data,backgroundColor:color+'cc',borderColor:color,borderWidth:1,borderRadius:4,borderSkipped:false}]},
-    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',
-      animation:{duration:600},layout:{padding:{right:52}},
-      plugins:{legend:{display:false},datalabels:dlHoriz(fmt),tooltip:{callbacks:{label:ctx=>fmt(ctx.parsed.x)}}},
-      scales:{
-        x:{type:'linear',grid:{color:GC},ticks:{color:TC,font:{size:9},callback:fmt},border:{color:'transparent'}},
-        y:{type:'category',grid:{display:false},ticks:{color:TC,font:{size:10}},border:{color:'transparent'}}
-      }}
-  });
-}
+# ── ROTAS ─────────────────────────────────────────────────────
+@app.route("/")
+def index():
+    return redirect("/login" if "nome" not in session else "/abril")
 
-function mkLine(id,labels,data,color,fmt){
-  dk(id);const ctx=document.getElementById(id).getContext('2d');
-  const g=ctx.createLinearGradient(0,0,0,180);g.addColorStop(0,color+'28');g.addColorStop(1,color+'00');
-  CH[id]=new Chart(ctx,{type:'line',data:{labels,datasets:[{data,borderColor:color,borderWidth:2,pointRadius:3.5,pointBackgroundColor:color,tension:.3,fill:true,backgroundColor:g}]},
-    options:{responsive:true,maintainAspectRatio:false,animation:{duration:600},layout:{padding:{top:22}},
-      plugins:{legend:{display:false},datalabels:dlL(fmt),tooltip:{callbacks:{label:ctx=>fmt(ctx.parsed.y)}}},
-      scales:{x:{grid:{display:false},ticks:{color:TC,font:{size:9}},border:{color:'transparent'}},y:{grid:{color:GC},ticks:{color:TC,font:{size:9},callback:fmt},border:{color:'transparent'}}}}});
-}
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        usuario = request.form.get("usuario", "").strip()
+        senha   = request.form.get("senha",   "").strip()
+        nome    = buscar_usuario(usuario, senha)
+        if nome:
+            session["nome"] = nome
+            return redirect("/abril")
+        return render_template("login.html", erro="Usuário ou senha inválidos"), 401
+    return render_template("login.html", erro=None)
 
-function mkDnut(id,labels,data,colors,tFmt){
-  dk(id);const total=data.reduce((a,b)=>a+b,0);
-  CH[id]=new Chart(document.getElementById(id),{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors,borderColor:'#fff',borderWidth:2,hoverOffset:5}]},
-    options:{responsive:true,maintainAspectRatio:false,animation:{duration:600},cutout:'52%',
-      plugins:{legend:{position:'right',labels:{color:TC,font:{size:9},padding:9,boxWidth:9}},
-        datalabels:{display:ctx=>ctx.dataset.data[ctx.dataIndex]>0,formatter:v=>total>0?((v/total)*100).toFixed(0)+'%':'',color:'#fff',font:{family:'DM Sans',size:9,weight:'600'}},
-        tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${tFmt(ctx.parsed)}`}}}}});
-}
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect("/login")
 
-function mkHBarRevenue(id,labels,data,colors,fmt){
-  dk(id);
-  CH[id]=new Chart(document.getElementById(id),{type:'bar',data:{labels,datasets:[{data,backgroundColor:colors,borderRadius:4,borderSkipped:false}]},
-    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',animation:{duration:600},layout:{padding:{right:52}},
-      plugins:{legend:{display:false},datalabels:dlHoriz(fmt),tooltip:{callbacks:{label:ctx=>fmt(ctx.parsed.x)}}},
-      scales:{x:{type:'linear',grid:{color:GC},ticks:{color:TC,font:{size:9},callback:fmt},border:{color:'transparent'}},
-              y:{type:'category',grid:{display:false},ticks:{color:TC,font:{size:10}},border:{color:'transparent'}}}}});
-}
+@app.route("/abril")
+def abril():
+    if "nome" not in session:
+        return redirect("/login")
+    return render_template("abril.html", nome=session["nome"], is_master=is_master(session["nome"]))
 
-// ── Heat matrix — background on cell, no rounded box ─────────
-function buildHeat(containerId,rows,cols,matrix){
-  if(!cols.length){document.getElementById(containerId).innerHTML='<p style="padding:14px;font-size:.8rem;color:var(--muted)">Nenhum dado disponível.</p>';return}
-  // Compute max per row for relative intensity
-  const maxR=rows.map((_,ri)=>Math.max(...cols.map((_,ci)=>matrix[ri][ci]||0),1));
-  let h=`<table class="mtable"><thead><tr><th>Licenciado</th>`;
-  cols.forEach(c=>{h+=`<th title="${c}">${c.length>20?c.slice(0,18)+'…':c}</th>`});
-  h+=`<th>Total</th></tr></thead><tbody>`;
-  rows.forEach((row,ri)=>{
-    const tot=cols.reduce((a,_,ci)=>a+(matrix[ri][ci]||0),0);
-    h+=`<tr><td>${row}</td>`;
-    cols.forEach((_,ci)=>{
-      const v=matrix[ri][ci]||0,rel=maxR[ri]>0?v/maxR[ri]:0;
-      let bg='transparent',fg='var(--text)',fw='400';
-      if(v>0){
-        if(rel>=.7){bg=`rgba(192,83,58,${(.25+rel*.65).toFixed(2)})`;fg=rel>.45?'#fff':'#8a2a1a';fw='600'}
-        else if(rel>=.35){bg=`rgba(184,135,63,${(.18+rel*.55).toFixed(2)})`;fg=rel>.55?'#fff':'#8c6428';fw='600'}
-        else{bg=`rgba(74,124,106,${(.12+rel*.45).toFixed(2)})`;fg=rel>.55?'#fff':'#2e5c4a';fw='600'}
-      }
-      h+=`<td style="background:${bg};color:${fg};font-weight:${fw}">${v>0?v.toLocaleString('pt-BR'):'—'}</td>`;
-    });
-    h+=`<td class="heat-total">${tot>0?tot.toLocaleString('pt-BR'):'—'}</td></tr>`;
-  });
-  h+=`</tbody></table>`;
-  document.getElementById(containerId).innerHTML=h;
-}
+@app.route("/api/abril")
+def api_abril():
+    if "nome" not in session:
+        return jsonify({"erro": "Não autenticado"}), 401
+    try:
+        mes  = request.args.get("mes", type=int)
+        ano  = request.args.get("ano", type=int)
+        nome_sess = session.get("nome", "")
 
-// ── Gauge ─────────────────────────────────────────────────────
-function gauge(pfx,meta,real){
-  const arc=document.getElementById(pfx+'A'),txt=document.getElementById(pfx+'T');
-  if(!meta){arc.style.strokeDashoffset=267;txt.textContent='—';document.getElementById(pfx+'N').style.display='block';document.getElementById(pfx+'D').style.display='none';return}
-  const p=(real/meta)*100,col=p>=100?'#4a7c6a':p>=70?'#b8873f':'#c0533a';
-  arc.style.strokeDashoffset=267*(1-Math.min(p,100)/100);arc.style.stroke=col;txt.textContent=p.toFixed(0)+'%';txt.style.fill=col;
-  const d=real-meta;
-  document.getElementById(pfx+'M').textContent=brl(meta);
-  document.getElementById(pfx+'R').textContent=brl(real);
-  document.getElementById(pfx+'Df').textContent=(d>=0?'+':'')+brl(d);
-  document.getElementById(pfx+'Df').style.color=d>=0?'#4a7c6a':'#c0533a';
-  document.getElementById(pfx+'N').style.display='none';document.getElementById(pfx+'D').style.display='block';
-}
+        # Detecta gerente: quem não tem head (ou é head de si mesmo)
+        colab_df  = buscar_colaboradores()
+        head_col  = next((c for c in colab_df.columns if "head" in norm(c)), None)
+        nome_col  = next((c for c in colab_df.columns if norm(c) == "nome"), "Nome")
+        # Superusuários sempre veem tudo
+        superusers = {norm(u.strip()) for u in SUPERUSERS_RAW.split(",")}
+        nn_sess = norm(nome_sess)
 
-const PTM=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
-function findMeta(rows,pname,f,t){
-  if(!rows?.length)return null;
-  const hs=Object.keys(rows[0]);const fnd=(...x)=>hs.find(h=>x.some(k=>h.toLowerCase().includes(k)));
-  const aC=fnd('ano','year'),mC=fnd('mes','mês','month'),mtC=fnd('meta','goal','objetivo'),pC=fnd('licenciado','pipeline','funil','lic');
-  if(!mtC)return null;
-  const pM=r=>{const n=parseInt(r);if(!isNaN(n))return n;const i=PTM.findIndex(m=>r?.toLowerCase().includes(m));return i>=0?i+1:-1};
-  let tot=0,hit=0;
-  for(const row of rows){
-    const lr=Object.fromEntries(Object.entries(row).map(([k,v])=>[k.toLowerCase().trim(),v]));
-    if(pC&&pname){const rp=(lr[pC.toLowerCase()]||'').toLowerCase(),pn=pname.toLowerCase();if(rp&&!pn.includes(rp)&&!rp.includes(pn.replace('lic-','').trim()))continue}
-    const ano=aC?parseInt(lr[aC.toLowerCase()]):null,mes=mC?pM(lr[mC.toLowerCase()]):null;
-    if(mes&&mes>0){const yr=ano||parseInt(f.split('-')[0]),ym=`${yr}-${String(mes).padStart(2,'0')}`;if(ym<f||ym>t)continue}
-    const rv=(lr[mtC.toLowerCase()]||'').replace(/[^\d.,]/g,'').replace(',','.');const vl=parseFloat(rv);
-    if(!isNaN(vl)&&vl>0){tot+=vl;hit++}
-  }
-  return hit>0?tot:null;
-}
+        if nn_sess in superusers:
+            # Superuser vê tudo
+            head_filter = None
+        else:
+            # Verifica se é Head
+            is_head = False
+            if head_col:
+                for _, row in colab_df.iterrows():
+                    if norm(str(row.get(head_col, ""))) == nn_sess:
+                        is_head = True
+                        break
 
-function agg(ids,f,t){
-  const c={};
-  for(const pid of ids){for(const d of(API.byPipeline[pid]||[])){
-    if(d.month<f||d.month>t)continue;
-    if(!c[d.month])c[d.month]={month:d.month,criados:0,finalizados:0,ganhos:0,criadosAberto:0,criadosGanho:0,criadosPerdido:0,won:0,revenue:0,products:{},perdidos:0,lostReasons:{},lostStages:{}};
-    const m=c[d.month];
-    m.criados+=d.criados;m.finalizados+=d.finalizados;m.ganhos+=d.ganhos;
-    m.criadosAberto+=d.criadosAberto||0;m.criadosGanho+=d.criadosGanho||0;m.criadosPerdido+=d.criadosPerdido||0;
-    m.won+=d.won;m.revenue+=d.revenue;m.perdidos+=d.perdidos;
-    for(const[k,v]of Object.entries(d.products)){if(!m.products[k])m.products[k]={count:0,revenue:0};m.products[k].count+=v.count;m.products[k].revenue+=v.revenue}
-    for(const[k,v]of Object.entries(d.lostReasons)){if(!m.lostReasons[k])m.lostReasons[k]=0;m.lostReasons[k]+=v}
-    for(const[k,v]of Object.entries(d.lostStages)){if(!m.lostStages[k])m.lostStages[k]=0;m.lostStages[k]+=v}
-  }}
-  return Object.values(c).sort((a,b)=>a.month.localeCompare(b.month)).map(d=>({...d,avgTicket:d.won>0?d.revenue/d.won:0,conversion:d.criados>0?(d.won/d.criados)*100:0}));
-}
+            if is_head:
+                # Head vê os squads onde é Head
+                head_filter = nome_sess
+            else:
+                # Verifica se é Líder
+                lider_col_l = next((c for c in colab_df.columns if "lider" in norm(c) and "team" in norm(c)), None)
+                is_lider = False
+                lider_sub = None
+                if lider_col_l:
+                    for _, row in colab_df.iterrows():
+                        if norm(str(row.get(lider_col_l, ""))) == nn_sess:
+                            sub = str(row.get(sub_col if (sub_col := next((c for c in colab_df.columns if norm(c) == "subarea"), None)) else "Subárea", "")).strip()
+                            if sub:
+                                lider_sub = sub
+                                is_lider = True
+                                break
 
-// ── PAGE 1 ────────────────────────────────────────────────────
-function renderP1(data,pid){
-  const pp=pid==='all'?null:API.pipelines.find(p=>p.id===pid);
-  const pn=pp?.name||null,dn=pn?mask(pn):null;
-  document.getElementById('p1Title').textContent=dn?`Relatório — ${dn}`:'Relatório — Licenciados';
-  document.getElementById('p1SecE').textContent=dn?`Evolução Mensal · ${dn}`:'Evolução Mensal';
-  document.getElementById('p1SecP').textContent=dn?`Quebra por Produto · ${dn}`:'Quebra por Produto';
-  if(!data.length)return;
-  const labels=data.map(d=>lMes(d.month));
-  const tC=data.reduce((a,d)=>a+d.criados,0),tF=data.reduce((a,d)=>a+d.finalizados,0);
-  const tG=data.reduce((a,d)=>a+d.ganhos,0),tW=data.reduce((a,d)=>a+d.won,0);
-  const tR=data.reduce((a,d)=>a+d.revenue,0),tP=data.reduce((a,d)=>a+d.perdidos,0);
-  const at=tW>0?tR/tW:0,cv=tC>0?(tW/tC)*100:0;
-  const fl=lMes(data[0].month),tl=lMes(data[data.length-1].month);
-  document.getElementById('p1Sub').textContent=fl===tl?fl:`${fl} a ${tl}`;
-  const mx=Math.max(tC,1);
-  document.getElementById('p1VC').textContent=tC.toLocaleString('pt-BR');
-  document.getElementById('p1VF').textContent=tF.toLocaleString('pt-BR');
-  document.getElementById('p1VG').textContent=tG.toLocaleString('pt-BR');
-  document.getElementById('p1Pct1').textContent=tC>0?(tF/tC*100).toFixed(1)+'%':'0%';
-  document.getElementById('p1Pct2').textContent=tC>0?(tG/tC*100).toFixed(1)+'%':'0%';
-  setTimeout(()=>{
-    document.getElementById('p1BF').style.width=Math.max(25,Math.round(tF/mx*100))+'%';
-    document.getElementById('p1BG').style.width=Math.max(15,Math.round(tG/mx*100))+'%';
-  },100);
-  document.getElementById('p1KR').textContent=brlK(tR);
-  document.getElementById('p1KT').textContent=at>0?brlK(at):'—';
-  document.getElementById('p1KW').textContent=tW.toLocaleString('pt-BR');
-  document.getElementById('p1KC').textContent=pct(cv);
-  gauge('p1G',findMeta(API.meta,pn,data[0].month,data[data.length-1].month),tR);
+                if is_lider and lider_sub:
+                    # Líder vê só o próprio squad — usa squad_filter especial
+                    head_filter = f"__squad__:{lider_sub}"
+                else:
+                    # Pessoa sem cargo especial — não vê nada
+                    head_filter = "__none__"
+        return jsonify(limpar_nans(calcular_abril(mes=mes, ano=ano, head_filter=head_filter)))
+    except Exception as e:
+        import traceback
+        return jsonify({"erro": str(e), "trace": traceback.format_exc()}), 500
 
-  // Stacked vertical — criados por status
-  mkStacked('p1CL',labels,[
-    {label:'Aberto',  data:data.map(d=>d.criadosAberto),  backgroundColor:STATUS_COLORS.aberto+'cc'},
-    {label:'Ganho',   data:data.map(d=>d.criadosGanho),   backgroundColor:STATUS_COLORS.ganho+'cc'},
-    {label:'Perdido', data:data.map(d=>d.criadosPerdido), backgroundColor:STATUS_COLORS.perdido+'cc'},
-  ]);
+@app.route("/api/debug/metas")
+def debug_metas():
+    if "nome" not in session:
+        return jsonify({"erro": "Não autenticado"}), 401
+    hoje = date.today()
+    df = ler_sheet(URL_METAS)
+    return jsonify({
+        "colunas": list(df.columns),
+        "primeiras_5_linhas": df.head(5).fillna("").to_dict(orient="records"),
+        "mes_ano": f"{hoje.month}/{hoje.year}",
+    })
 
-  mkHorizBar('p1CW',labels,data.map(d=>d.won),PAL[1],v=>v);
-  mkLine('p1CR',labels,data.map(d=>d.revenue),PAL[2],v=>brlK(v));
-  mkLine('p1CT',labels,data.map(d=>d.avgTicket),PAL[3],v=>brlK(v));
+@app.route("/api/debug/colab")
+def debug_colab():
+    if "nome" not in session:
+        return jsonify({"erro": "Não autenticado"}), 401
+    df = ler_sheet(URL_COLAB)
+    return jsonify({
+        "colunas": list(df.columns),
+        "primeiras_5_linhas": df.head(5).fillna("").to_dict(orient="records"),
+    })
 
-  const pm={};for(const d of data)for(const[p,v]of Object.entries(d.products)){if(!pm[p])pm[p]={count:0,revenue:0};pm[p].count+=v.count;pm[p].revenue+=v.revenue}
-  const pe=Object.entries(pm).sort((a,b)=>b[1].revenue-a[1].revenue);
-  const pL=pe.map(([k])=>k),pC=pe.map(([,v])=>v.count),pR=pe.map(([,v])=>v.revenue),pCl=pL.map((_,i)=>PAL[i%PAL.length]);
-  mkDnut('p1CPV',pL,pC,pCl,v=>v+' ganhos');
-  mkHBarRevenue('p1CPR',pL,pR,pCl,v=>brlK(v));
 
-  const tb=document.getElementById('p1TB');tb.innerHTML='';
-  const z=v=>v===0?'<span class="tdz">—</span>':v.toLocaleString('pt-BR');
-  data.forEach(d=>{const tr=document.createElement('tr');tr.innerHTML=`<td class="tdn">${lMes(d.month)}</td><td>${z(d.criados)}</td><td>${z(d.finalizados)}</td><td>${z(d.ganhos)}</td><td>${z(d.won)}</td><td>${z(d.perdidos)}</td><td>${d.revenue>0?brl(d.revenue):'<span class="tdz">—</span>'}</td><td>${d.avgTicket>0?brl(d.avgTicket):'<span class="tdz">—</span>'}</td><td>${d.criados>0?pct(d.conversion):'<span class="tdz">—</span>'}</td>`;tb.appendChild(tr)});
-  document.getElementById('p1TF').innerHTML=`<tr><td>Total/Média</td><td>${tC.toLocaleString('pt-BR')}</td><td>${tF.toLocaleString('pt-BR')}</td><td>${tG.toLocaleString('pt-BR')}</td><td>${tW.toLocaleString('pt-BR')}</td><td>${tP.toLocaleString('pt-BR')}</td><td>${brl(tR)}</td><td>${at>0?brl(at):'—'}</td><td>${pct(cv)}</td></tr>`;
-  document.getElementById('p1FU').textContent='Atualizado em '+new Date().toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'});
-}
+@app.route("/api/exportar-ganhos")
+def exportar_ganhos():
+    if "nome" not in session:
+        return jsonify({"erro": "Não autenticado"}), 401
+    import csv, io
+    try:
+        mes = request.args.get("mes", type=int) or date.today().month
+        ano = request.args.get("ano", type=int) or date.today().year
 
-// ── PAGE 2 ────────────────────────────────────────────────────
-function renderP2(f,t){
-  const fl=lMes(f),tl=lMes(t);
-  document.getElementById('p2Sub').textContent=fl===tl?fl:`${fl} a ${tl}`;
+        deals = buscar_deals_mes(mes, ano)
 
-  const rows=licP.map(p=>{
-    const data=agg([p.id],f,t);
-    const meta=findMeta(API.meta,p.name,f,t);
-    return{
-      id:p.id,name:mask(p.name),pipeName:p.name,
-      criados:     data.reduce((a,d)=>a+d.criados,0),
-      criadosAberto: data.reduce((a,d)=>a+(d.criadosAberto||0),0),
-      criadosGanho:  data.reduce((a,d)=>a+(d.criadosGanho||0),0),
-      criadosPerdido:data.reduce((a,d)=>a+(d.criadosPerdido||0),0),
-      ganhos:  data.reduce((a,d)=>a+d.ganhos,0),
-      won:     data.reduce((a,d)=>a+d.won,0),
-      revenue: data.reduce((a,d)=>a+d.revenue,0),
-      perdidos:data.reduce((a,d)=>a+d.perdidos,0),
-      meta,
-      lostReasons:data.reduce((a,d)=>{for(const[k,v]of Object.entries(d.lostReasons))a[k]=(a[k]||0)+v;return a},{}),
-      lostStages: data.reduce((a,d)=>{for(const[k,v]of Object.entries(d.lostStages))a[k]=(a[k]||0)+v;return a},{}),
-    };
-  }).filter(r=>r.criados>0||r.won>0||r.perdidos>0);
+        # Busca pipeline names
+        resp_pipes = req.get(f"{BASE_V1}/pipelines", params={"api_token": API_KEY}, timeout=15)
+        pipes = {p["id"]: p["name"] for p in (resp_pipes.json().get("data") or [])}
 
-  if(!rows.length)return;
+        output = io.StringIO()
+        writer = csv.writer(output)
+        writer.writerow([
+            "ID", "Título", "Proprietário", "Squad", "Funil",
+            "Data Criação", "Data Ganho", "Valor Bruto", "Valor c/ Multiplicador"
+        ])
 
-  // ── Criados: sorted by total desc ──
-  const rowsCriados=[...rows].sort((a,b)=>b.criados-a.criados);
-  const namesCriados=rowsCriados.map(r=>r.name);
-  mkHorizStacked('p2CC',namesCriados,[
-    {label:'Aberto',  data:rowsCriados.map(r=>r.criadosAberto),  backgroundColor:STATUS_COLORS.aberto+'cc'},
-    {label:'Ganho',   data:rowsCriados.map(r=>r.criadosGanho),   backgroundColor:STATUS_COLORS.ganho+'cc'},
-    {label:'Perdido', data:rowsCriados.map(r=>r.criadosPerdido), backgroundColor:STATUS_COLORS.perdido+'cc'},
-  ]);
+        colab_df  = buscar_colaboradores(mes=mes, ano=ano)
+        sub_col   = next((c for c in colab_df.columns if norm(c) == "subarea"), None)
+        nome_col  = next((c for c in colab_df.columns if norm(c) == "nome"), "Nome")
+        nome_to_sub = {
+            norm(str(row.get(nome_col, ""))): str(row.get(sub_col, "")).strip()
+            for _, row in colab_df.iterrows()
+        } if sub_col else {}
 
-  // ── Ganhos volume: sorted by won desc ──
-  const rowsWon=[...rows].sort((a,b)=>b.won-a.won);
-  mkHorizBar('p2CW',rowsWon.map(r=>r.name),rowsWon.map(r=>r.won),PAL[1],v=>v);
+        for d in deals:
+            uid       = d.get("user_id")
+            owner     = uid.get("name", "") if isinstance(uid, dict) else ""
+            squad     = nome_to_sub.get(norm(owner), "")
+            pipeline  = pipes.get(d.get("pipeline_id"), "")
+            criacao   = str(d.get("add_time", ""))[:10]
+            ganho     = won_time_br(d)[:10]
+            valor     = float(d.get("value") or 0)
+            multi     = float(cf(d, CF_MULTIPLICADOR) or 0)
+            writer.writerow([
+                d["id"], d.get("title", ""), owner, squad, pipeline,
+                criacao, ganho,
+                f"R$ {valor:,.0f}".replace(",", "."),
+                f"R$ {multi:,.0f}".replace(",", "."),
+            ])
 
-  // ── Receita: sorted by revenue desc ──
-  const rowsRev=[...rows].sort((a,b)=>b.revenue-a.revenue);
-  mkHBarRevenue('p2CR',rowsRev.map(r=>r.name),rowsRev.map(r=>r.revenue),rowsRev.map((_,i)=>PAL[i%PAL.length]),v=>brlK(v));
+        output.seek(0)
+        from flask import Response
+        return Response(
+            "﻿" + output.getvalue(),  # BOM para Excel abrir UTF-8 corretamente
+            mimetype="text/csv",
+            headers={"Content-Disposition": f"attachment; filename=ganhos_{mes:02d}_{ano}.csv"}
+        )
+    except Exception as e:
+        import traceback
+        return jsonify({"erro": str(e), "trace": traceback.format_exc()}), 500
 
-  // ── Perdidos: sorted by perdidos desc ──
-  const rowsPerd=[...rows].sort((a,b)=>b.perdidos-a.perdidos);
-  mkHorizBar('p2CP',rowsPerd.map(r=>r.name),rowsPerd.map(r=>r.perdidos),PAL[3],v=>v);
 
-  // ── Heat matrices (unsorted — rows keep original order for readability) ──
-  const names=rows.map(r=>r.name);
-  const aR={};rows.forEach(r=>Object.entries(r.lostReasons).forEach(([k,v])=>{aR[k]=(aR[k]||0)+v}));
-  const top10=Object.entries(aR).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([k])=>k);
-  buildHeat('p2MR',names,top10,rows.map(r=>top10.map(k=>r.lostReasons[k]||0)));
+# ── FORECAST DIÁRIO ───────────────────────────────────────────
+FILTER_FORECAST = int(os.environ.get("FILTER_FORECAST", "1490240"))
 
-  const aS={};rows.forEach(r=>Object.entries(r.lostStages).forEach(([k,v])=>{aS[k]=(aS[k]||0)+v}));
-  const stages=Object.entries(aS).sort((a,b)=>b[1]-a[1]).map(([k])=>k);
-  buildHeat('p2MS',names,stages,rows.map(r=>stages.map(k=>r.lostStages[k]||0)));
+def buscar_deals_forecast():
+    """Busca todos os deals do filtro forecast (todos os status) via API v2"""
+    todos, cursor = [], None
+    users_pipe = buscar_users_pipe()
+    while True:
+        params = {"filter_id": FILTER_FORECAST, "limit": 500}
+        if cursor: params["cursor"] = cursor
+        resp = req.get(f"{BASE_V2}/deals", params=params,
+                       headers={"x-api-token": API_KEY}, timeout=30)
+        resp.raise_for_status()
+        data = resp.json()
+        lote = data.get("data") or []
+        for deal in lote:
+            oid = deal.get("owner_id")
+            deal["owner_name"] = users_pipe.get(oid, "") if oid else ""
+        todos.extend(lote)
+        cursor = (data.get("additional_data") or {}).get("next_cursor")
+        if not cursor or not lote: break
+    return todos
 
-  // ── Summary table ──
-  const tb=document.getElementById('p2TB');tb.innerHTML='';
-  const tots={c:0,g:0,p:0,r:0,w:0,m:0};
-  // Table sorted by revenue desc
-  [...rows].sort((a,b)=>b.revenue-a.revenue).forEach(r=>{
-    const at=r.won>0?r.revenue/r.won:0,cv=r.criados>0?(r.won/r.criados)*100:0;
-    const ap=r.meta&&r.meta>0?(r.revenue/r.meta)*100:null;
-    const ac=ap===null?'':(ap>=100?'pct-hi':ap>=70?'pct-md':'pct-lo');
-    const tr=document.createElement('tr');
-    tr.innerHTML=`<td class="tdn">${r.name}</td><td>${r.criados.toLocaleString('pt-BR')}</td><td>${r.ganhos.toLocaleString('pt-BR')}</td><td>${r.perdidos.toLocaleString('pt-BR')}</td><td>${r.revenue>0?brl(r.revenue):'<span class="tdz">—</span>'}</td><td>${at>0?brl(at):'<span class="tdz">—</span>'}</td><td>${r.criados>0?pct(cv):'<span class="tdz">—</span>'}</td><td>${r.meta?brl(r.meta):'<span class="tdz">—</span>'}</td><td>${ap!==null?`<span class="pct-badge ${ac}">${ap.toFixed(0)}%</span>`:'<span class="tdz">—</span>'}</td>`;
-    tb.appendChild(tr);
-    tots.c+=r.criados;tots.g+=r.ganhos;tots.p+=r.perdidos;tots.r+=r.revenue;tots.w+=r.won;if(r.meta)tots.m+=r.meta;
-  });
-  const tat=tots.w>0?tots.r/tots.w:0,tcv=tots.c>0?(tots.w/tots.c)*100:0,tap=tots.m>0?(tots.r/tots.m)*100:null;
-  const tac=tap===null?'':(tap>=100?'pct-hi':tap>=70?'pct-md':'pct-lo');
-  document.getElementById('p2TF').innerHTML=`<tr><td>Total</td><td>${tots.c.toLocaleString('pt-BR')}</td><td>${tots.g.toLocaleString('pt-BR')}</td><td>${tots.p.toLocaleString('pt-BR')}</td><td>${brl(tots.r)}</td><td>${tat>0?brl(tat):'—'}</td><td>${pct(tcv)}</td><td>${tots.m>0?brl(tots.m):'—'}</td><td>${tap!==null?`<span class="pct-badge ${tac}">${tap.toFixed(0)}%</span>`:'—'}</td></tr>`;
-  document.getElementById('p2FU').textContent='Atualizado em '+new Date().toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'});
-}
+def calcular_forecast(head_filter=None):
+    from collections import defaultdict
+    hoje_fc = date.today()
+    colab_df  = buscar_colaboradores(mes=hoje_fc.month, ano=hoje_fc.year)
+    sub_col   = next((c for c in colab_df.columns if norm(c) == "subarea"), None)
+    nome_col  = next((c for c in colab_df.columns if norm(c) == "nome"), "Nome")
+    head_col  = next((c for c in colab_df.columns if "head" in norm(c)), None)
 
-function ap1(){const pid=document.getElementById('p1Pipe').value,f=document.getElementById('p1From').value,t=document.getElementById('p1To').value;const data=pid==='all'?agg(licP.map(p=>p.id),f,t):(API.byPipeline[pid]||[]).filter(d=>d.month>=f&&d.month<=t);renderP1(data,pid)}
-function ap2(){renderP2(document.getElementById('p2From').value,document.getElementById('p2To').value)}
+    nome_to_subarea = {}
+    nome_to_head    = {}
+    for _, row in colab_df.iterrows():
+        nn  = norm(str(row.get(nome_col, "")))
+        sub = str(row.get(sub_col, "")).strip() if sub_col else ""
+        hd  = str(row.get(head_col, "")).strip() if head_col else ""
+        nome_to_subarea[nn] = sub
+        nome_to_head[nn]    = hd
 
-function buildSel(pipelines){
-  licP=pipelines.filter(p=>p.name.toUpperCase().startsWith('LIC-'));
-  const sp=document.getElementById('p1Pipe');
-  sp.appendChild(new Option('Todos os Licenciados','all'));
-  licP.forEach(p=>sp.appendChild(new Option(mask(p.name),p.id)));
-  const ms=new Set();licP.forEach(p=>(API.byPipeline[p.id]||[]).forEach(d=>ms.add(d.month)));
-  const months=[...ms].sort();
-  ['p1From','p1To','p2From','p2To'].forEach(id=>{const el=document.getElementById(id);months.forEach(m=>el.appendChild(new Option(lMes(m),m)));el.value=id.includes('From')?months[0]:months[months.length-1]});
-  sp.addEventListener('change',ap1);
-  const p1f=document.getElementById('p1From'),p1t=document.getElementById('p1To');
-  p1f.addEventListener('change',()=>{if(p1f.value>p1t.value)p1t.value=p1f.value;ap1()});
-  p1t.addEventListener('change',()=>{if(p1t.value<p1f.value)p1f.value=p1t.value;ap1()});
-  const p2f=document.getElementById('p2From'),p2t=document.getElementById('p2To');
-  p2f.addEventListener('change',()=>{if(p2f.value>p2t.value)p2t.value=p2f.value;ap2()});
-  p2t.addEventListener('change',()=>{if(p2t.value<p2f.value)p2f.value=p2t.value;ap2()});
-}
+    # Squads visíveis
+    if head_filter and not head_filter.startswith("__"):
+        head_nn = norm(head_filter)
+        squads_visiveis = {norm(sub) for nn, sub in nome_to_subarea.items()
+                           if norm(nome_to_head.get(nn, "")) == head_nn and sub}
+    elif head_filter and head_filter.startswith("__squad__:"):
+        squads_visiveis = {norm(head_filter.replace("__squad__:", ""))}
+    else:
+        squads_visiveis = None
 
-async function load(){
-  try{
-    const r=await aFetch('/api/report');const j=await r.json();if(!j.ok)throw new Error(j.error);
-    API=j;document.getElementById('tbUser').textContent=usr();
-    ['p1Pipe','p1From','p1To','p2From','p2To'].forEach(id=>{const e=document.getElementById(id);while(e.firstChild)e.removeChild(e.firstChild)});
-    Object.keys(CH).forEach(k=>{if(CH[k]){CH[k].destroy();delete CH[k]}});
-    buildSel(j.pipelines);ap1();ap2();
-  }catch(e){if(e.message!=='Sessão expirada.'){const b=document.getElementById('p1Err');b.style.display='block';b.textContent=`Erro: ${e.message}`}}
-}
+    deals = buscar_deals_forecast()
 
-async function doRefresh(){
-  const b=document.getElementById('btnRefresh');b.disabled=true;b.textContent='↺ Atualizando...';
-  await load();b.disabled=false;b.textContent='↺ Atualizar';
-}
+    # Agrupa: subarea -> date -> { totais + closers: {nome: {...}} }
+    by_squad = defaultdict(lambda: defaultdict(lambda: {
+        "p20": 0.0, "p50": 0.0, "p70": 0.0,
+        "realizado": 0.0, "perda": 0.0,
+        "closers": defaultdict(lambda: {"p20":0.0,"p50":0.0,"p70":0.0,"realizado":0.0,"perda":0.0})
+    }))
 
-if(TOKEN){hideLogin();load()}else{showLogin()}
-</script>
-</body>
-</html>
+    for deal in deals:
+        status = deal.get("status")
+        # Deals ganhos usam a data de ganho; os demais usam expected_close_date
+        if status == "won":
+            date_fc = str(deal.get("won_time") or deal.get("close_time") or "")[:10]
+        else:
+            date_fc = deal.get("expected_close_date")
+        if not date_fc: continue
+        owner     = (deal.get("owner_name") or "").strip()
+        owner_nn  = norm(owner)
+        subarea   = nome_to_subarea.get(owner_nn, "")
+        if not subarea: continue
+        if squads_visiveis and norm(subarea) not in squads_visiveis: continue
+
+        # Agrupa LIC-* em Licenciados
+        sub_display = "Licenciados" if subarea.upper().startswith("LIC") else subarea
+
+        value       = float(deal.get("value") or 0)
+        probability = deal.get("probability")
+        status      = deal.get("status")
+
+        d = by_squad[sub_display][date_fc]
+        c = d["closers"][owner]
+
+        deal_info = {
+            "id":          deal.get("id"),
+            "titulo":      deal.get("title", ""),
+            "valor":       arred(value),
+            "probabilidade": probability,
+            "status":      status,
+        }
+        if "deals" not in c: c["deals"] = []
+        c["deals"].append(deal_info)
+
+        if status == "won":
+            d["realizado"] += value; c["realizado"] += value
+        elif status == "lost":
+            d["perda"] += value; c["perda"] += value
+        else:
+            # Só deals abertos entram nas probabilidades
+            if probability == 20:
+                d["p20"] += value; c["p20"] += value
+            elif probability == 50:
+                d["p50"] += value; c["p50"] += value
+            elif probability == 70:
+                d["p70"] += value; c["p70"] += value
+
+    result = {}
+    for squad, days in by_squad.items():
+        rows = []
+        for dt in sorted(days.keys()):
+            d = days[dt]
+            media     = d["p20"]*0.20 + d["p50"]*0.50 + d["p70"]*0.70
+            em_aberto = d["p20"] + d["p50"] + d["p70"]
+            total_prev= em_aberto + d["realizado"] + d["perda"]
+            ating     = arred(d["realizado"] / total_prev * 100) if total_prev > 0 else None
+
+            closers_list = []
+            for cname, cv in d["closers"].items():
+                c_media = cv["p20"]*0.20 + cv["p50"]*0.50 + cv["p70"]*0.70
+                c_em_ab = cv["p20"] + cv["p50"] + cv["p70"]
+                c_total = c_em_ab + cv["realizado"] + cv["perda"]
+                c_ating = arred(cv["realizado"] / c_total * 100) if c_total > 0 else None
+                closers_list.append({
+                    "nome": cname,
+                    "p20": arred(cv["p20"]), "p50": arred(cv["p50"]), "p70": arred(cv["p70"]),
+                    "media": arred(c_media), "em_aberto": arred(c_em_ab),
+                    "realizado": arred(cv["realizado"]), "perda": arred(cv["perda"]),
+                    "total_previsto": arred(c_total), "atingimento": c_ating,
+                    "deals": cv.get("deals", []),
+                })
+            closers_list.sort(key=lambda x: -(x["realizado"] + x["media"]))
+
+            rows.append({
+                "dia": dt,
+                "p20": arred(d["p20"]), "p50": arred(d["p50"]), "p70": arred(d["p70"]),
+                "media": arred(media), "em_aberto": arred(em_aberto),
+                "realizado": arred(d["realizado"]), "perda": arred(d["perda"]),
+                "total_previsto": arred(total_prev), "atingimento": ating,
+                "closers": closers_list,
+            })
+
+        # Total do squad
+        t = {k: sum(r[k] for r in rows) for k in ["p20","p50","p70","media","em_aberto","realizado","perda","total_previsto"]}
+        t_ating = arred(t["realizado"] / t["total_previsto"] * 100) if t["total_previsto"] else None
+        result[squad] = {
+            "rows": rows,
+            "total": {**{k: arred(v) for k,v in t.items()}, "atingimento": t_ating}
+        }
+
+    return {
+        "squads": result,
+        "atualizado_em": (datetime.now() - timedelta(hours=3)).strftime("%d/%m/%Y %H:%M"),
+    }
+
+@app.route("/api/forecast")
+def api_forecast():
+    if "nome" not in session:
+        return jsonify({"erro": "Não autenticado"}), 401
+    try:
+        nome_sess = session.get("nome", "")
+        superusers = {norm(u.strip()) for u in SUPERUSERS_RAW.split(",")}
+        if norm(nome_sess) in superusers:
+            head_filter = None
+        else:
+            colab_df  = buscar_colaboradores()
+            head_col  = next((c for c in colab_df.columns if "head" in norm(c)), None)
+            nome_col  = next((c for c in colab_df.columns if norm(c) == "nome"), "Nome")
+            sub_col   = next((c for c in colab_df.columns if norm(c) == "subarea"), None)
+            is_head   = head_col and any(
+                norm(str(row.get(head_col,""))) == norm(nome_sess)
+                for _, row in colab_df.iterrows()
+            )
+            if is_head:
+                head_filter = nome_sess
+            else:
+                lider_col = next((c for c in colab_df.columns if "lider" in norm(c) and "team" in norm(c)), None)
+                lider_sub = None
+                if lider_col:
+                    for _, row in colab_df.iterrows():
+                        if norm(str(row.get(lider_col,""))) == norm(nome_sess):
+                            lider_sub = str(row.get(sub_col,"")).strip() if sub_col else None
+                            break
+                head_filter = f"__squad__:{lider_sub}" if lider_sub else "__none__"
+
+        return jsonify(limpar_nans(calcular_forecast(head_filter=head_filter)))
+    except Exception as e:
+        import traceback
+        return jsonify({"erro": str(e), "trace": traceback.format_exc()}), 500
+
+
+# ── HISTÓRICO / SNAPSHOT ──────────────────────────────────────
+def is_master(nome_sess):
+    masters = {norm(u.strip()) for u in MASTERS_RAW.split(",")}
+    return norm(nome_sess) in masters
+
+def github_get_file(path):
+    """Retorna (content_decoded, sha) ou (None, None) se não existir"""
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{path}"
+    resp = req.get(url, headers={
+        "Authorization": f"token {GITHUB_TOKEN}",
+        "Accept": "application/vnd.github.v3+json"
+    }, timeout=15)
+    if resp.status_code == 404:
+        return None, None
+    resp.raise_for_status()
+    data = resp.json()
+    import base64
+    decoded = base64.b64decode(data["content"]).decode("utf-8")
+    return decoded, data["sha"]
+
+def github_put_file(path, content_str, sha=None, message="snapshot"):
+    """Cria ou atualiza arquivo no GitHub"""
+    import base64
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{path}"
+    body = {
+        "message": message,
+        "content": base64.b64encode(content_str.encode("utf-8")).decode("utf-8"),
+        "branch": GITHUB_BRANCH,
+    }
+    if sha:
+        body["sha"] = sha
+    resp = req.put(url, json=body, headers={
+        "Authorization": f"token {GITHUB_TOKEN}",
+        "Accept": "application/vnd.github.v3+json"
+    }, timeout=15)
+    resp.raise_for_status()
+    return resp.json()
+
+def calcular_snapshot():
+    """Grava deals abertos por squad/closer/dia com IDs e datas originais"""
+    import json
+    hoje_fc = date.today()
+    colab_df = buscar_colaboradores(mes=hoje_fc.month, ano=hoje_fc.year)
+    sub_col  = next((c for c in colab_df.columns if norm(c) == "subarea"), None)
+    nome_col = next((c for c in colab_df.columns if norm(c) == "nome"), "Nome")
+
+    nome_to_subarea = {}
+    for _, row in colab_df.iterrows():
+        nn  = norm(str(row.get(nome_col, "")))
+        sub = str(row.get(sub_col, "")).strip() if sub_col else ""
+        nome_to_subarea[nn] = sub
+
+    deals = buscar_deals_forecast()
+    users_pipe = buscar_users_pipe()
+
+    from collections import defaultdict
+    snapshot = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
+
+    for deal in deals:
+        if deal.get("status") != "open": continue
+        date_fc = deal.get("expected_close_date")
+        if not date_fc: continue
+        # Snapshot só grava deals previstos para HOJE
+        if date_fc != hoje_fc.strftime("%Y-%m-%d"): continue
+        owner    = (deal.get("owner_name") or "").strip()
+        owner_nn = norm(owner)
+        subarea  = nome_to_subarea.get(owner_nn, "")
+        if not subarea: continue
+        sub_display = "Licenciados" if subarea.upper().startswith("LIC") else subarea
+        probability = deal.get("probability")
+        value       = float(deal.get("value") or 0)
+
+        snapshot[sub_display][date_fc][owner].append({
+            "id":          deal.get("id"),
+            "titulo":      deal.get("title", ""),
+            "valor":       arred(value),
+            "probabilidade": probability,
+            "expected_close_date_original": date_fc,
+        })
+
+    # Converte defaultdict para dict normal
+    result = {}
+    for squad, days in snapshot.items():
+        result[squad] = {}
+        for dt, closers in days.items():
+            result[squad][dt] = dict(closers)
+
+    return result
+
+def enriquecer_snapshot(snapshot_data):
+    """Consulta deals atuais e classifica em ganho/perdido/remanejado/aberto"""
+    deals_atuais = buscar_deals_forecast()
+    deal_map = {d["id"]: d for d in deals_atuais}
+
+    result = {}
+    for squad, days in snapshot_data.items():
+        result[squad] = {}
+        for dt, closers in days.items():
+            day_totals = {
+                "media_prevista": 0.0, "ganho": 0.0,
+                "perdido": 0.0, "remanejado": 0.0,
+                "closers": {}
+            }
+            for closer, deals_list in closers.items():
+                c_totals = {"media_prevista": 0.0, "ganho": 0.0, "perdido": 0.0, "remanejado": 0.0, "deals": []}
+                for d in deals_list:
+                    prob  = d.get("probabilidade") or 0
+                    valor = d.get("valor", 0)
+                    media = valor * (prob / 100)
+                    c_totals["media_prevista"] += media
+                    day_totals["media_prevista"] += media
+
+                    atual = deal_map.get(d["id"])
+                    if not atual:
+                        status_atual = "ganho"  # não aparece mais = assumimos ganho/arquivado
+                    else:
+                        status_atual = atual.get("status", "open")
+                        new_date     = atual.get("expected_close_date", "")
+                        if status_atual == "open" and new_date != d["expected_close_date_original"]:
+                            status_atual = "remanejado"
+
+                    c_totals[status_atual if status_atual in ("ganho","perdido","remanejado") else "ganho"] += valor
+                    day_totals[status_atual if status_atual in ("ganho","perdido","remanejado") else "ganho"] += valor
+                    c_totals["deals"].append({**d, "status_atual": status_atual})
+
+                day_totals["closers"][closer] = c_totals
+
+            total_prev = day_totals["media_prevista"]
+            day_totals["pct_atingimento"] = arred(day_totals["ganho"] / total_prev * 100) if total_prev else None
+            result[squad][dt] = day_totals
+
+    return result
+
+@app.route("/api/snapshot", methods=["POST"])
+def api_snapshot():
+    if "nome" not in session or not is_master(session["nome"]):
+        return jsonify({"erro": "Acesso negado"}), 403
+    try:
+        hoje_str = (datetime.now() - timedelta(hours=3)).strftime("%Y-%m-%d")
+        path     = f"snapshots/{hoje_str}.json"
+
+        existing, sha = github_get_file(path)
+        if existing:
+            return jsonify({"existe": True, "data": hoje_str})
+
+        import json
+        data = calcular_snapshot()
+        github_put_file(path, json.dumps(data, ensure_ascii=False, indent=2),
+                        sha=None, message=f"snapshot {hoje_str}")
+        return jsonify({"ok": True, "data": hoje_str})
+    except Exception as e:
+        import traceback
+        return jsonify({"erro": str(e), "trace": traceback.format_exc()}), 500
+
+@app.route("/api/snapshot/sobrepor", methods=["POST"])
+def api_snapshot_sobrepor():
+    if "nome" not in session or not is_master(session["nome"]):
+        return jsonify({"erro": "Acesso negado"}), 403
+    try:
+        hoje_str = (datetime.now() - timedelta(hours=3)).strftime("%Y-%m-%d")
+        path     = f"snapshots/{hoje_str}.json"
+        _, sha   = github_get_file(path)
+        import json
+        data = calcular_snapshot()
+        github_put_file(path, json.dumps(data, ensure_ascii=False, indent=2),
+                        sha=sha, message=f"snapshot {hoje_str} (sobreposto)")
+        return jsonify({"ok": True, "data": hoje_str})
+    except Exception as e:
+        import traceback
+        return jsonify({"erro": str(e), "trace": traceback.format_exc()}), 500
+
+@app.route("/api/historico")
+def api_historico():
+    if "nome" not in session or not is_master(session["nome"]):
+        return jsonify({"erro": "Acesso negado"}), 403
+    try:
+        import json
+        # Lista arquivos na pasta snapshots
+        url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/snapshots"
+        resp = req.get(url, headers={
+            "Authorization": f"token {GITHUB_TOKEN}",
+            "Accept": "application/vnd.github.v3+json"
+        }, timeout=15)
+        if resp.status_code == 404:
+            return jsonify({"snapshots": []})
+        resp.raise_for_status()
+        files = [f["name"].replace(".json","") for f in resp.json() if f["name"].endswith(".json")]
+        files.sort(reverse=True)
+
+        # Carrega todos os snapshots e enriquece com status atual
+        result = {}
+        for fname in files[:30]:  # máximo 30 dias
+            content_str, _ = github_get_file(f"snapshots/{fname}.json")
+            if content_str:
+                snap = json.loads(content_str)
+                result[fname] = enriquecer_snapshot(snap)
+
+        return jsonify(limpar_nans({
+            "snapshots": result,
+            "datas": files,
+            "atualizado_em": (datetime.now() - timedelta(hours=3)).strftime("%d/%m/%Y %H:%M"),
+        }))
+    except Exception as e:
+        import traceback
+        return jsonify({"erro": str(e), "trace": traceback.format_exc()}), 500
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False)
