@@ -85,7 +85,6 @@ select:focus{outline:none;border-color:var(--navy)}
 .ccard-ttl{font-size:.64rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
 .cwrap{position:relative;height:180px}
 .cwrap.tall{height:240px}
-.cwrap.xtall{height:300px}
 .pgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
 .twrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:auto}
 table{width:100%;border-collapse:collapse;font-size:.78rem}
@@ -100,19 +99,19 @@ tbody td:not(:first-child){text-align:right;font-variant-numeric:tabular-nums}
 .tdn{font-weight:500;color:var(--navy)}.tdz{color:var(--muted)}
 tfoot td{padding:9px 13px;font-weight:600;color:var(--navy);background:var(--goldP);font-size:.79rem;border-top:1.5px solid var(--border)}
 tfoot td:not(:first-child){text-align:right;font-variant-numeric:tabular-nums}
-/* pct badge on table */
 .pct-badge{display:inline-block;padding:2px 7px;border-radius:20px;font-size:.7rem;font-weight:600}
 .pct-hi{background:#e8f5f0;color:#2e5c4a}.pct-md{background:#fef3e2;color:#8c6428}.pct-lo{background:#fef2f2;color:#8a2a1a}
-/* HEAT */
+/* HEAT — cell background, no box */
 .mwrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:auto;margin-bottom:14px}
-.mtable{width:100%;border-collapse:collapse;font-size:.75rem}
-.mtable thead th{background:var(--navy);color:rgba(255,255,255,.75);font-size:.6rem;font-weight:500;letter-spacing:.09em;text-transform:uppercase;padding:9px 10px;text-align:center;white-space:nowrap}
+.mtable{width:100%;border-collapse:collapse;font-size:.78rem}
+.mtable thead th{background:var(--navy);color:rgba(255,255,255,.75);font-size:.6rem;font-weight:500;letter-spacing:.09em;text-transform:uppercase;padding:9px 12px;text-align:center;white-space:nowrap}
 .mtable thead th:first-child{text-align:left;min-width:130px}
 .mtable tbody tr{border-bottom:1px solid var(--border)}
 .mtable tbody tr:last-child{border-bottom:none}
-.mtable tbody td{padding:7px 10px;text-align:center;font-variant-numeric:tabular-nums}
-.mtable tbody td:first-child{text-align:left;font-weight:600;color:var(--navy);background:var(--bg);border-right:1px solid var(--border);white-space:nowrap;padding-right:14px}
-.hcell{border-radius:4px;padding:4px 8px;display:inline-block;min-width:32px;font-weight:600;font-size:.75rem;text-align:center}
+.mtable tbody td{padding:9px 12px;text-align:right;font-variant-numeric:tabular-nums;font-size:.78rem;transition:filter .12s}
+.mtable tbody td:first-child{text-align:left;font-weight:600;color:var(--navy);background:var(--bg)!important;border-right:1.5px solid var(--border);white-space:nowrap}
+.mtable tbody td.heat-total{font-weight:700;color:var(--navy);background:var(--goldP)!important;border-left:1.5px solid var(--border)}
+.mtable tbody tr:hover td{filter:brightness(.95)}
 .errbanner{background:#fef2f2;border:1px solid #fecaca;border-radius:var(--radius);color:#991b1b;padding:12px 16px;font-size:.82rem;margin-bottom:16px;display:none}
 .pfooter{margin-top:28px;padding-top:12px;border-top:1px solid var(--border);display:flex;justify-content:space-between}
 .pfooter span{font-size:.68rem;color:var(--muted)}
@@ -244,16 +243,16 @@ tfoot td:not(:first-child){text-align:right;font-variant-numeric:tabular-nums}
     </div>
 
     <div class="sec-ttl">Criados por Licenciado — data de criação</div>
-    <div class="ccard" style="margin-bottom:14px"><div class="ccard-ttl">Leads Criados por Status</div><div class="cwrap tall"><canvas id="p2CC"></canvas></div></div>
+    <div class="ccard" style="margin-bottom:14px"><div class="ccard-ttl">Leads Criados por Status — ordem decrescente por total</div><div class="cwrap tall"><canvas id="p2CC"></canvas></div></div>
 
     <div class="sec-ttl">Ganhos por Licenciado — data de ganho</div>
     <div class="charts-row cols-2" style="margin-bottom:14px">
-      <div class="ccard"><div class="ccard-ttl">Volume de Ganhos</div><div class="cwrap tall"><canvas id="p2CW"></canvas></div></div>
-      <div class="ccard"><div class="ccard-ttl">Receita (R$)</div><div class="cwrap tall"><canvas id="p2CR"></canvas></div></div>
+      <div class="ccard"><div class="ccard-ttl">Volume de Ganhos — ordem decrescente</div><div class="cwrap tall"><canvas id="p2CW"></canvas></div></div>
+      <div class="ccard"><div class="ccard-ttl">Receita — ordem decrescente</div><div class="cwrap tall"><canvas id="p2CR"></canvas></div></div>
     </div>
 
     <div class="sec-ttl">Perdidos por Licenciado — data de perda</div>
-    <div class="ccard" style="margin-bottom:14px"><div class="ccard-ttl">Volume de Perdidos</div><div class="cwrap tall"><canvas id="p2CP"></canvas></div></div>
+    <div class="ccard" style="margin-bottom:14px"><div class="ccard-ttl">Volume de Perdidos — ordem decrescente</div><div class="cwrap tall"><canvas id="p2CP"></canvas></div></div>
 
     <div class="sec-ttl">Motivo de Perda por Licenciado — Top 10</div>
     <div class="mwrap" id="p2MR"></div>
@@ -276,7 +275,6 @@ Chart.register(ChartDataLabels);
 const MASKS={'LIC-BC':'Balneário Camboriú','LIC-BEL':'Belém','LIC-BH':'Belo Horizonte','LIC-BSB':'Brasília','LIC-CWB':'Curitiba','LIC-REC':'Recife','LIC-RIO':'Rio de Janeiro','LIC-SAL':'Salvador','LIC-SJC':'São José dos Campos'};
 function mask(name){for(const[k,v]of Object.entries(MASKS))if(name.toUpperCase().includes(k))return v;return name}
 
-// ── Auth ─────────────────────────────────────────────────────
 let TOKEN=sessionStorage.getItem('ba_tok')||null;
 function setTok(t,u){TOKEN=t;sessionStorage.setItem('ba_tok',t);sessionStorage.setItem('ba_usr',u)}
 function clrTok(){TOKEN=null;sessionStorage.removeItem('ba_tok');sessionStorage.removeItem('ba_usr')}
@@ -304,7 +302,6 @@ function switchTab(id){
   document.querySelectorAll('.nav-tab')[id==='p1'?0:1].classList.add('active');
 }
 
-// ── Formatters ────────────────────────────────────────────────
 const brl=v=>v.toLocaleString('pt-BR',{style:'currency',currency:'BRL',minimumFractionDigits:0,maximumFractionDigits:0});
 const brlK=v=>v>=1000?'R$'+(v/1000).toFixed(0)+'k':'R$'+v.toFixed(0);
 const pct=v=>v.toFixed(1)+'%';
@@ -313,62 +310,73 @@ const lMes=ym=>{const[y,m]=ym.split('-');return['Jan','Fev','Mar','Abr','Mai','J
 let API=null,CH={},licP=[];
 const PAL=['#1c2b3a','#b8873f','#4a7c6a','#c0533a','#7b5ea7','#2d7da8','#c47a2d','#3d7a5c','#a05c8a','#5a8a6a'];
 const GC='rgba(28,32,32,.06)',TC='#8a8277';
+const STATUS_COLORS={aberto:'#1c2b3a',ganho:'#4a7c6a',perdido:'#c0533a'};
 
-const dlB=fmt=>({display:ctx=>ctx.dataset.data[ctx.dataIndex]>0,formatter:fmt,color:'#fff',font:{family:'DM Sans',size:8,weight:'600'},anchor:'center',align:'center'});
 const dlL=fmt=>({display:ctx=>{const d=ctx.dataset.data,i=ctx.dataIndex,v=d[i];return v>0&&v>=(d[i-1]||0)&&v>=(d[i+1]||0)},formatter:fmt,color:ctx=>ctx.dataset.borderColor,font:{family:'DM Sans',size:9,weight:'600'},anchor:'end',align:'top',offset:4});
 const dlHoriz=fmt=>({display:ctx=>ctx.dataset.data[ctx.dataIndex]>0,formatter:fmt,color:'#1c2b3a',font:{family:'DM Sans',size:9,weight:'600'},anchor:'end',align:'right',offset:4});
 
 function dk(id){if(CH[id]){CH[id].destroy();delete CH[id]}}
 
-// Grouped column chart (for criados by status)
-function mkGroupedBar(id,labels,datasets){
+// ── Stacked bar (vertical) for status breakdown ──────────────
+function mkStacked(id,labels,datasets){
   dk(id);
   CH[id]=new Chart(document.getElementById(id),{type:'bar',
-    data:{labels,datasets:datasets.map(d=>({...d,borderRadius:4,borderSkipped:false,borderWidth:0}))},
+    data:{labels,datasets:datasets.map(d=>({...d,borderWidth:0,borderRadius:0,borderSkipped:false}))},
     options:{responsive:true,maintainAspectRatio:false,
       animation:{duration:600,easing:'easeOutQuart'},
-      layout:{padding:{top:8}},
+      layout:{padding:{top:28}},
       plugins:{
         legend:{display:true,position:'bottom',labels:{color:TC,font:{size:9},padding:12,boxWidth:10}},
-        datalabels:{display:false},
+        datalabels:{
+          display:ctx=>{const v=ctx.dataset.data[ctx.dataIndex];return v>0},
+          formatter:v=>v,
+          color:'#fff',
+          font:{family:'DM Sans',size:8,weight:'600'},
+          anchor:'center',align:'center',
+        },
         tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.parsed.y}`}}
       },
       scales:{
-        x:{grid:{display:false},ticks:{color:TC,font:{size:9}},border:{color:'transparent'}},
-        y:{grid:{color:GC},ticks:{color:TC,font:{size:9}},border:{color:'transparent'}}
+        x:{stacked:true,grid:{display:false},ticks:{color:TC,font:{size:9}},border:{color:'transparent'}},
+        y:{stacked:true,grid:{color:GC},ticks:{color:TC,font:{size:9}},border:{color:'transparent'}}
       }}
   });
 }
 
-// Horizontal bar — FIXED: explicit category scale for y
+// ── Horizontal stacked bar (for P2 criados comparison) ───────
+function mkHorizStacked(id,labels,datasets){
+  dk(id);
+  CH[id]=new Chart(document.getElementById(id),{type:'bar',
+    data:{labels,datasets:datasets.map(d=>({...d,borderWidth:0,borderSkipped:false}))},
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',
+      animation:{duration:600,easing:'easeOutQuart'},
+      layout:{padding:{right:50}},
+      plugins:{
+        legend:{display:true,position:'bottom',labels:{color:TC,font:{size:9},padding:12,boxWidth:10}},
+        datalabels:{
+          display:ctx=>ctx.dataset.data[ctx.dataIndex]>0,
+          formatter:v=>v,
+          color:'#fff',
+          font:{family:'DM Sans',size:8,weight:'600'},
+          anchor:'center',align:'center',
+        },
+        tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.parsed.x}`}}
+      },
+      scales:{
+        x:{stacked:true,type:'linear',grid:{color:GC},ticks:{color:TC,font:{size:9}},border:{color:'transparent'}},
+        y:{stacked:true,type:'category',grid:{display:false},ticks:{color:TC,font:{size:10}},border:{color:'transparent'}}
+      }}
+  });
+}
+
+// ── Simple horizontal bar ────────────────────────────────────
 function mkHorizBar(id,labels,data,color,fmt){
   dk(id);
   CH[id]=new Chart(document.getElementById(id),{type:'bar',
     data:{labels,datasets:[{data,backgroundColor:color+'cc',borderColor:color,borderWidth:1,borderRadius:4,borderSkipped:false}]},
     options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',
-      animation:{duration:600,easing:'easeOutQuart'},
-      layout:{padding:{right:52}},
+      animation:{duration:600},layout:{padding:{right:52}},
       plugins:{legend:{display:false},datalabels:dlHoriz(fmt),tooltip:{callbacks:{label:ctx=>fmt(ctx.parsed.x)}}},
-      scales:{
-        x:{type:'linear',grid:{color:GC},ticks:{color:TC,font:{size:9},callback:fmt},border:{color:'transparent'}},
-        y:{type:'category',grid:{display:false},ticks:{color:TC,font:{size:10}},border:{color:'transparent'}}
-      }}
-  });
-}
-
-// Horizontal multi-bar (comparison p2)
-function mkHorizMulti(id,labels,datasets,fmt){
-  dk(id);
-  CH[id]=new Chart(document.getElementById(id),{type:'bar',
-    data:{labels,datasets:datasets.map((d,i)=>({label:d.label,data:d.data,backgroundColor:PAL[i%PAL.length]+'cc',borderColor:PAL[i%PAL.length],borderWidth:1,borderRadius:3,borderSkipped:false}))},
-    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',
-      animation:{duration:600},
-      layout:{padding:{right:52}},
-      plugins:{
-        legend:{display:true,position:'bottom',labels:{color:TC,font:{size:9},padding:8,boxWidth:10}},
-        datalabels:{display:false},
-        tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${fmt(ctx.parsed.x)}`}}
-      },
       scales:{
         x:{type:'linear',grid:{color:GC},ticks:{color:TC,font:{size:9},callback:fmt},border:{color:'transparent'}},
         y:{type:'category',grid:{display:false},ticks:{color:TC,font:{size:10}},border:{color:'transparent'}}
@@ -403,9 +411,10 @@ function mkHBarRevenue(id,labels,data,colors,fmt){
               y:{type:'category',grid:{display:false},ticks:{color:TC,font:{size:10}},border:{color:'transparent'}}}}});
 }
 
-// ── Heat matrix ───────────────────────────────────────────────
+// ── Heat matrix — background on cell, no rounded box ─────────
 function buildHeat(containerId,rows,cols,matrix){
   if(!cols.length){document.getElementById(containerId).innerHTML='<p style="padding:14px;font-size:.8rem;color:var(--muted)">Nenhum dado disponível.</p>';return}
+  // Compute max per row for relative intensity
   const maxR=rows.map((_,ri)=>Math.max(...cols.map((_,ci)=>matrix[ri][ci]||0),1));
   let h=`<table class="mtable"><thead><tr><th>Licenciado</th>`;
   cols.forEach(c=>{h+=`<th title="${c}">${c.length>20?c.slice(0,18)+'…':c}</th>`});
@@ -415,15 +424,15 @@ function buildHeat(containerId,rows,cols,matrix){
     h+=`<tr><td>${row}</td>`;
     cols.forEach((_,ci)=>{
       const v=matrix[ri][ci]||0,rel=maxR[ri]>0?v/maxR[ri]:0;
-      let bg='transparent',fg='var(--text)';
+      let bg='transparent',fg='var(--text)',fw='400';
       if(v>0){
-        if(rel>=.7){bg=`rgba(192,83,58,${(.3+rel*.6).toFixed(2)})`;fg='#fff'}
-        else if(rel>=.35){bg=`rgba(184,135,63,${(.2+rel*.6).toFixed(2)})`;fg=rel>.4?'#fff':'var(--gold)'}
-        else{bg=`rgba(74,124,106,${(.15+rel*.5).toFixed(2)})`;fg='var(--sage)'}
+        if(rel>=.7){bg=`rgba(192,83,58,${(.25+rel*.65).toFixed(2)})`;fg=rel>.45?'#fff':'#8a2a1a';fw='600'}
+        else if(rel>=.35){bg=`rgba(184,135,63,${(.18+rel*.55).toFixed(2)})`;fg=rel>.55?'#fff':'#8c6428';fw='600'}
+        else{bg=`rgba(74,124,106,${(.12+rel*.45).toFixed(2)})`;fg=rel>.55?'#fff':'#2e5c4a';fw='600'}
       }
-      h+=`<td><span class="hcell" style="background:${bg};color:${fg}">${v>0?v:'—'}</span></td>`;
+      h+=`<td style="background:${bg};color:${fg};font-weight:${fw}">${v>0?v.toLocaleString('pt-BR'):'—'}</td>`;
     });
-    h+=`<td><strong>${tot>0?tot:'—'}</strong></td></tr>`;
+    h+=`<td class="heat-total">${tot>0?tot.toLocaleString('pt-BR'):'—'}</td></tr>`;
   });
   h+=`</tbody></table>`;
   document.getElementById(containerId).innerHTML=h;
@@ -443,7 +452,6 @@ function gauge(pfx,meta,real){
   document.getElementById(pfx+'N').style.display='none';document.getElementById(pfx+'D').style.display='block';
 }
 
-// ── Meta ─────────────────────────────────────────────────────
 const PTM=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 function findMeta(rows,pname,f,t){
   if(!rows?.length)return null;
@@ -463,7 +471,6 @@ function findMeta(rows,pname,f,t){
   return hit>0?tot:null;
 }
 
-// ── Aggregate ─────────────────────────────────────────────────
 function agg(ids,f,t){
   const c={};
   for(const pid of ids){for(const d of(API.byPipeline[pid]||[])){
@@ -511,11 +518,11 @@ function renderP1(data,pid){
   document.getElementById('p1KC').textContent=pct(cv);
   gauge('p1G',findMeta(API.meta,pn,data[0].month,data[data.length-1].month),tR);
 
-  // Criados grouped by status
-  mkGroupedBar('p1CL',labels,[
-    {label:'Aberto',   data:data.map(d=>d.criadosAberto),  backgroundColor:'#1c2b3acc',borderColor:'#1c2b3a'},
-    {label:'Ganho',    data:data.map(d=>d.criadosGanho),   backgroundColor:'#4a7c6acc',borderColor:'#4a7c6a'},
-    {label:'Perdido',  data:data.map(d=>d.criadosPerdido), backgroundColor:'#c0533acc',borderColor:'#c0533a'},
+  // Stacked vertical — criados por status
+  mkStacked('p1CL',labels,[
+    {label:'Aberto',  data:data.map(d=>d.criadosAberto),  backgroundColor:STATUS_COLORS.aberto+'cc'},
+    {label:'Ganho',   data:data.map(d=>d.criadosGanho),   backgroundColor:STATUS_COLORS.ganho+'cc'},
+    {label:'Perdido', data:data.map(d=>d.criadosPerdido), backgroundColor:STATUS_COLORS.perdido+'cc'},
   ]);
 
   mkHorizBar('p1CW',labels,data.map(d=>d.won),PAL[1],v=>v);
@@ -542,39 +549,48 @@ function renderP2(f,t){
 
   const rows=licP.map(p=>{
     const data=agg([p.id],f,t);
-    const pipeName=p.name;
-    const meta=findMeta(API.meta,pipeName,f,t);
+    const meta=findMeta(API.meta,p.name,f,t);
     return{
-      id:p.id,name:mask(p.name),pipeName,
-      criados:data.reduce((a,d)=>a+d.criados,0),
-      criadosAberto:data.reduce((a,d)=>a+(d.criadosAberto||0),0),
-      criadosGanho:data.reduce((a,d)=>a+(d.criadosGanho||0),0),
+      id:p.id,name:mask(p.name),pipeName:p.name,
+      criados:     data.reduce((a,d)=>a+d.criados,0),
+      criadosAberto: data.reduce((a,d)=>a+(d.criadosAberto||0),0),
+      criadosGanho:  data.reduce((a,d)=>a+(d.criadosGanho||0),0),
       criadosPerdido:data.reduce((a,d)=>a+(d.criadosPerdido||0),0),
-      ganhos:data.reduce((a,d)=>a+d.ganhos,0),
-      won:data.reduce((a,d)=>a+d.won,0),
-      revenue:data.reduce((a,d)=>a+d.revenue,0),
+      ganhos:  data.reduce((a,d)=>a+d.ganhos,0),
+      won:     data.reduce((a,d)=>a+d.won,0),
+      revenue: data.reduce((a,d)=>a+d.revenue,0),
       perdidos:data.reduce((a,d)=>a+d.perdidos,0),
       meta,
       lostReasons:data.reduce((a,d)=>{for(const[k,v]of Object.entries(d.lostReasons))a[k]=(a[k]||0)+v;return a},{}),
-      lostStages:data.reduce((a,d)=>{for(const[k,v]of Object.entries(d.lostStages))a[k]=(a[k]||0)+v;return a},{}),
+      lostStages: data.reduce((a,d)=>{for(const[k,v]of Object.entries(d.lostStages))a[k]=(a[k]||0)+v;return a},{}),
     };
   }).filter(r=>r.criados>0||r.won>0||r.perdidos>0);
 
   if(!rows.length)return;
+
+  // ── Criados: sorted by total desc ──
+  const rowsCriados=[...rows].sort((a,b)=>b.criados-a.criados);
+  const namesCriados=rowsCriados.map(r=>r.name);
+  mkHorizStacked('p2CC',namesCriados,[
+    {label:'Aberto',  data:rowsCriados.map(r=>r.criadosAberto),  backgroundColor:STATUS_COLORS.aberto+'cc'},
+    {label:'Ganho',   data:rowsCriados.map(r=>r.criadosGanho),   backgroundColor:STATUS_COLORS.ganho+'cc'},
+    {label:'Perdido', data:rowsCriados.map(r=>r.criadosPerdido), backgroundColor:STATUS_COLORS.perdido+'cc'},
+  ]);
+
+  // ── Ganhos volume: sorted by won desc ──
+  const rowsWon=[...rows].sort((a,b)=>b.won-a.won);
+  mkHorizBar('p2CW',rowsWon.map(r=>r.name),rowsWon.map(r=>r.won),PAL[1],v=>v);
+
+  // ── Receita: sorted by revenue desc ──
+  const rowsRev=[...rows].sort((a,b)=>b.revenue-a.revenue);
+  mkHBarRevenue('p2CR',rowsRev.map(r=>r.name),rowsRev.map(r=>r.revenue),rowsRev.map((_,i)=>PAL[i%PAL.length]),v=>brlK(v));
+
+  // ── Perdidos: sorted by perdidos desc ──
+  const rowsPerd=[...rows].sort((a,b)=>b.perdidos-a.perdidos);
+  mkHorizBar('p2CP',rowsPerd.map(r=>r.name),rowsPerd.map(r=>r.perdidos),PAL[3],v=>v);
+
+  // ── Heat matrices (unsorted — rows keep original order for readability) ──
   const names=rows.map(r=>r.name);
-
-  // Criados grouped by status — horizontal multi
-  mkHorizMulti('p2CC',names,[
-    {label:'Aberto',  data:rows.map(r=>r.criadosAberto)},
-    {label:'Ganho',   data:rows.map(r=>r.criadosGanho)},
-    {label:'Perdido', data:rows.map(r=>r.criadosPerdido)},
-  ],v=>v);
-
-  mkHorizBar('p2CW',names,rows.map(r=>r.won),PAL[1],v=>v);
-  mkHBarRevenue('p2CR',names,rows.map(r=>r.revenue),rows.map((_,i)=>PAL[i%PAL.length]),v=>brlK(v));
-  mkHorizBar('p2CP',names,rows.map(r=>r.perdidos),PAL[3],v=>v);
-
-  // Heat matrices
   const aR={};rows.forEach(r=>Object.entries(r.lostReasons).forEach(([k,v])=>{aR[k]=(aR[k]||0)+v}));
   const top10=Object.entries(aR).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([k])=>k);
   buildHeat('p2MR',names,top10,rows.map(r=>top10.map(k=>r.lostReasons[k]||0)));
@@ -583,28 +599,25 @@ function renderP2(f,t){
   const stages=Object.entries(aS).sort((a,b)=>b[1]-a[1]).map(([k])=>k);
   buildHeat('p2MS',names,stages,rows.map(r=>stages.map(k=>r.lostStages[k]||0)));
 
-  // Summary table with META
+  // ── Summary table ──
   const tb=document.getElementById('p2TB');tb.innerHTML='';
   const tots={c:0,g:0,p:0,r:0,w:0,m:0};
-  rows.forEach(r=>{
-    const at=r.won>0?r.revenue/r.won:0;
-    const cv=r.criados>0?(r.won/r.criados)*100:0;
-    const atingPct=r.meta&&r.meta>0?(r.revenue/r.meta)*100:null;
-    const atingClass=atingPct===null?'':(atingPct>=100?'pct-hi':atingPct>=70?'pct-md':'pct-lo');
-    const atingTxt=atingPct!==null?`<span class="pct-badge ${atingClass}">${atingPct.toFixed(0)}%</span>`:'<span class="tdz">—</span>';
+  // Table sorted by revenue desc
+  [...rows].sort((a,b)=>b.revenue-a.revenue).forEach(r=>{
+    const at=r.won>0?r.revenue/r.won:0,cv=r.criados>0?(r.won/r.criados)*100:0;
+    const ap=r.meta&&r.meta>0?(r.revenue/r.meta)*100:null;
+    const ac=ap===null?'':(ap>=100?'pct-hi':ap>=70?'pct-md':'pct-lo');
     const tr=document.createElement('tr');
-    tr.innerHTML=`<td class="tdn">${r.name}</td><td>${r.criados.toLocaleString('pt-BR')}</td><td>${r.ganhos.toLocaleString('pt-BR')}</td><td>${r.perdidos.toLocaleString('pt-BR')}</td><td>${r.revenue>0?brl(r.revenue):'<span class="tdz">—</span>'}</td><td>${at>0?brl(at):'<span class="tdz">—</span>'}</td><td>${r.criados>0?pct(cv):'<span class="tdz">—</span>'}</td><td>${r.meta?brl(r.meta):'<span class="tdz">—</span>'}</td><td>${atingTxt}</td>`;
+    tr.innerHTML=`<td class="tdn">${r.name}</td><td>${r.criados.toLocaleString('pt-BR')}</td><td>${r.ganhos.toLocaleString('pt-BR')}</td><td>${r.perdidos.toLocaleString('pt-BR')}</td><td>${r.revenue>0?brl(r.revenue):'<span class="tdz">—</span>'}</td><td>${at>0?brl(at):'<span class="tdz">—</span>'}</td><td>${r.criados>0?pct(cv):'<span class="tdz">—</span>'}</td><td>${r.meta?brl(r.meta):'<span class="tdz">—</span>'}</td><td>${ap!==null?`<span class="pct-badge ${ac}">${ap.toFixed(0)}%</span>`:'<span class="tdz">—</span>'}</td>`;
     tb.appendChild(tr);
     tots.c+=r.criados;tots.g+=r.ganhos;tots.p+=r.perdidos;tots.r+=r.revenue;tots.w+=r.won;if(r.meta)tots.m+=r.meta;
   });
-  const tat=tots.w>0?tots.r/tots.w:0,tcv=tots.c>0?(tots.w/tots.c)*100:0;
-  const tatP=tots.m>0?(tots.r/tots.m)*100:null;
-  const tatClass=tatP===null?'':(tatP>=100?'pct-hi':tatP>=70?'pct-md':'pct-lo');
-  document.getElementById('p2TF').innerHTML=`<tr><td>Total</td><td>${tots.c.toLocaleString('pt-BR')}</td><td>${tots.g.toLocaleString('pt-BR')}</td><td>${tots.p.toLocaleString('pt-BR')}</td><td>${brl(tots.r)}</td><td>${tat>0?brl(tat):'—'}</td><td>${pct(tcv)}</td><td>${tots.m>0?brl(tots.m):'—'}</td><td>${tatP!==null?`<span class="pct-badge ${tatClass}">${tatP.toFixed(0)}%</span>`:'—'}</td></tr>`;
+  const tat=tots.w>0?tots.r/tots.w:0,tcv=tots.c>0?(tots.w/tots.c)*100:0,tap=tots.m>0?(tots.r/tots.m)*100:null;
+  const tac=tap===null?'':(tap>=100?'pct-hi':tap>=70?'pct-md':'pct-lo');
+  document.getElementById('p2TF').innerHTML=`<tr><td>Total</td><td>${tots.c.toLocaleString('pt-BR')}</td><td>${tots.g.toLocaleString('pt-BR')}</td><td>${tots.p.toLocaleString('pt-BR')}</td><td>${brl(tots.r)}</td><td>${tat>0?brl(tat):'—'}</td><td>${pct(tcv)}</td><td>${tots.m>0?brl(tots.m):'—'}</td><td>${tap!==null?`<span class="pct-badge ${tac}">${tap.toFixed(0)}%</span>`:'—'}</td></tr>`;
   document.getElementById('p2FU').textContent='Atualizado em '+new Date().toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'});
 }
 
-// ── Selectors ─────────────────────────────────────────────────
 function ap1(){const pid=document.getElementById('p1Pipe').value,f=document.getElementById('p1From').value,t=document.getElementById('p1To').value;const data=pid==='all'?agg(licP.map(p=>p.id),f,t):(API.byPipeline[pid]||[]).filter(d=>d.month>=f&&d.month<=t);renderP1(data,pid)}
 function ap2(){renderP2(document.getElementById('p2From').value,document.getElementById('p2To').value)}
 
