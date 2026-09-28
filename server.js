@@ -27,13 +27,21 @@ async function fetchCSV(url) {
   const csv = await res.text();
   const lines = csv.trim().split('\n');
   if (lines.length < 2) return [];
-  const headers = lines[0].replace(/^\uFEFF/, '').split(',').map(h => h.trim().replace(/^"|"$/g, '').toLowerCase());
+  // Detect separator: tab or comma
+  const sep = lines[0].includes('\t') ? '\t' : ',';
+  const headers = lines[0].replace(/^\uFEFF/, '').split(sep).map(h => h.trim().replace(/^"|"$/g, '').toLowerCase());
   return lines.slice(1).filter(l => l.trim()).map(line => {
-    const vals = []; let cur = '', inQ = false;
-    for (const ch of line) { if (ch === '"') inQ = !inQ; else if (ch === ',' && !inQ) { vals.push(cur.trim()); cur = ''; } else cur += ch; }
-    vals.push(cur.trim());
+    let vals;
+    if (sep === '\t') {
+      vals = line.split('\t').map(v => v.trim().replace(/^"|"$/g, ''));
+    } else {
+      vals = []; let cur = '', inQ = false;
+      for (const ch of line) { if (ch === '"') inQ = !inQ; else if (ch === ',' && !inQ) { vals.push(cur.trim()); cur = ''; } else cur += ch; }
+      vals.push(cur.trim());
+      vals = vals.map(v => v.replace(/^"|"$/g, ''));
+    }
     const obj = {};
-    headers.forEach((h, i) => obj[h] = (vals[i] || '').replace(/^"|"$/g, '').trim());
+    headers.forEach((h, i) => obj[h] = (vals[i] || '').trim());
     return obj;
   });
 }
