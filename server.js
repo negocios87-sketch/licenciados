@@ -209,10 +209,9 @@ app.get('/api/report', requireAuth, async (req, res) => {
         if (deal.status === 'won')    m.criadosGanho++;
         if (deal.status === 'lost')   m.criadosPerdido++;
 
-        // Closers — por data de criação
+        // Closers — por data de criação (só criados)
         if (!m.closers[closerName]) m.closers[closerName] = { criados: 0, won: 0, revenue: 0, perdidos: 0, lostReasons: {} };
         m.closers[closerName].criados++;
-        if (deal.status === 'lost') m.closers[closerName].perdidos++;
       }
 
       // Por data de ganho
