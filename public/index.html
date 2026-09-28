@@ -668,7 +668,8 @@ function buildSel(pipelines,um){
   if(um.restricted&&licP.length===1) sp.disabled=true;
   const ms=new Set();licP.forEach(p=>(API.byPipeline[p.id]||[]).forEach(d=>ms.add(d.month)));
   const months=[...ms].sort();
-  ['p1From','p1To','p2From','p2To'].forEach(id=>{const el=document.getElementById(id);months.forEach(m=>el.appendChild(new Option(lMes(m),m)));el.value=id.includes('From')?months[0]:months[months.length-1]});
+  const currentYM=`${new Date().getFullYear()}-${String(new Date().getMonth()+1).padStart(2,'0')}`;
+  ['p1From','p1To','p2From','p2To'].forEach(id=>{const el=document.getElementById(id);months.forEach(m=>el.appendChild(new Option(lMes(m),m)));const def=months.includes(currentYM)?currentYM:(id.includes('From')?months[0]:months[months.length-1]);el.value=def});
   sp.addEventListener('change',ap1);
   const p1f=document.getElementById('p1From'),p1t=document.getElementById('p1To');
   p1f.addEventListener('change',()=>{if(p1f.value>p1t.value)p1t.value=p1f.value;ap1()});
