@@ -456,7 +456,7 @@ const PTM=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto
 function findMeta(rows,pname,f,t){
   if(!rows?.length)return null;
   const hs=Object.keys(rows[0]);const fnd=(...x)=>hs.find(h=>x.some(k=>h.toLowerCase().includes(k)));
-  const aC=fnd('ano','year'),mC=fnd('mes','mês','month'),mtC=fnd('meta','goal','objetivo'),pC=fnd('licenciado','pipeline','funil','lic');
+  const aC=fnd('ano','year'),mC=fnd('mes','mês','month'),mtC=fnd('meta financeira','financial','meta fin','goal')||fnd('meta','objetivo'),pC=fnd('nome','licenciado','pipeline','funil','lic');
   if(!mtC)return null;
   const pM=r=>{const n=parseInt(r);if(!isNaN(n))return n;const i=PTM.findIndex(m=>r?.toLowerCase().includes(m));return i>=0?i+1:-1};
   let tot=0,hit=0;
