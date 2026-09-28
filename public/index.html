@@ -101,20 +101,24 @@ tfoot td{padding:9px 13px;font-weight:600;color:var(--navy);background:var(--gol
 tfoot td:not(:first-child){text-align:right;font-variant-numeric:tabular-nums}
 .pct-badge{display:inline-block;padding:2px 7px;border-radius:20px;font-size:.7rem;font-weight:600}
 .pct-hi{background:#e8f5f0;color:#2e5c4a}.pct-md{background:#fef3e2;color:#8c6428}.pct-lo{background:#fef2f2;color:#8a2a1a}
-/* HEAT — cell background, no box */
 .mwrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:auto;margin-bottom:14px}
 .mtable{width:100%;border-collapse:collapse;font-size:.78rem}
 .mtable thead th{background:var(--navy);color:rgba(255,255,255,.75);font-size:.6rem;font-weight:500;letter-spacing:.09em;text-transform:uppercase;padding:9px 12px;text-align:center;white-space:nowrap}
 .mtable thead th:first-child{text-align:left;min-width:130px}
 .mtable tbody tr{border-bottom:1px solid var(--border)}
 .mtable tbody tr:last-child{border-bottom:none}
-.mtable tbody td{padding:9px 12px;text-align:right;font-variant-numeric:tabular-nums;font-size:.78rem;transition:filter .12s}
+.mtable tbody td{padding:9px 12px;text-align:right;font-variant-numeric:tabular-nums;font-size:.78rem}
 .mtable tbody td:first-child{text-align:left;font-weight:600;color:var(--navy);background:var(--bg)!important;border-right:1.5px solid var(--border);white-space:nowrap}
 .mtable tbody td.heat-total{font-weight:700;color:var(--navy);background:var(--goldP)!important;border-left:1.5px solid var(--border)}
-.mtable tbody tr:hover td{filter:brightness(.95)}
 .errbanner{background:#fef2f2;border:1px solid #fecaca;border-radius:var(--radius);color:#991b1b;padding:12px 16px;font-size:.82rem;margin-bottom:16px;display:none}
 .pfooter{margin-top:28px;padding-top:12px;border-top:1px solid var(--border);display:flex;justify-content:space-between}
 .pfooter span{font-size:.68rem;color:var(--muted)}
+/* rank badge on closer table */
+.rank-num{display:inline-block;width:20px;height:20px;border-radius:50%;font-size:.65rem;font-weight:700;text-align:center;line-height:20px;margin-right:6px}
+.rank-1{background:#FFD700;color:#000}
+.rank-2{background:#C0C0C0;color:#000}
+.rank-3{background:#CD7F32;color:#fff}
+.rank-n{background:var(--border);color:var(--muted)}
 @media print{
   @page{size:A4 landscape;margin:6mm}
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
@@ -147,7 +151,7 @@ tfoot td:not(:first-child){text-align:right;font-variant-numeric:tabular-nums}
       <div class="tb-sep"></div>
       <div class="tb-nav">
         <button class="nav-tab active" onclick="switchTab('p1')">Relatório</button>
-        <button class="nav-tab" onclick="switchTab('p2')">Comparativo</button>
+        <button class="nav-tab" id="tabComparativo" onclick="switchTab('p2')">Comparativo</button>
       </div>
     </div>
     <div class="tb-right">
@@ -224,10 +228,23 @@ tfoot td:not(:first-child){text-align:right;font-variant-numeric:tabular-nums}
       <div class="ccard"><div class="ccard-ttl">Receita por Produto (R$)</div><div class="cwrap tall"><canvas id="p1CPR"></canvas></div></div>
     </div>
 
+    <!-- Tabela de Closers -->
+    <div class="sec-ttl" id="p1SecClosers">Detalhe por Closer</div>
+    <div class="twrap" style="margin-bottom:18px">
+      <table>
+        <thead><tr><th>Closer</th><th>Criados</th><th>Ganhos</th><th>Perdidos</th><th>Receita</th><th>Ticket Médio</th><th>Conversão</th></tr></thead>
+        <tbody id="p1CloserBody"></tbody>
+        <tfoot id="p1CloserFoot"></tfoot>
+      </table>
+    </div>
+
+    <!-- Tabela mensal -->
     <div class="sec-ttl">Detalhe por Mês</div>
     <div class="twrap">
-      <table><thead><tr><th>Mês</th><th>Criados</th><th>Finalizados</th><th>Ganhos(cri.)</th><th>Won(rec.)</th><th>Perdidos</th><th>Receita</th><th>Ticket Médio</th><th>Conversão</th></tr></thead>
-      <tbody id="p1TB"></tbody><tfoot id="p1TF"></tfoot></table>
+      <table>
+        <thead><tr><th>Mês</th><th>Criados</th><th>Finalizados</th><th>Ganhos(cri.)</th><th>Won(rec.)</th><th>Perdidos</th><th>Receita</th><th>Ticket Médio</th><th>Conversão</th></tr></thead>
+        <tbody id="p1TB"></tbody><tfoot id="p1TF"></tfoot>
+      </table>
     </div>
     <div class="pfooter"><span>Board Academy · Licenciados</span><span id="p1FU"></span></div>
   </div>
@@ -241,25 +258,19 @@ tfoot td:not(:first-child){text-align:right;font-variant-numeric:tabular-nums}
         <div class="cg"><span class="cl">Até</span><select id="p2To"></select></div>
       </div>
     </div>
-
     <div class="sec-ttl">Criados por Licenciado — data de criação</div>
     <div class="ccard" style="margin-bottom:14px"><div class="ccard-ttl">Leads Criados por Status — ordem decrescente por total</div><div class="cwrap tall"><canvas id="p2CC"></canvas></div></div>
-
     <div class="sec-ttl">Ganhos por Licenciado — data de ganho</div>
     <div class="charts-row cols-2" style="margin-bottom:14px">
       <div class="ccard"><div class="ccard-ttl">Volume de Ganhos — ordem decrescente</div><div class="cwrap tall"><canvas id="p2CW"></canvas></div></div>
       <div class="ccard"><div class="ccard-ttl">Receita — ordem decrescente</div><div class="cwrap tall"><canvas id="p2CR"></canvas></div></div>
     </div>
-
     <div class="sec-ttl">Perdidos por Licenciado — data de perda</div>
     <div class="ccard" style="margin-bottom:14px"><div class="ccard-ttl">Volume de Perdidos — ordem decrescente</div><div class="cwrap tall"><canvas id="p2CP"></canvas></div></div>
-
     <div class="sec-ttl">Motivo de Perda por Licenciado — Top 10</div>
     <div class="mwrap" id="p2MR"></div>
-
     <div class="sec-ttl" style="margin-top:14px">Etapa de Perda por Licenciado</div>
     <div class="mwrap" id="p2MS"></div>
-
     <div class="sec-ttl" style="margin-top:14px">Resumo Geral por Licenciado</div>
     <div class="twrap">
       <table><thead><tr><th>Licenciado</th><th>Criados</th><th>Ganhos</th><th>Perdidos</th><th>Receita</th><th>Ticket Médio</th><th>Conversão</th><th>Meta</th><th>Atingimento</th></tr></thead>
@@ -271,14 +282,15 @@ tfoot td:not(:first-child){text-align:right;font-variant-numeric:tabular-nums}
 
 <script>
 Chart.register(ChartDataLabels);
-
 const MASKS={'LIC-BC':'Balneário Camboriú','LIC-BEL':'Belém','LIC-BH':'Belo Horizonte','LIC-BSB':'Brasília','LIC-CWB':'Curitiba','LIC-REC':'Recife','LIC-RIO':'Rio de Janeiro','LIC-SAL':'Salvador','LIC-SJC':'São José dos Campos'};
 function mask(name){for(const[k,v]of Object.entries(MASKS))if(name.toUpperCase().includes(k))return v;return name}
 
 let TOKEN=sessionStorage.getItem('ba_tok')||null;
-function setTok(t,u){TOKEN=t;sessionStorage.setItem('ba_tok',t);sessionStorage.setItem('ba_usr',u)}
-function clrTok(){TOKEN=null;sessionStorage.removeItem('ba_tok');sessionStorage.removeItem('ba_usr')}
+let USER_META={};
+function setTok(t,u,um){TOKEN=t;USER_META=um||{};sessionStorage.setItem('ba_tok',t);sessionStorage.setItem('ba_usr',u);sessionStorage.setItem('ba_um',JSON.stringify(um||{}))}
+function clrTok(){TOKEN=null;USER_META={};sessionStorage.removeItem('ba_tok');sessionStorage.removeItem('ba_usr');sessionStorage.removeItem('ba_um')}
 function usr(){return sessionStorage.getItem('ba_usr')||''}
+function loadUM(){try{return JSON.parse(sessionStorage.getItem('ba_um')||'{}')}catch{return{}}}
 async function aFetch(url,opts={}){const r=await fetch(url,{...opts,headers:{...(opts.headers||{}),'Authorization':`Bearer ${TOKEN}`}});if(r.status===401){clrTok();showLogin();throw new Error('Sessão expirada.')}return r}
 function showLogin(){document.getElementById('loginScreen').style.display='flex';document.getElementById('shell').style.display='none'}
 function hideLogin(){document.getElementById('loginScreen').style.display='none';document.getElementById('shell').style.display='block'}
@@ -288,14 +300,29 @@ async function doLogin(){
   const u=document.getElementById('lUser').value.trim(),p=document.getElementById('lPass').value;
   if(!u||!p){showE('Preencha usuário e senha.');return}
   btn.disabled=true;btn.innerHTML='<span class="lspinner"></span>Entrando...';err.style.display='none';
-  try{const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({usuario:u,senha:p})});const j=await r.json();if(!j.ok)throw new Error(j.error);setTok(j.token,j.user);hideLogin();await load()}
-  catch(e){showE(e.message)}finally{btn.disabled=false;btn.textContent='Entrar'}
+  try{
+    const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({usuario:u,senha:p})});
+    const j=await r.json();if(!j.ok)throw new Error(j.error);
+    setTok(j.token,j.user,j.userMeta||{});
+    hideLogin();applyUserRestrictions(j.userMeta||{});await load();
+  }catch(e){showE(e.message)}finally{btn.disabled=false;btn.textContent='Entrar'}
 }
 function showE(m){const e=document.getElementById('lErr');e.textContent=m;e.style.display='block'}
 async function doLogout(){try{await aFetch('/api/logout',{method:'POST'})}catch{}clrTok();showLogin()}
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('loginScreen').style.display!=='none')doLogin()});
 
+function applyUserRestrictions(um){
+  const tabComp=document.getElementById('tabComparativo');
+  if(um.restricted&&um.allowedTabs&&!um.allowedTabs.includes('comparativo')){
+    tabComp.style.display='none';
+  } else {
+    tabComp.style.display='';
+  }
+}
+
 function switchTab(id){
+  // Bloqueia aba comparativo se usuário restrito
+  if(id==='p2'&&USER_META.restricted&&USER_META.allowedTabs&&!USER_META.allowedTabs.includes('comparativo')) return;
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -313,75 +340,31 @@ const GC='rgba(28,32,32,.06)',TC='#8a8277';
 const STATUS_COLORS={aberto:'#1c2b3a',ganho:'#4a7c6a',perdido:'#c0533a'};
 
 const dlL=fmt=>({display:ctx=>{const d=ctx.dataset.data,i=ctx.dataIndex,v=d[i];return v>0&&v>=(d[i-1]||0)&&v>=(d[i+1]||0)},formatter:fmt,color:ctx=>ctx.dataset.borderColor,font:{family:'DM Sans',size:9,weight:'600'},anchor:'end',align:'top',offset:4});
-const dlHoriz=fmt=>({display:ctx=>ctx.dataset.data[ctx.dataIndex]>0,formatter:fmt,color:'#1c2b3a',font:{family:'DM Sans',size:9,weight:'600'},anchor:'end',align:'right',offset:4});
-
+const dlH=fmt=>({display:ctx=>ctx.dataset.data[ctx.dataIndex]>0,formatter:fmt,color:'#1c2b3a',font:{family:'DM Sans',size:9,weight:'600'},anchor:'end',align:'right',offset:4});
 function dk(id){if(CH[id]){CH[id].destroy();delete CH[id]}}
 
-// ── Stacked bar (vertical) for status breakdown ──────────────
 function mkStacked(id,labels,datasets){
   dk(id);
-  CH[id]=new Chart(document.getElementById(id),{type:'bar',
-    data:{labels,datasets:datasets.map(d=>({...d,borderWidth:0,borderRadius:0,borderSkipped:false}))},
-    options:{responsive:true,maintainAspectRatio:false,
-      animation:{duration:600,easing:'easeOutQuart'},
-      layout:{padding:{top:28}},
-      plugins:{
-        legend:{display:true,position:'bottom',labels:{color:TC,font:{size:9},padding:12,boxWidth:10}},
-        datalabels:{
-          display:ctx=>{const v=ctx.dataset.data[ctx.dataIndex];return v>0},
-          formatter:v=>v,
-          color:'#fff',
-          font:{family:'DM Sans',size:8,weight:'600'},
-          anchor:'center',align:'center',
-        },
-        tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.parsed.y}`}}
-      },
-      scales:{
-        x:{stacked:true,grid:{display:false},ticks:{color:TC,font:{size:9}},border:{color:'transparent'}},
-        y:{stacked:true,grid:{color:GC},ticks:{color:TC,font:{size:9}},border:{color:'transparent'}}
-      }}
-  });
+  CH[id]=new Chart(document.getElementById(id),{type:'bar',data:{labels,datasets:datasets.map(d=>({...d,borderWidth:0,borderSkipped:false}))},
+    options:{responsive:true,maintainAspectRatio:false,animation:{duration:600},layout:{padding:{top:8}},
+      plugins:{legend:{display:true,position:'bottom',labels:{color:TC,font:{size:9},padding:12,boxWidth:10}},datalabels:{display:ctx=>ctx.dataset.data[ctx.dataIndex]>0,formatter:v=>v,color:'#fff',font:{family:'DM Sans',size:8,weight:'600'},anchor:'center',align:'center'},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.parsed.y}`}}},
+      scales:{x:{stacked:true,grid:{display:false},ticks:{color:TC,font:{size:9}},border:{color:'transparent'}},y:{stacked:true,grid:{color:GC},ticks:{color:TC,font:{size:9}},border:{color:'transparent'}}}}});
 }
 
-// ── Horizontal stacked bar (for P2 criados comparison) ───────
 function mkHorizStacked(id,labels,datasets){
   dk(id);
-  CH[id]=new Chart(document.getElementById(id),{type:'bar',
-    data:{labels,datasets:datasets.map(d=>({...d,borderWidth:0,borderSkipped:false}))},
-    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',
-      animation:{duration:600,easing:'easeOutQuart'},
-      layout:{padding:{right:50}},
-      plugins:{
-        legend:{display:true,position:'bottom',labels:{color:TC,font:{size:9},padding:12,boxWidth:10}},
-        datalabels:{
-          display:ctx=>ctx.dataset.data[ctx.dataIndex]>0,
-          formatter:v=>v,
-          color:'#fff',
-          font:{family:'DM Sans',size:8,weight:'600'},
-          anchor:'center',align:'center',
-        },
-        tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.parsed.x}`}}
-      },
-      scales:{
-        x:{stacked:true,type:'linear',grid:{color:GC},ticks:{color:TC,font:{size:9}},border:{color:'transparent'}},
-        y:{stacked:true,type:'category',grid:{display:false},ticks:{color:TC,font:{size:10}},border:{color:'transparent'}}
-      }}
-  });
+  CH[id]=new Chart(document.getElementById(id),{type:'bar',data:{labels,datasets:datasets.map(d=>({...d,borderWidth:0,borderSkipped:false}))},
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',animation:{duration:600},layout:{padding:{right:50}},
+      plugins:{legend:{display:true,position:'bottom',labels:{color:TC,font:{size:9},padding:12,boxWidth:10}},datalabels:{display:ctx=>ctx.dataset.data[ctx.dataIndex]>0,formatter:v=>v,color:'#fff',font:{family:'DM Sans',size:8,weight:'600'},anchor:'center',align:'center'},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.parsed.x}`}}},
+      scales:{x:{stacked:true,type:'linear',grid:{color:GC},ticks:{color:TC,font:{size:9}},border:{color:'transparent'}},y:{stacked:true,type:'category',grid:{display:false},ticks:{color:TC,font:{size:10}},border:{color:'transparent'}}}}});
 }
 
-// ── Simple horizontal bar ────────────────────────────────────
 function mkHorizBar(id,labels,data,color,fmt){
   dk(id);
-  CH[id]=new Chart(document.getElementById(id),{type:'bar',
-    data:{labels,datasets:[{data,backgroundColor:color+'cc',borderColor:color,borderWidth:1,borderRadius:4,borderSkipped:false}]},
-    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',
-      animation:{duration:600},layout:{padding:{right:52}},
-      plugins:{legend:{display:false},datalabels:dlHoriz(fmt),tooltip:{callbacks:{label:ctx=>fmt(ctx.parsed.x)}}},
-      scales:{
-        x:{type:'linear',grid:{color:GC},ticks:{color:TC,font:{size:9},callback:fmt},border:{color:'transparent'}},
-        y:{type:'category',grid:{display:false},ticks:{color:TC,font:{size:10}},border:{color:'transparent'}}
-      }}
-  });
+  CH[id]=new Chart(document.getElementById(id),{type:'bar',data:{labels,datasets:[{data,backgroundColor:color+'cc',borderColor:color,borderWidth:1,borderRadius:4,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',animation:{duration:600},layout:{padding:{right:52}},
+      plugins:{legend:{display:false},datalabels:dlH(fmt),tooltip:{callbacks:{label:ctx=>fmt(ctx.parsed.x)}}},
+      scales:{x:{type:'linear',grid:{color:GC},ticks:{color:TC,font:{size:9},callback:fmt},border:{color:'transparent'}},y:{type:'category',grid:{display:false},ticks:{color:TC,font:{size:10}},border:{color:'transparent'}}}}});
 }
 
 function mkLine(id,labels,data,color,fmt){
@@ -397,24 +380,19 @@ function mkDnut(id,labels,data,colors,tFmt){
   dk(id);const total=data.reduce((a,b)=>a+b,0);
   CH[id]=new Chart(document.getElementById(id),{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors,borderColor:'#fff',borderWidth:2,hoverOffset:5}]},
     options:{responsive:true,maintainAspectRatio:false,animation:{duration:600},cutout:'52%',
-      plugins:{legend:{position:'right',labels:{color:TC,font:{size:9},padding:9,boxWidth:9}},
-        datalabels:{display:ctx=>ctx.dataset.data[ctx.dataIndex]>0,formatter:v=>total>0?((v/total)*100).toFixed(0)+'%':'',color:'#fff',font:{family:'DM Sans',size:9,weight:'600'}},
-        tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${tFmt(ctx.parsed)}`}}}}});
+      plugins:{legend:{position:'right',labels:{color:TC,font:{size:9},padding:9,boxWidth:9}},datalabels:{display:ctx=>ctx.dataset.data[ctx.dataIndex]>0,formatter:v=>total>0?((v/total)*100).toFixed(0)+'%':'',color:'#fff',font:{family:'DM Sans',size:9,weight:'600'}},tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${tFmt(ctx.parsed)}`}}}}});
 }
 
-function mkHBarRevenue(id,labels,data,colors,fmt){
+function mkHBarRev(id,labels,data,colors,fmt){
   dk(id);
   CH[id]=new Chart(document.getElementById(id),{type:'bar',data:{labels,datasets:[{data,backgroundColor:colors,borderRadius:4,borderSkipped:false}]},
     options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',animation:{duration:600},layout:{padding:{right:52}},
-      plugins:{legend:{display:false},datalabels:dlHoriz(fmt),tooltip:{callbacks:{label:ctx=>fmt(ctx.parsed.x)}}},
-      scales:{x:{type:'linear',grid:{color:GC},ticks:{color:TC,font:{size:9},callback:fmt},border:{color:'transparent'}},
-              y:{type:'category',grid:{display:false},ticks:{color:TC,font:{size:10}},border:{color:'transparent'}}}}});
+      plugins:{legend:{display:false},datalabels:dlH(fmt),tooltip:{callbacks:{label:ctx=>fmt(ctx.parsed.x)}}},
+      scales:{x:{type:'linear',grid:{color:GC},ticks:{color:TC,font:{size:9},callback:fmt},border:{color:'transparent'}},y:{type:'category',grid:{display:false},ticks:{color:TC,font:{size:10}},border:{color:'transparent'}}}}});
 }
 
-// ── Heat matrix — background on cell, no rounded box ─────────
 function buildHeat(containerId,rows,cols,matrix){
-  if(!cols.length){document.getElementById(containerId).innerHTML='<p style="padding:14px;font-size:.8rem;color:var(--muted)">Nenhum dado disponível.</p>';return}
-  // Compute max per row for relative intensity
+  if(!cols.length){document.getElementById(containerId).innerHTML='<p style="padding:14px;font-size:.8rem;color:var(--muted)">Nenhum dado.</p>';return}
   const maxR=rows.map((_,ri)=>Math.max(...cols.map((_,ci)=>matrix[ri][ci]||0),1));
   let h=`<table class="mtable"><thead><tr><th>Licenciado</th>`;
   cols.forEach(c=>{h+=`<th title="${c}">${c.length>20?c.slice(0,18)+'…':c}</th>`});
@@ -425,30 +403,23 @@ function buildHeat(containerId,rows,cols,matrix){
     cols.forEach((_,ci)=>{
       const v=matrix[ri][ci]||0,rel=maxR[ri]>0?v/maxR[ri]:0;
       let bg='transparent',fg='var(--text)',fw='400';
-      if(v>0){
-        if(rel>=.7){bg=`rgba(192,83,58,${(.25+rel*.65).toFixed(2)})`;fg=rel>.45?'#fff':'#8a2a1a';fw='600'}
-        else if(rel>=.35){bg=`rgba(184,135,63,${(.18+rel*.55).toFixed(2)})`;fg=rel>.55?'#fff':'#8c6428';fw='600'}
-        else{bg=`rgba(74,124,106,${(.12+rel*.45).toFixed(2)})`;fg=rel>.55?'#fff':'#2e5c4a';fw='600'}
-      }
-      h+=`<td style="background:${bg};color:${fg};font-weight:${fw}">${v>0?v.toLocaleString('pt-BR'):'—'}</td>`;
+      if(v>0){if(rel>=.7){bg=`rgba(192,83,58,${(.25+rel*.65).toFixed(2)})`;fg='#fff';fw='600'}else if(rel>=.35){bg=`rgba(184,135,63,${(.18+rel*.55).toFixed(2)})`;fg=rel>.55?'#fff':'#8c6428';fw='600'}else{bg=`rgba(74,124,106,${(.12+rel*.45).toFixed(2)})`;fg='var(--sage)';fw='600'}}
+      h+=`<td style="background:${bg};color:${fg};font-weight:${fw}">${v>0?v:'—'}</td>`;
     });
-    h+=`<td class="heat-total">${tot>0?tot.toLocaleString('pt-BR'):'—'}</td></tr>`;
+    h+=`<td class="heat-total">${tot>0?tot:'—'}</td></tr>`;
   });
   h+=`</tbody></table>`;
   document.getElementById(containerId).innerHTML=h;
 }
 
-// ── Gauge ─────────────────────────────────────────────────────
 function gauge(pfx,meta,real){
   const arc=document.getElementById(pfx+'A'),txt=document.getElementById(pfx+'T');
   if(!meta){arc.style.strokeDashoffset=267;txt.textContent='—';document.getElementById(pfx+'N').style.display='block';document.getElementById(pfx+'D').style.display='none';return}
   const p=(real/meta)*100,col=p>=100?'#4a7c6a':p>=70?'#b8873f':'#c0533a';
   arc.style.strokeDashoffset=267*(1-Math.min(p,100)/100);arc.style.stroke=col;txt.textContent=p.toFixed(0)+'%';txt.style.fill=col;
   const d=real-meta;
-  document.getElementById(pfx+'M').textContent=brl(meta);
-  document.getElementById(pfx+'R').textContent=brl(real);
-  document.getElementById(pfx+'Df').textContent=(d>=0?'+':'')+brl(d);
-  document.getElementById(pfx+'Df').style.color=d>=0?'#4a7c6a':'#c0533a';
+  document.getElementById(pfx+'M').textContent=brl(meta);document.getElementById(pfx+'R').textContent=brl(real);
+  document.getElementById(pfx+'Df').textContent=(d>=0?'+':'')+brl(d);document.getElementById(pfx+'Df').style.color=d>=0?'#4a7c6a':'#c0533a';
   document.getElementById(pfx+'N').style.display='none';document.getElementById(pfx+'D').style.display='block';
 }
 
@@ -456,7 +427,7 @@ const PTM=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto
 function findMeta(rows,pname,f,t){
   if(!rows?.length)return null;
   const hs=Object.keys(rows[0]);const fnd=(...x)=>hs.find(h=>x.some(k=>h.toLowerCase().includes(k)));
-  const aC=fnd('ano','year'),mC=fnd('mes','mês','month'),mtC=fnd('meta financeira','financial','meta fin','goal')||fnd('meta','objetivo'),pC=fnd('nome','licenciado','pipeline','funil','lic');
+  const aC=fnd('ano','year'),mC=fnd('mes','mês','month'),mtC=fnd('meta financeira','meta fin','financial','goal','meta','objetivo'),pC=fnd('licenciado','nome','pipeline','funil','lic');
   if(!mtC)return null;
   const pM=r=>{const n=parseInt(r);if(!isNaN(n))return n;const i=PTM.findIndex(m=>r?.toLowerCase().includes(m));return i>=0?i+1:-1};
   let tot=0,hit=0;
@@ -475,7 +446,7 @@ function agg(ids,f,t){
   const c={};
   for(const pid of ids){for(const d of(API.byPipeline[pid]||[])){
     if(d.month<f||d.month>t)continue;
-    if(!c[d.month])c[d.month]={month:d.month,criados:0,finalizados:0,ganhos:0,criadosAberto:0,criadosGanho:0,criadosPerdido:0,won:0,revenue:0,products:{},perdidos:0,lostReasons:{},lostStages:{}};
+    if(!c[d.month])c[d.month]={month:d.month,criados:0,finalizados:0,ganhos:0,criadosAberto:0,criadosGanho:0,criadosPerdido:0,won:0,revenue:0,products:{},perdidos:0,lostReasons:{},lostStages:{},closers:{}};
     const m=c[d.month];
     m.criados+=d.criados;m.finalizados+=d.finalizados;m.ganhos+=d.ganhos;
     m.criadosAberto+=d.criadosAberto||0;m.criadosGanho+=d.criadosGanho||0;m.criadosPerdido+=d.criadosPerdido||0;
@@ -483,17 +454,48 @@ function agg(ids,f,t){
     for(const[k,v]of Object.entries(d.products)){if(!m.products[k])m.products[k]={count:0,revenue:0};m.products[k].count+=v.count;m.products[k].revenue+=v.revenue}
     for(const[k,v]of Object.entries(d.lostReasons)){if(!m.lostReasons[k])m.lostReasons[k]=0;m.lostReasons[k]+=v}
     for(const[k,v]of Object.entries(d.lostStages)){if(!m.lostStages[k])m.lostStages[k]=0;m.lostStages[k]+=v}
+    for(const[k,v]of Object.entries(d.closers||{})){
+      if(!m.closers[k])m.closers[k]={criados:0,won:0,revenue:0,perdidos:0};
+      m.closers[k].criados+=v.criados||0;m.closers[k].won+=v.won||0;m.closers[k].revenue+=v.revenue||0;m.closers[k].perdidos+=v.perdidos||0;
+    }
   }}
   return Object.values(c).sort((a,b)=>a.month.localeCompare(b.month)).map(d=>({...d,avgTicket:d.won>0?d.revenue/d.won:0,conversion:d.criados>0?(d.won/d.criados)*100:0}));
 }
 
-// ── PAGE 1 ────────────────────────────────────────────────────
+// ── Closer table ──────────────────────────────────────────────
+function buildCloserTable(data){
+  const cm={};
+  for(const d of data){
+    for(const[name,v]of Object.entries(d.closers||{})){
+      if(!cm[name])cm[name]={criados:0,won:0,revenue:0,perdidos:0};
+      cm[name].criados+=v.criados||0;cm[name].won+=v.won||0;cm[name].revenue+=v.revenue||0;cm[name].perdidos+=v.perdidos||0;
+    }
+  }
+  const sorted=Object.entries(cm).sort((a,b)=>b[1].revenue-a[1].revenue);
+  const tbody=document.getElementById('p1CloserBody');tbody.innerHTML='';
+  const z=v=>v===0?'<span class="tdz">—</span>':v.toLocaleString('pt-BR');
+  let tots={c:0,w:0,r:0,p:0};
+  sorted.forEach(([name,v],i)=>{
+    const at=v.won>0?v.revenue/v.won:0;
+    const cv=v.criados>0?(v.won/v.criados)*100:0;
+    const rank=i<3?`<span class="rank-num rank-${i+1}">${i+1}</span>`:`<span class="rank-num rank-n">${i+1}</span>`;
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td class="tdn">${rank}${name}</td><td>${z(v.criados)}</td><td>${z(v.won)}</td><td>${z(v.perdidos)}</td><td>${v.revenue>0?brl(v.revenue):'<span class="tdz">—</span>'}</td><td>${at>0?brl(at):'<span class="tdz">—</span>'}</td><td>${v.criados>0?pct(cv):'<span class="tdz">—</span>'}</td>`;
+    tbody.appendChild(tr);
+    tots.c+=v.criados;tots.w+=v.won;tots.r+=v.revenue;tots.p+=v.perdidos;
+  });
+  const tat=tots.w>0?tots.r/tots.w:0,tcv=tots.c>0?(tots.w/tots.c)*100:0;
+  document.getElementById('p1CloserFoot').innerHTML=`<tr><td>Total / Média</td><td>${tots.c.toLocaleString('pt-BR')}</td><td>${tots.w.toLocaleString('pt-BR')}</td><td>${tots.p.toLocaleString('pt-BR')}</td><td>${brl(tots.r)}</td><td>${tat>0?brl(tat):'—'}</td><td>${pct(tcv)}</td></tr>`;
+}
+
+// ── P1 render ─────────────────────────────────────────────────
 function renderP1(data,pid){
   const pp=pid==='all'?null:API.pipelines.find(p=>p.id===pid);
   const pn=pp?.name||null,dn=pn?mask(pn):null;
   document.getElementById('p1Title').textContent=dn?`Relatório — ${dn}`:'Relatório — Licenciados';
   document.getElementById('p1SecE').textContent=dn?`Evolução Mensal · ${dn}`:'Evolução Mensal';
   document.getElementById('p1SecP').textContent=dn?`Quebra por Produto · ${dn}`:'Quebra por Produto';
+  document.getElementById('p1SecClosers').textContent=dn?`Detalhe por Closer · ${dn}`:'Detalhe por Closer';
   if(!data.length)return;
   const labels=data.map(d=>lMes(d.month));
   const tC=data.reduce((a,d)=>a+d.criados,0),tF=data.reduce((a,d)=>a+d.finalizados,0);
@@ -508,33 +510,23 @@ function renderP1(data,pid){
   document.getElementById('p1VG').textContent=tG.toLocaleString('pt-BR');
   document.getElementById('p1Pct1').textContent=tC>0?(tF/tC*100).toFixed(1)+'%':'0%';
   document.getElementById('p1Pct2').textContent=tC>0?(tG/tC*100).toFixed(1)+'%':'0%';
-  setTimeout(()=>{
-    document.getElementById('p1BF').style.width=Math.max(25,Math.round(tF/mx*100))+'%';
-    document.getElementById('p1BG').style.width=Math.max(15,Math.round(tG/mx*100))+'%';
-  },100);
-  document.getElementById('p1KR').textContent=brlK(tR);
-  document.getElementById('p1KT').textContent=at>0?brlK(at):'—';
-  document.getElementById('p1KW').textContent=tW.toLocaleString('pt-BR');
-  document.getElementById('p1KC').textContent=pct(cv);
+  setTimeout(()=>{document.getElementById('p1BF').style.width=Math.max(25,Math.round(tF/mx*100))+'%';document.getElementById('p1BG').style.width=Math.max(15,Math.round(tG/mx*100))+'%';},100);
+  document.getElementById('p1KR').textContent=brlK(tR);document.getElementById('p1KT').textContent=at>0?brlK(at):'—';
+  document.getElementById('p1KW').textContent=tW.toLocaleString('pt-BR');document.getElementById('p1KC').textContent=pct(cv);
   gauge('p1G',findMeta(API.meta,pn,data[0].month,data[data.length-1].month),tR);
-
-  // Stacked vertical — criados por status
   mkStacked('p1CL',labels,[
-    {label:'Aberto',  data:data.map(d=>d.criadosAberto),  backgroundColor:STATUS_COLORS.aberto+'cc'},
-    {label:'Ganho',   data:data.map(d=>d.criadosGanho),   backgroundColor:STATUS_COLORS.ganho+'cc'},
-    {label:'Perdido', data:data.map(d=>d.criadosPerdido), backgroundColor:STATUS_COLORS.perdido+'cc'},
+    {label:'Aberto',data:data.map(d=>d.criadosAberto),backgroundColor:STATUS_COLORS.aberto+'cc'},
+    {label:'Ganho',data:data.map(d=>d.criadosGanho),backgroundColor:STATUS_COLORS.ganho+'cc'},
+    {label:'Perdido',data:data.map(d=>d.criadosPerdido),backgroundColor:STATUS_COLORS.perdido+'cc'},
   ]);
-
   mkHorizBar('p1CW',labels,data.map(d=>d.won),PAL[1],v=>v);
   mkLine('p1CR',labels,data.map(d=>d.revenue),PAL[2],v=>brlK(v));
   mkLine('p1CT',labels,data.map(d=>d.avgTicket),PAL[3],v=>brlK(v));
-
   const pm={};for(const d of data)for(const[p,v]of Object.entries(d.products)){if(!pm[p])pm[p]={count:0,revenue:0};pm[p].count+=v.count;pm[p].revenue+=v.revenue}
   const pe=Object.entries(pm).sort((a,b)=>b[1].revenue-a[1].revenue);
-  const pL=pe.map(([k])=>k),pC=pe.map(([,v])=>v.count),pR=pe.map(([,v])=>v.revenue),pCl=pL.map((_,i)=>PAL[i%PAL.length]);
-  mkDnut('p1CPV',pL,pC,pCl,v=>v+' ganhos');
-  mkHBarRevenue('p1CPR',pL,pR,pCl,v=>brlK(v));
-
+  const pL=pe.map(([k])=>k),pC2=pe.map(([,v])=>v.count),pR=pe.map(([,v])=>v.revenue),pCl=pL.map((_,i)=>PAL[i%PAL.length]);
+  mkDnut('p1CPV',pL,pC2,pCl,v=>v+' ganhos');mkHBarRev('p1CPR',pL,pR,pCl,v=>brlK(v));
+  buildCloserTable(data);
   const tb=document.getElementById('p1TB');tb.innerHTML='';
   const z=v=>v===0?'<span class="tdz">—</span>':v.toLocaleString('pt-BR');
   data.forEach(d=>{const tr=document.createElement('tr');tr.innerHTML=`<td class="tdn">${lMes(d.month)}</td><td>${z(d.criados)}</td><td>${z(d.finalizados)}</td><td>${z(d.ganhos)}</td><td>${z(d.won)}</td><td>${z(d.perdidos)}</td><td>${d.revenue>0?brl(d.revenue):'<span class="tdz">—</span>'}</td><td>${d.avgTicket>0?brl(d.avgTicket):'<span class="tdz">—</span>'}</td><td>${d.criados>0?pct(d.conversion):'<span class="tdz">—</span>'}</td>`;tb.appendChild(tr)});
@@ -542,75 +534,48 @@ function renderP1(data,pid){
   document.getElementById('p1FU').textContent='Atualizado em '+new Date().toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'});
 }
 
-// ── PAGE 2 ────────────────────────────────────────────────────
+// ── P2 render ─────────────────────────────────────────────────
 function renderP2(f,t){
   const fl=lMes(f),tl=lMes(t);
   document.getElementById('p2Sub').textContent=fl===tl?fl:`${fl} a ${tl}`;
-
   const rows=licP.map(p=>{
     const data=agg([p.id],f,t);
     const meta=findMeta(API.meta,p.name,f,t);
-    return{
-      id:p.id,name:mask(p.name),pipeName:p.name,
-      criados:     data.reduce((a,d)=>a+d.criados,0),
-      criadosAberto: data.reduce((a,d)=>a+(d.criadosAberto||0),0),
-      criadosGanho:  data.reduce((a,d)=>a+(d.criadosGanho||0),0),
-      criadosPerdido:data.reduce((a,d)=>a+(d.criadosPerdido||0),0),
-      ganhos:  data.reduce((a,d)=>a+d.ganhos,0),
-      won:     data.reduce((a,d)=>a+d.won,0),
-      revenue: data.reduce((a,d)=>a+d.revenue,0),
-      perdidos:data.reduce((a,d)=>a+d.perdidos,0),
-      meta,
+    return{id:p.id,name:mask(p.name),pipeName:p.name,
+      criados:data.reduce((a,d)=>a+d.criados,0),criadosAberto:data.reduce((a,d)=>a+(d.criadosAberto||0),0),
+      criadosGanho:data.reduce((a,d)=>a+(d.criadosGanho||0),0),criadosPerdido:data.reduce((a,d)=>a+(d.criadosPerdido||0),0),
+      ganhos:data.reduce((a,d)=>a+d.ganhos,0),won:data.reduce((a,d)=>a+d.won,0),revenue:data.reduce((a,d)=>a+d.revenue,0),
+      perdidos:data.reduce((a,d)=>a+d.perdidos,0),meta,
       lostReasons:data.reduce((a,d)=>{for(const[k,v]of Object.entries(d.lostReasons))a[k]=(a[k]||0)+v;return a},{}),
-      lostStages: data.reduce((a,d)=>{for(const[k,v]of Object.entries(d.lostStages))a[k]=(a[k]||0)+v;return a},{}),
+      lostStages:data.reduce((a,d)=>{for(const[k,v]of Object.entries(d.lostStages))a[k]=(a[k]||0)+v;return a},{}),
     };
   }).filter(r=>r.criados>0||r.won>0||r.perdidos>0);
-
   if(!rows.length)return;
-
-  // ── Criados: sorted by total desc ──
-  const rowsCriados=[...rows].sort((a,b)=>b.criados-a.criados);
-  const namesCriados=rowsCriados.map(r=>r.name);
-  mkHorizStacked('p2CC',namesCriados,[
-    {label:'Aberto',  data:rowsCriados.map(r=>r.criadosAberto),  backgroundColor:STATUS_COLORS.aberto+'cc'},
-    {label:'Ganho',   data:rowsCriados.map(r=>r.criadosGanho),   backgroundColor:STATUS_COLORS.ganho+'cc'},
-    {label:'Perdido', data:rowsCriados.map(r=>r.criadosPerdido), backgroundColor:STATUS_COLORS.perdido+'cc'},
-  ]);
-
-  // ── Ganhos volume: sorted by won desc ──
-  const rowsWon=[...rows].sort((a,b)=>b.won-a.won);
-  mkHorizBar('p2CW',rowsWon.map(r=>r.name),rowsWon.map(r=>r.won),PAL[1],v=>v);
-
-  // ── Receita: sorted by revenue desc ──
-  const rowsRev=[...rows].sort((a,b)=>b.revenue-a.revenue);
-  mkHBarRevenue('p2CR',rowsRev.map(r=>r.name),rowsRev.map(r=>r.revenue),rowsRev.map((_,i)=>PAL[i%PAL.length]),v=>brlK(v));
-
-  // ── Perdidos: sorted by perdidos desc ──
-  const rowsPerd=[...rows].sort((a,b)=>b.perdidos-a.perdidos);
-  mkHorizBar('p2CP',rowsPerd.map(r=>r.name),rowsPerd.map(r=>r.perdidos),PAL[3],v=>v);
-
-  // ── Heat matrices (unsorted — rows keep original order for readability) ──
   const names=rows.map(r=>r.name);
+  const rC=[...rows].sort((a,b)=>b.criados-a.criados);
+  mkHorizStacked('p2CC',rC.map(r=>r.name),[
+    {label:'Aberto',data:rC.map(r=>r.criadosAberto),backgroundColor:STATUS_COLORS.aberto+'cc'},
+    {label:'Ganho',data:rC.map(r=>r.criadosGanho),backgroundColor:STATUS_COLORS.ganho+'cc'},
+    {label:'Perdido',data:rC.map(r=>r.criadosPerdido),backgroundColor:STATUS_COLORS.perdido+'cc'},
+  ]);
+  const rW=[...rows].sort((a,b)=>b.won-a.won);mkHorizBar('p2CW',rW.map(r=>r.name),rW.map(r=>r.won),PAL[1],v=>v);
+  const rR=[...rows].sort((a,b)=>b.revenue-a.revenue);mkHBarRev('p2CR',rR.map(r=>r.name),rR.map(r=>r.revenue),rR.map((_,i)=>PAL[i%PAL.length]),v=>brlK(v));
+  const rP=[...rows].sort((a,b)=>b.perdidos-a.perdidos);mkHorizBar('p2CP',rP.map(r=>r.name),rP.map(r=>r.perdidos),PAL[3],v=>v);
   const aR={};rows.forEach(r=>Object.entries(r.lostReasons).forEach(([k,v])=>{aR[k]=(aR[k]||0)+v}));
   const top10=Object.entries(aR).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([k])=>k);
   buildHeat('p2MR',names,top10,rows.map(r=>top10.map(k=>r.lostReasons[k]||0)));
-
   const aS={};rows.forEach(r=>Object.entries(r.lostStages).forEach(([k,v])=>{aS[k]=(aS[k]||0)+v}));
   const stages=Object.entries(aS).sort((a,b)=>b[1]-a[1]).map(([k])=>k);
   buildHeat('p2MS',names,stages,rows.map(r=>stages.map(k=>r.lostStages[k]||0)));
-
-  // ── Summary table ──
   const tb=document.getElementById('p2TB');tb.innerHTML='';
   const tots={c:0,g:0,p:0,r:0,w:0,m:0};
-  // Table sorted by revenue desc
   [...rows].sort((a,b)=>b.revenue-a.revenue).forEach(r=>{
     const at=r.won>0?r.revenue/r.won:0,cv=r.criados>0?(r.won/r.criados)*100:0;
     const ap=r.meta&&r.meta>0?(r.revenue/r.meta)*100:null;
     const ac=ap===null?'':(ap>=100?'pct-hi':ap>=70?'pct-md':'pct-lo');
     const tr=document.createElement('tr');
     tr.innerHTML=`<td class="tdn">${r.name}</td><td>${r.criados.toLocaleString('pt-BR')}</td><td>${r.ganhos.toLocaleString('pt-BR')}</td><td>${r.perdidos.toLocaleString('pt-BR')}</td><td>${r.revenue>0?brl(r.revenue):'<span class="tdz">—</span>'}</td><td>${at>0?brl(at):'<span class="tdz">—</span>'}</td><td>${r.criados>0?pct(cv):'<span class="tdz">—</span>'}</td><td>${r.meta?brl(r.meta):'<span class="tdz">—</span>'}</td><td>${ap!==null?`<span class="pct-badge ${ac}">${ap.toFixed(0)}%</span>`:'<span class="tdz">—</span>'}</td>`;
-    tb.appendChild(tr);
-    tots.c+=r.criados;tots.g+=r.ganhos;tots.p+=r.perdidos;tots.r+=r.revenue;tots.w+=r.won;if(r.meta)tots.m+=r.meta;
+    tb.appendChild(tr);tots.c+=r.criados;tots.g+=r.ganhos;tots.p+=r.perdidos;tots.r+=r.revenue;tots.w+=r.won;if(r.meta)tots.m+=r.meta;
   });
   const tat=tots.w>0?tots.r/tots.w:0,tcv=tots.c>0?(tots.w/tots.c)*100:0,tap=tots.m>0?(tots.r/tots.m)*100:null;
   const tac=tap===null?'':(tap>=100?'pct-hi':tap>=70?'pct-md':'pct-lo');
@@ -621,11 +586,14 @@ function renderP2(f,t){
 function ap1(){const pid=document.getElementById('p1Pipe').value,f=document.getElementById('p1From').value,t=document.getElementById('p1To').value;const data=pid==='all'?agg(licP.map(p=>p.id),f,t):(API.byPipeline[pid]||[]).filter(d=>d.month>=f&&d.month<=t);renderP1(data,pid)}
 function ap2(){renderP2(document.getElementById('p2From').value,document.getElementById('p2To').value)}
 
-function buildSel(pipelines){
+function buildSel(pipelines,um){
   licP=pipelines.filter(p=>p.name.toUpperCase().startsWith('LIC-'));
   const sp=document.getElementById('p1Pipe');
-  sp.appendChild(new Option('Todos os Licenciados','all'));
+  // Usuário restrito não vê o "Todos"
+  if(!um.restricted) sp.appendChild(new Option('Todos os Licenciados','all'));
   licP.forEach(p=>sp.appendChild(new Option(mask(p.name),p.id)));
+  // Se restrito, trava no único pipeline disponível
+  if(um.restricted&&licP.length===1) sp.disabled=true;
   const ms=new Set();licP.forEach(p=>(API.byPipeline[p.id]||[]).forEach(d=>ms.add(d.month)));
   const months=[...ms].sort();
   ['p1From','p1To','p2From','p2To'].forEach(id=>{const el=document.getElementById(id);months.forEach(m=>el.appendChild(new Option(lMes(m),m)));el.value=id.includes('From')?months[0]:months[months.length-1]});
@@ -641,19 +609,19 @@ function buildSel(pipelines){
 async function load(){
   try{
     const r=await aFetch('/api/report');const j=await r.json();if(!j.ok)throw new Error(j.error);
-    API=j;document.getElementById('tbUser').textContent=usr();
-    ['p1Pipe','p1From','p1To','p2From','p2To'].forEach(id=>{const e=document.getElementById(id);while(e.firstChild)e.removeChild(e.firstChild)});
+    API=j;USER_META=j.userMeta||{};
+    document.getElementById('tbUser').textContent=usr();
+    ['p1Pipe','p1From','p1To','p2From','p2To'].forEach(id=>{const e=document.getElementById(id);e.disabled=false;while(e.firstChild)e.removeChild(e.firstChild)});
     Object.keys(CH).forEach(k=>{if(CH[k]){CH[k].destroy();delete CH[k]}});
-    buildSel(j.pipelines);ap1();ap2();
+    applyUserRestrictions(USER_META);
+    buildSel(j.pipelines,USER_META);ap1();ap2();
   }catch(e){if(e.message!=='Sessão expirada.'){const b=document.getElementById('p1Err');b.style.display='block';b.textContent=`Erro: ${e.message}`}}
 }
 
-async function doRefresh(){
-  const b=document.getElementById('btnRefresh');b.disabled=true;b.textContent='↺ Atualizando...';
-  await load();b.disabled=false;b.textContent='↺ Atualizar';
-}
+async function doRefresh(){const b=document.getElementById('btnRefresh');b.disabled=true;b.textContent='↺ Atualizando...';await load();b.disabled=false;b.textContent='↺ Atualizar'}
 
-if(TOKEN){hideLogin();load()}else{showLogin()}
+// Init
+if(TOKEN){USER_META=loadUM();hideLogin();applyUserRestrictions(USER_META);load()}else{showLogin()}
 </script>
 </body>
 </html>
