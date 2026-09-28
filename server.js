@@ -15,6 +15,18 @@ const PRODUCT_FIELD_KEY = process.env.PRODUCT_FIELD    || '8bdce76ba66f0fed02809
 const META_CSV_URL      = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSvwO3Ag2f2cbkVgR1pJZp6fANQcbualGKlAG50fmOljuEGKZ1gJBbSAjRdO3SomXUEVQOWnTvlfHRd/pub?gid=1105730510&single=true&output=csv';
 const USERS_CSV_URL     = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSvwO3Ag2f2cbkVgR1pJZp6fANQcbualGKlAG50fmOljuEGKZ1gJBbSAjRdO3SomXUEVQOWnTvlfHRd/pub?gid=160245570&single=true&output=csv';
 
+// ── Usuários locais com restrições ──────────────────────────
+// Esses usuários têm acesso restrito definido no código.
+// Sobrepõem qualquer linha da planilha com mesmo nome de usuário.
+const LOCAL_USERS = {
+  'paulo lucio': {
+    pass: 'sjc123',
+    restricted: true,
+    allowedPipelines: ['LIC-SJC'], // só vê pipelines cujo nome contém esses valores
+    allowedTabs: ['relatorio'],    // só vê a aba relatório
+  }
+};
+
 // ── Sessions ────────────────────────────────────────────────
 const SESSIONS = new Map();
 const SESSION_TTL = 8 * 60 * 60 * 1000;
@@ -27,7 +39,6 @@ async function fetchCSV(url) {
   const csv = await res.text();
   const lines = csv.trim().split('\n');
   if (lines.length < 2) return [];
-  // Detect separator: tab or comma
   const sep = lines[0].includes('\t') ? '\t' : ',';
   const headers = lines[0].replace(/^\uFEFF/, '').split(sep).map(h => h.trim().replace(/^"|"$/g, '').toLowerCase());
   return lines.slice(1).filter(l => l.trim()).map(line => {
@@ -65,19 +76,34 @@ function requireAuth(req, res, next) {
   const token = (req.headers['authorization'] || '').replace('Bearer ', '').trim();
   const s = SESSIONS.get(token);
   if (!s || Date.now() > s.expiresAt) return res.status(401).json({ ok: false, error: 'Não autorizado.' });
-  req.user = s.user; next();
+  req.user = s.user;
+  req.userMeta = s.userMeta || {};
+  next();
 }
 
 app.post('/api/login', async (req, res) => {
   try {
     const { usuario, senha } = req.body;
     if (!usuario || !senha) return res.status(400).json({ ok: false, error: 'Preencha usuário e senha.' });
+
+    const userKey = usuario.toLowerCase().trim();
+
+    // Verifica usuários locais primeiro
+    if (LOCAL_USERS[userKey]) {
+      const lu = LOCAL_USERS[userKey];
+      if (lu.pass !== senha.trim()) return res.status(401).json({ ok: false, error: 'Usuário ou senha incorretos.' });
+      const token = crypto.randomUUID();
+      SESSIONS.set(token, { user: userKey, userMeta: { restricted: lu.restricted, allowedPipelines: lu.allowedPipelines, allowedTabs: lu.allowedTabs }, expiresAt: Date.now() + SESSION_TTL });
+      return res.json({ ok: true, token, user: userKey, userMeta: { restricted: lu.restricted, allowedPipelines: lu.allowedPipelines, allowedTabs: lu.allowedTabs } });
+    }
+
+    // Usuários da planilha (sem restrições)
     const users = await getUsers();
-    const match = users.find(u => u.user === usuario.toLowerCase().trim() && u.pass === senha.trim());
+    const match = users.find(u => u.user === userKey && u.pass === senha.trim());
     if (!match) return res.status(401).json({ ok: false, error: 'Usuário ou senha incorretos.' });
     const token = crypto.randomUUID();
-    SESSIONS.set(token, { user: match.user, expiresAt: Date.now() + SESSION_TTL });
-    res.json({ ok: true, token, user: match.user });
+    SESSIONS.set(token, { user: match.user, userMeta: {}, expiresAt: Date.now() + SESSION_TTL });
+    res.json({ ok: true, token, user: match.user, userMeta: {} });
   } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
 });
 
@@ -125,22 +151,9 @@ async function fetchPipelines() {
 async function getStages() {
   try {
     const json = await pipeGet('/stages');
-    // Map stage_id → stage name
     return Object.fromEntries((json.data || []).map(s => [String(s.id), s.name]));
   } catch { return {}; }
 }
-
-// ── DEBUG — remove depois ───────────────────────────────────
-app.get('/api/debug-meta', async (req, res) => {
-  try {
-    const rows = await fetchCSV(META_CSV_URL);
-    const sample = rows.slice(0, 3);
-    const lic = rows.filter(r => Object.values(r).some(v => String(v).includes('LIC-')));
-    res.json({ ok: true, totalRows: rows.length, firstKeys: Object.keys(rows[0] || {}), sampleRows: sample, licRows: lic });
-  } catch (e) {
-    res.status(500).json({ ok: false, error: e.message });
-  }
-});
 
 // ── Report endpoint ─────────────────────────────────────────
 app.get('/api/report', requireAuth, async (req, res) => {
@@ -152,13 +165,24 @@ app.get('/api/report', requireAuth, async (req, res) => {
       getStages()
     ]);
 
+    // Filtra pipelines permitidos para usuários restritos
+    const userMeta = req.userMeta || {};
+    const allowedPipelines = userMeta.allowedPipelines || null;
+
+    const filteredPipelines = allowedPipelines
+      ? pipelines.filter(p => allowedPipelines.some(a => p.name.toUpperCase().includes(a.toUpperCase())))
+      : pipelines;
+
+    const allowedPipelineIds = new Set(filteredPipelines.map(p => p.id));
+
     const data = {};
     const ensure = (container, ym) => {
       if (!container[ym]) container[ym] = {
         criados: 0, finalizados: 0, ganhos: 0,
         criadosAberto: 0, criadosGanho: 0, criadosPerdido: 0,
         won: 0, revenue: 0, products: {},
-        perdidos: 0, lostReasons: {}, lostStages: {}
+        perdidos: 0, lostReasons: {}, lostStages: {},
+        closers: {}
       };
       return container[ym];
     };
@@ -166,47 +190,60 @@ app.get('/api/report', requireAuth, async (req, res) => {
     for (const deal of deals) {
       if (parseFloat(deal.value || 0) === 0) continue;
       const pipeId = String(deal.pipeline_id || 'unknown');
+
+      // Restrição de pipeline por usuário
+      if (allowedPipelines && !allowedPipelineIds.has(pipeId)) continue;
+
       if (!data[pipeId]) data[pipeId] = {};
 
-      // ── Por data de criação ──
+      const closerName = deal.user_id?.name || 'Não informado';
+
+      // Por data de criação
       if (deal.add_time) {
         const ym = deal.add_time.substring(0, 7);
         const m = ensure(data[pipeId], ym);
         m.criados++;
         if (deal.status === 'won' || deal.status === 'lost') m.finalizados++;
         if (deal.status === 'won') m.ganhos++;
+        if (deal.status === 'open')   m.criadosAberto++;
+        if (deal.status === 'won')    m.criadosGanho++;
+        if (deal.status === 'lost')   m.criadosPerdido++;
 
-        // Breakdown por status na criação
-        if (deal.status === 'open')  m.criadosAberto++;
-        if (deal.status === 'won')   m.criadosGanho++;
-        if (deal.status === 'lost')  m.criadosPerdido++;
+        // Closers — por data de criação
+        if (!m.closers[closerName]) m.closers[closerName] = { criados: 0, won: 0, revenue: 0, perdidos: 0 };
+        m.closers[closerName].criados++;
+        if (deal.status === 'lost') m.closers[closerName].perdidos++;
       }
 
-      // ── Por data de ganho ──
+      // Por data de ganho
       if (deal.status === 'won' && deal.won_time) {
         const ym = deal.won_time.substring(0, 7);
         const m = ensure(data[pipeId], ym);
         const val = parseFloat(deal.value || 0);
         m.won++; m.revenue += val;
+
         const raw = deal[PRODUCT_FIELD_KEY];
         let produto = 'Não informado';
         if (raw !== null && raw !== undefined && raw !== '') produto = productLabels[String(raw)] || String(raw);
         if (!m.products[produto]) m.products[produto] = { count: 0, revenue: 0 };
         m.products[produto].count++; m.products[produto].revenue += val;
+
+        // Closers — receita por data de ganho
+        const cymKey = deal.won_time.substring(0, 7);
+        const cm = ensure(data[pipeId], cymKey);
+        if (!cm.closers[closerName]) cm.closers[closerName] = { criados: 0, won: 0, revenue: 0, perdidos: 0 };
+        cm.closers[closerName].won++;
+        cm.closers[closerName].revenue += val;
       }
 
-      // ── Por data de perda ──
+      // Por data de perda
       if (deal.status === 'lost' && deal.lost_time) {
         const ym = deal.lost_time.substring(0, 7);
         const m = ensure(data[pipeId], ym);
         m.perdidos++;
-
-        // Motivo: usar o texto direto (lost_reason), não o ID
         const reason = (deal.lost_reason && deal.lost_reason.trim()) ? deal.lost_reason.trim() : 'Não informado';
         if (!m.lostReasons[reason]) m.lostReasons[reason] = 0;
         m.lostReasons[reason]++;
-
-        // Etapa: stage_id → nome da etapa
         const stageId = String(deal.stage_id || '');
         const stage = (stageId && stages[stageId]) ? stages[stageId] : 'Não informado';
         if (!m.lostStages[stage]) m.lostStages[stage] = 0;
@@ -230,12 +267,19 @@ app.get('/api/report', requireAuth, async (req, res) => {
       perdidos:       obj[m].perdidos,
       lostReasons:    obj[m].lostReasons,
       lostStages:     obj[m].lostStages,
+      closers:        obj[m].closers,
     }));
 
     const byPipeline = {};
     for (const [id, months] of Object.entries(data)) byPipeline[id] = toArray(months);
 
-    res.json({ ok: true, pipelines, byPipeline, meta });
+    res.json({
+      ok: true,
+      pipelines: filteredPipelines,
+      byPipeline,
+      meta,
+      userMeta: { restricted: userMeta.restricted || false, allowedTabs: userMeta.allowedTabs || null }
+    });
   } catch (e) {
     console.error('[/api/report]', e);
     res.status(500).json({ ok: false, error: e.message });
