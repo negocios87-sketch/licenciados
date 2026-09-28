@@ -130,6 +130,18 @@ async function getStages() {
   } catch { return {}; }
 }
 
+// ── DEBUG — remove depois ───────────────────────────────────
+app.get('/api/debug-meta', async (req, res) => {
+  try {
+    const rows = await fetchCSV(META_CSV_URL);
+    const sample = rows.slice(0, 3);
+    const lic = rows.filter(r => Object.values(r).some(v => String(v).includes('LIC-')));
+    res.json({ ok: true, totalRows: rows.length, firstKeys: Object.keys(rows[0] || {}), sampleRows: sample, licRows: lic });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
 // ── Report endpoint ─────────────────────────────────────────
 app.get('/api/report', requireAuth, async (req, res) => {
   if (!API_TOKEN) return res.status(500).json({ ok: false, error: 'PIPEDRIVE_TOKEN não configurado.' });
