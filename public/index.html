@@ -238,6 +238,24 @@ tfoot td:not(:first-child){text-align:right;font-variant-numeric:tabular-nums}
       </table>
     </div>
 
+    <!-- Cancelamentos -->
+    <div class="sec-ttl" id="p1SecCanc">Motivos de Perda</div>
+    <div class="charts-row cols-2" style="margin-bottom:18px">
+      <div class="twrap">
+        <table>
+          <thead><tr><th>Motivo</th><th>Volume</th><th>% Rep.</th></tr></thead>
+          <tbody id="p1CancBody"></tbody>
+          <tfoot id="p1CancFoot"></tfoot>
+        </table>
+      </div>
+      <div class="twrap">
+        <table>
+          <thead><tr><th>Closer</th><th>Motivo Principal</th><th>Volume</th><th>% do Closer</th></tr></thead>
+          <tbody id="p1CancCloserBody"></tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- Tabela mensal -->
     <div class="sec-ttl">Detalhe por Mês</div>
     <div class="twrap">
@@ -462,6 +480,72 @@ function agg(ids,f,t){
   return Object.values(c).sort((a,b)=>a.month.localeCompare(b.month)).map(d=>({...d,avgTicket:d.won>0?d.revenue/d.won:0,conversion:d.criados>0?(d.won/d.criados)*100:0}));
 }
 
+// ── Cancellation tables ───────────────────────────────────────
+function buildCancTables(data){
+  // Agrega motivos de perda de todos os meses
+  const reasons={};
+  // Agrega por closer → motivos
+  const closerReasons={};
+
+  for(const d of data){
+    for(const[reason,vol]of Object.entries(d.lostReasons||{})){
+      reasons[reason]=(reasons[reason]||0)+vol;
+    }
+    // Para closer × motivo precisamos recalcular a partir dos deals
+    // Os dados de closer no mês não têm breakdown por motivo
+    // Usamos lostReasons do mês como agregado geral
+  }
+
+  const total=Object.values(reasons).reduce((a,b)=>a+b,0);
+  const sorted=Object.entries(reasons).sort((a,b)=>b[1]-a[1]);
+
+  // Tabela 1: motivos gerais
+  const tbody1=document.getElementById('p1CancBody');tbody1.innerHTML='';
+  sorted.forEach(([motivo,vol])=>{
+    const rep=total>0?(vol/total*100).toFixed(1):'0.0';
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td class="tdn">${motivo}</td><td style="text-align:right;font-variant-numeric:tabular-nums">${vol.toLocaleString('pt-BR')}</td><td style="text-align:right"><span class="pct-badge ${parseFloat(rep)>=30?'pct-lo':parseFloat(rep)>=15?'pct-md':''}" style="background:rgba(28,32,32,.06);color:var(--muted)">${rep}%</span></td>`;
+    tbody1.appendChild(tr);
+  });
+  document.getElementById('p1CancFoot').innerHTML=total>0?`<tr><td>Total</td><td style="text-align:right">${total.toLocaleString('pt-BR')}</td><td style="text-align:right">100%</td></tr>`:'';
+
+  // Tabela 2: por closer — motivo principal de cada um
+  // Reconstruímos a partir dos dados disponíveis por mês
+  // Cruzamos closers com lostReasons proporcionalmente (aproximação)
+  // Para ter exatidão seria necessário dados no nível de deal
+  // Como temos closers aggregados e reasons aggregados por mês, fazemos o merge
+  const closerMap={};
+  for(const d of data){
+    const totalPerdMes=Object.values(d.lostReasons||{}).reduce((a,b)=>a+b,0);
+    for(const[closer,cv]of Object.entries(d.closers||{})){
+      if(!cv.perdidos) continue;
+      if(!closerMap[closer]) closerMap[closer]={perdidos:0,reasons:{}};
+      closerMap[closer].perdidos+=cv.perdidos;
+      // Distribui os motivos do mês proporcionalmente aos perdidos do closer
+      if(totalPerdMes>0){
+        const frac=cv.perdidos/totalPerdMes;
+        for(const[r,rv]of Object.entries(d.lostReasons||{})){
+          const est=Math.round(rv*frac);
+          if(est>0) closerMap[closer].reasons[r]=(closerMap[closer].reasons[r]||0)+est;
+        }
+      }
+    }
+  }
+
+  const tbody2=document.getElementById('p1CancCloserBody');tbody2.innerHTML='';
+  Object.entries(closerMap)
+    .filter(([,v])=>v.perdidos>0)
+    .sort((a,b)=>b[1].perdidos-a[1].perdidos)
+    .forEach(([closer,v])=>{
+      const topReason=Object.entries(v.reasons).sort((a,b)=>b[1]-a[1])[0];
+      const motivo=topReason?topReason[0]:'—';
+      const repPct=v.perdidos>0&&topReason?(topReason[1]/v.perdidos*100).toFixed(0)+'%':'—';
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td class="tdn">${closer}</td><td style="color:var(--muted);font-size:.78rem">${motivo}</td><td style="text-align:right;font-variant-numeric:tabular-nums">${v.perdidos.toLocaleString('pt-BR')}</td><td style="text-align:right">${repPct}</td>`;
+      tbody2.appendChild(tr);
+    });
+}
+
 // ── Closer table ──────────────────────────────────────────────
 function buildCloserTable(data){
   const cm={};
@@ -527,6 +611,8 @@ function renderP1(data,pid){
   const pL=pe.map(([k])=>k),pC2=pe.map(([,v])=>v.count),pR=pe.map(([,v])=>v.revenue),pCl=pL.map((_,i)=>PAL[i%PAL.length]);
   mkDnut('p1CPV',pL,pC2,pCl,v=>v+' ganhos');mkHBarRev('p1CPR',pL,pR,pCl,v=>brlK(v));
   buildCloserTable(data);
+  buildCancTables(data);
+  document.getElementById('p1SecCanc').textContent=dn?`Motivos de Perda · ${dn}`:'Motivos de Perda';
   const tb=document.getElementById('p1TB');tb.innerHTML='';
   const z=v=>v===0?'<span class="tdz">—</span>':v.toLocaleString('pt-BR');
   data.forEach(d=>{const tr=document.createElement('tr');tr.innerHTML=`<td class="tdn">${lMes(d.month)}</td><td>${z(d.criados)}</td><td>${z(d.finalizados)}</td><td>${z(d.ganhos)}</td><td>${z(d.won)}</td><td>${z(d.perdidos)}</td><td>${d.revenue>0?brl(d.revenue):'<span class="tdz">—</span>'}</td><td>${d.avgTicket>0?brl(d.avgTicket):'<span class="tdz">—</span>'}</td><td>${d.criados>0?pct(d.conversion):'<span class="tdz">—</span>'}</td>`;tb.appendChild(tr)});
