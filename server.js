@@ -210,7 +210,7 @@ app.get('/api/report', requireAuth, async (req, res) => {
         if (deal.status === 'lost')   m.criadosPerdido++;
 
         // Closers — por data de criação
-        if (!m.closers[closerName]) m.closers[closerName] = { criados: 0, won: 0, revenue: 0, perdidos: 0 };
+        if (!m.closers[closerName]) m.closers[closerName] = { criados: 0, won: 0, revenue: 0, perdidos: 0, lostReasons: {} };
         m.closers[closerName].criados++;
         if (deal.status === 'lost') m.closers[closerName].perdidos++;
       }
@@ -231,7 +231,7 @@ app.get('/api/report', requireAuth, async (req, res) => {
         // Closers — receita por data de ganho
         const cymKey = deal.won_time.substring(0, 7);
         const cm = ensure(data[pipeId], cymKey);
-        if (!cm.closers[closerName]) cm.closers[closerName] = { criados: 0, won: 0, revenue: 0, perdidos: 0 };
+        if (!cm.closers[closerName]) cm.closers[closerName] = { criados: 0, won: 0, revenue: 0, perdidos: 0, lostReasons: {} };
         cm.closers[closerName].won++;
         cm.closers[closerName].revenue += val;
       }
@@ -248,6 +248,12 @@ app.get('/api/report', requireAuth, async (req, res) => {
         const stage = (stageId && stages[stageId]) ? stages[stageId] : 'Não informado';
         if (!m.lostStages[stage]) m.lostStages[stage] = 0;
         m.lostStages[stage]++;
+
+        // Closer × motivo — dado real, deal a deal
+        if (!m.closers[closerName]) m.closers[closerName] = { criados: 0, won: 0, revenue: 0, perdidos: 0, lostReasons: {} };
+        m.closers[closerName].perdidos++;
+        if (!m.closers[closerName].lostReasons[reason]) m.closers[closerName].lostReasons[reason] = 0;
+        m.closers[closerName].lostReasons[reason]++;
       }
     }
 
